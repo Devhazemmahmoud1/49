@@ -13,6 +13,9 @@ var usersRouter = require('./routes/users');
 var categoriesRouter = require('./routes/categories');
 var services = require('./routes/services')
 var profit = require('./routes/profits')
+var riders = require('./routes/riders')
+var customer = require('./routes/transCustomer')
+var loading = require('./routes/loading')
 
 var app = express();
 
@@ -31,6 +34,9 @@ app.use('/users', usersRouter);
 app.use('/categories', categoriesRouter)
 app.use('/services', services)
 app.use('/profit', profit)
+app.use('/ride', riders)
+app.use('/transport', customer);
+app.use('/loading', loading)
 
 // catch 404 and forward to error handler
 app.use(function(req, res, next) {

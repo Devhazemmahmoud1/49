@@ -4,7 +4,6 @@ const db = new PrismaClient();
 const moment = require('moment')
 
 /*  Get Daily/Monthly/Weekly prices according to the giving information  */
-
 let getSubCategoryPrices = async (req, res, next) => {
     const { id } = req.params
 
@@ -45,7 +44,6 @@ let getSubCategoryPrices = async (req, res, next) => {
 }
 
 /*  Make a subscription for a specific user according to the givin information  */
-
 let makeSubscriptionPayments = async (req, res, next) => {
     const { amount, Paymenttype, paymentMethod, period, isWithdrawing, paymentFactor, portion, providerPortion, subcategory_id } = req.body
     if (!amount || !paymentMethod || !period) {
@@ -606,9 +604,7 @@ let makeSubscriptionPayments = async (req, res, next) => {
 
 }
 
-
 /* This method is for charging balance for a specific user */
-
 let chargeBalance = async (req, res) => {
     const { amount, paymentMethod } = req.body
 
@@ -618,7 +614,7 @@ let chargeBalance = async (req, res) => {
                 error_en: 'Amount is not defined',
                 error_ar: 'السعر غير معروف'
             }
-        })
+        });
     }
 
     // no cashback

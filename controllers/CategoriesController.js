@@ -36,4 +36,6 @@ let getSubCats = async (req, res, next) => {
     return res.status(200).json(categories)    
 }
 
+
+
 module.exports = { getAllCategories, getSubCats }

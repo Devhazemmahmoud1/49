@@ -11,20 +11,22 @@ datasource db {
 }
 
 model Users {
-  id            Int             @id @default(autoincrement())
-  firstName     String          @db.VarChar(255)
-  lastName      String          @db.VarChar(255)
-  email         String          @db.VarChar(5000)
-  gender        Int             @default(1)
-  phone         String          @db.VarChar(255)
-  password      String          @db.VarChar(255)
-  is_locked     Int             @default(0)
-  ref_number    String          @db.VarChar(255)
+  id            Int              @id @default(autoincrement())
+  firstName     String           @db.VarChar(255)
+  lastName      String           @db.VarChar(255)
+  email         String           @db.VarChar(5000)
+  gender        Int              @default(1)
+  phone         String           @db.VarChar(255)
+  password      String           @db.VarChar(255)
+  is_locked     Int              @default(0)
+  ref_number    String           @db.VarChar(255)
   country       String?
-  created_at    DateTime        @default(now())
-  updated_at    DateTime        @updatedAt
+  created_at    DateTime         @default(now())
+  updated_at    DateTime         @updatedAt
   Wallet        Wallet?
+  Ride          ride[]
   subscriptions subscriptions[]
+  agent         ridesRequested[]
 }
 
 model Blocked_users {
@@ -211,10 +213,10 @@ model PayoutRequests {
 }
 
 model AppInfo {
-  id Int @id @default(autoincrement())
-  intrest Float 
-  created_at    DateTime @default(now())
-  updated_at    DateTime @updatedAt
+  id         Int      @id @default(autoincrement())
+  intrest    Float
+  created_at DateTime @default(now())
+  updated_at DateTime @updatedAt
 }
 
 model Profit {
@@ -223,8 +225,77 @@ model Profit {
   startBalance     Float?   @default(0)
   generatedBalance Float?   @default(0)
   intest           Int      @default(0)
-  profit           Float?   @default(0) 
+  profit           Float?   @default(0)
   total            Float?   @default(0)
   created_at       DateTime @default(now())
   updated_at       DateTime @updatedAt
+}
+
+model ride {
+  id              Int                @id @default(autoincrement())
+  user_id         Int
+  carModel        String             @db.VarChar(255)
+  distancePerKilo Decimal            @db.Decimal(9, 2)
+  isApproved      Int                @default(0)
+  user            Users              @relation(fields: [user_id], references: [id])
+  riderPhoto      ridersAttachment[]
+  created_at      DateTime           @default(now())
+  updated_at      DateTime           @updatedAt
+  requestRide     ridesRequested[]
+}
+
+model ridersAttachment {
+  id         Int      @id @default(autoincrement())
+  rideId     Int
+  url        String   @db.VarChar(255)
+  type       Int      @db.Int
+  ridePhotos ride     @relation(fields: [rideId], references: [id])
+  created_at DateTime @default(now())
+  updated_at DateTime @updatedAt
+}
+
+model ridesPendingRequests {
+  id         Int      @id @default(autoincrement())
+  client_id  Int      @db.Int
+  total      String
+  lng        String
+  lat        String
+  toLng      String
+  toLat      String
+  isTaken    Int      @default(0)
+  created_at DateTime @default(now())
+  updated_at DateTime @updatedAt
+}
+
+model ridesRequested {
+  id         Int      @id @default(autoincrement())
+  client_id  Int      @db.Int
+  rider_id   Int
+  distance   String
+  total      String
+  created_at DateTime @default(now())
+  updated_at DateTime @updatedAt
+  clientInfo Users    @relation(fields: [client_id], references: [id])
+  agentInfo  ride     @relation(fields: [rider_id], references: [user_id])
+}
+
+model loading {
+  id                Int                  @id @default(autoincrement())
+  user_id           Int
+  carModel          String
+  lng               String
+  lat               String
+  loadingAttachment loadingAttachments[]
+  created_at  DateTime @default(now())
+  updated_at  DateTime @updatedAt
+}
+
+model loadingAttachments {
+  id          Int      @id @default(autoincrement())
+  url         String
+  loading_id  Int
+  type        Int
+  created_at  DateTime @default(now())
+  updated_at  DateTime @updatedAt
+  attachments loading  @relation(fields: [loading_id], references: [id])
 }
