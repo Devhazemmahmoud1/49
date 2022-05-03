@@ -1,11 +1,9 @@
 const router = require('express').Router()
-var guard = require('../middleware/guard')
-var loading = require('../controllers/loadingController')
+const guard = require('../middleware/guard')
+const health = require('../controllers/HealthCareController')
 var multer = require('multer')
 
-/* This Router file represents loading transportation */
-
-
+/* Add a multter API FOR UPLLOADING IMAGES  */
 var store = multer.diskStorage({
     destination: (req, file, cb) => {
         cb(null, './uploads/');
@@ -29,26 +27,12 @@ var upload = multer({
     }
 });
 
-/* create a new loading agent */
-
-/* Upload attachments for a specific agent */
 /* Uploading Images using Multter Package */
-router.post('/upload-loading-attahcments' ,upload.array('attachments', 12), (req, res, next) => {
+router.post('/upload-resturant-attahcments' ,upload.array('attachment', 12), (req, res, next) => {
     res.status(200).json(req.files)
 });
 
-/* Create a new loading */
-router.post('/make-loading', guard, loading.makeNewLoading)
-
-/* Make a transport request */
-router.post('/make-request', guard, loading.createNewLoadingRequest)
-
-/* Upload images for this shipment */
-router.post('/upload-shipment',upload.array('attachments', 12), (req, res, next) => {
-    res.status(200).json(req.files)
-});
-
-/* Notifiction is required to send the pending requests to the other agents */
-//router.get('');
+/*  HealthCare API goes here  */
+router.post('/create-healthcare', guard, health.createNewDoctorHost);
 
 module.exports = router

@@ -5,6 +5,7 @@ var cookieParser = require('cookie-parser');
 var logger = require('morgan');
 const { PrismaClient } = require('@prisma/client');
 const db = new PrismaClient();
+var io = require('socket.io')(3001), socket = []
 
 var cronJob = require('./controllers/cronJobController')
 
@@ -16,6 +17,9 @@ var profit = require('./routes/profits')
 var riders = require('./routes/riders')
 var customer = require('./routes/transCustomer')
 var loading = require('./routes/loading')
+var resturants = require('./routes/resturants')
+var health = require('./routes/Health')
+var ads = require('./routes/ads')
 
 var app = express();
 
@@ -37,6 +41,9 @@ app.use('/profit', profit)
 app.use('/ride', riders)
 app.use('/transport', customer);
 app.use('/loading', loading)
+app.use('/resturants', resturants)
+app.use('/health', health)
+app.use('/ads', ads)
 
 // catch 404 and forward to error handler
 app.use(function(req, res, next) {

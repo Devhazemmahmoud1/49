@@ -343,7 +343,7 @@ let changePassword = async (req, res, next) => {
     }
 
     let newpassword = hash.hashSync(newPassword, 10);
-
+    
     await db.users.update({
         where: {
             id: req.user.id
@@ -358,6 +358,5 @@ let changePassword = async (req, res, next) => {
         "message_ar": "تم تغيير كلمه السر بنجاح",
     })
 }
-
 
 module.exports = { register , login, changePassword }

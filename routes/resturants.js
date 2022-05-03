@@ -1,11 +1,9 @@
 const router = require('express').Router()
-var guard = require('../middleware/guard')
-var loading = require('../controllers/loadingController')
+const guard = require('../middleware/guard')
+const rest = require('../controllers/resturantsController')
 var multer = require('multer')
 
-/* This Router file represents loading transportation */
-
-
+/* Add a multter API FOR UPLLOADING IMAGES  */
 var store = multer.diskStorage({
     destination: (req, file, cb) => {
         cb(null, './uploads/');
@@ -29,26 +27,23 @@ var upload = multer({
     }
 });
 
-/* create a new loading agent */
-
-/* Upload attachments for a specific agent */
 /* Uploading Images using Multter Package */
-router.post('/upload-loading-attahcments' ,upload.array('attachments', 12), (req, res, next) => {
+router.post('/upload-resturant-attahcments' ,upload.array('attachment', 12), (req, res, next) => {
     res.status(200).json(req.files)
 });
 
-/* Create a new loading */
-router.post('/make-loading', guard, loading.makeNewLoading)
-
-/* Make a transport request */
-router.post('/make-request', guard, loading.createNewLoadingRequest)
-
-/* Upload images for this shipment */
-router.post('/upload-shipment',upload.array('attachments', 12), (req, res, next) => {
+/* Uploading Images using Multter Package */
+router.post('/upload-resturant-meal-attachments' ,upload.array('attachment', 12), (req, res, next) => {
     res.status(200).json(req.files)
 });
 
-/* Notifiction is required to send the pending requests to the other agents */
-//router.get('');
+/* Here goes resturants APIS */
+router.post('/create-rest', guard, rest.createResturant)
+
+/* Create MainCategories for a specific resturant */
+router.post('/create-maincategory', guard, rest.createMainCategories)
+
+/* Create a new Meal for a specific category of  resturant */
+router.post('/create-meal', guard, rest.createMealForResturant)
 
 module.exports = router

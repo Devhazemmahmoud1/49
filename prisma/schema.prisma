@@ -7,8 +7,8 @@ generator client {
 
 datasource db {
   provider = "mysql"
-  //url      = "mysql://root:root@localhost:3306/fourtynine?schema=public"
-  url      = "mysql://49hub1:Database49hub@64.225.101.68:3306/fourtynine?schema=public"
+  url      = "mysql://root:root@localhost:3306/fourtynine?schema=public"
+  //url      = "mysql://49hub1:Database49hub@64.225.101.68:3306/fourtynine?schema=public"
 }
 
 model Users {
@@ -28,6 +28,7 @@ model Users {
   Ride          ride[]
   subscriptions subscriptions[]
   agent         ridesRequested[]
+  ads           Advertisment[]
 }
 
 model Blocked_users {
@@ -63,6 +64,8 @@ model SubCategories {
   updated_at      DateTime                 @updatedAt
   Categories      MainCategories           @relation(fields: [parent], references: [id])
   photo           SubCategoryAttachments[]
+  props           subCategoryProperties[]
+  ads             Advertisment[]
 }
 
 model MainCategoryAttachments {
@@ -238,6 +241,7 @@ model ride {
   carModel        String             @db.VarChar(255)
   distancePerKilo Decimal            @db.Decimal(9, 2)
   isApproved      Int                @default(0)
+  category_id     Int                @default(0)
   user            Users              @relation(fields: [user_id], references: [id])
   riderPhoto      ridersAttachment[]
   created_at      DateTime           @default(now())
@@ -286,9 +290,11 @@ model loading {
   carModel          String
   lng               String
   lat               String
+  hashCode          String
+  category_id       Int
   loadingAttachment loadingAttachments[]
-  created_at  DateTime @default(now())
-  updated_at  DateTime @updatedAt
+  created_at        DateTime             @default(now())
+  updated_at        DateTime             @updatedAt
 }
 
 model loadingAttachments {
@@ -300,3 +306,209 @@ model loadingAttachments {
   updated_at  DateTime @updatedAt
   attachments loading  @relation(fields: [loading_id], references: [id])
 }
+
+model loadingRequests {
+  id         Int                         @id @default(autoincrement())
+  client_id  Int
+  hash       String
+  fromLng    String
+  fromLat    String
+  toLng      String
+  toLat      String
+  date       String
+  created_at DateTime                    @default(now())
+  updated_at DateTime                    @updatedAt
+  photos     loadingShippingAttachment[]
+}
+
+model loadingShippingAttachment {
+  id          Int             @id @default(autoincrement())
+  request_id  Int
+  url         String
+  created_at  DateTime        @default(now())
+  updated_at  DateTime        @updatedAt
+  attachments loadingRequests @relation(fields: [request_id], references: [id])
+}
+
+model resturants {
+  id                   Int                         @id @default(autoincrement())
+  name                 String
+  lng                  String
+  lat                  String
+  workFrom_en          String
+  workFrom_ar          String
+  workTo_en            String
+  workTo_ar            String
+  contant_number       String?
+  category_id          Int
+  created_at           DateTime                    @default(now())
+  updated_at           DateTime                    @updatedAt
+  workingDays          restWorkingDays[]
+  resturantAttachments resturantAttachments[]
+  resturantCategory    resturantMainCategoryMenu[]
+}
+
+model restWorkingDays {
+  id           Int        @id @default(autoincrement())
+  day_en       String
+  day_ar       String
+  resturant_id Int
+  created_at   DateTime   @default(now())
+  updated_at   DateTime   @updatedAt
+  workingDays  resturants @relation(fields: [resturant_id], references: [id])
+}
+
+model resturantAttachments {
+  id           Int        @id @default(autoincrement())
+  url          String
+  resturant_id Int
+  resturant    resturants @relation(fields: [resturant_id], references: [id])
+  created_at   DateTime   @default(now())
+  updated_at   DateTime   @updatedAt
+}
+
+model resturantMainCategoryMenu {
+  id           Int                             @id @default(autoincrement())
+  name         String
+  resturant_id Int
+  created_at   DateTime                        @default(now())
+  update_at    DateTime                        @updatedAt
+  resutantMenu resturantSpecificCategoryMeal[]
+  resturant    resturants                      @relation(fields: [resturant_id], references: [id])
+}
+
+model resturantSpecificCategoryMeal {
+  id             Int                       @id @default(autoincrement())
+  mainCategoryId Int
+  name           String
+  description    String                    @db.LongText
+  price          String
+  url            String
+  created_at     DateTime                  @default(now())
+  updated_at     DateTime                  @updatedAt
+  subCategory    resturantMainCategoryMenu @relation(fields: [mainCategoryId], references: [id])
+}
+
+model HealthCare {
+  id             Int                     @id @default(autoincrement())
+  contact_number String?
+  specification  String
+  lng            String
+  lat            String
+  workFrom       String
+  workTo         String
+  price          String
+  category_id    Int
+  waitingPeriod  String?
+  workingDays    DocWorkingDays[]
+  attachments    HealthCareAttachments[]
+}
+
+model HealthCareAttachments {
+  id         Int        @id @default(autoincrement())
+  health_id  Int
+  url        String
+  type       Int
+  created_at DateTime   @default(now())
+  updated_at DateTime   @updatedAt
+  HealthCare HealthCare @relation(fields: [health_id], references: [id])
+}
+
+model DocWorkingDays {
+  id          Int        @id @default(autoincrement())
+  day_en      String
+  day_ar      String
+  doc_id      Int
+  created_at  DateTime   @default(now())
+  updated_at  DateTime   @updatedAt
+  workingDays HealthCare @relation(fields: [doc_id], references: [id])
+}
+
+model Advertisment {
+  id              Int              @id @default(autoincrement())
+  title           String           @db.VarChar(255)
+  desc            String           @db.LongText
+  mainCategory_id Int
+  subCategory_id  Int
+  user_id         Int
+  created_at      DateTime         @default(now())
+  updated_at      DateTime         @updatedAt
+  user            Users            @relation(fields: [user_id], references: [id])
+  sub             SubCategories    @relation(fields: [subCategory_id], references: [id])
+  attachments     AdsAttachments[]
+  values          userPropValues[]
+}
+
+model AdsAttachments {
+  id          Int          @id @default(autoincrement())
+  url         String
+  ad_id       Int
+  created_at  DateTime     @default(now())
+  updated_at  DateTime     @updatedAt
+  attachments Advertisment @relation(fields: [ad_id], references: [id])
+}
+
+model subCategoryProperties {
+  id          Int             @id @default(autoincrement())
+  prop_en     String
+  prop_ar     String
+  category_id Int
+  created_at  DateTime        @default(now())
+  updated_at  DateTime        @updatedAt
+  subCategory SubCategories   @relation(fields: [category_id], references: [id])
+  propValues  userPropValues?
+}
+
+model userPropValues {
+  id                     Int                   @id @default(autoincrement())
+  subCategory_id         Int
+  subCategoryProperty_id Int                   @unique
+  value                  String
+  ad_id                  Int
+  created_at             DateTime              @default(now())
+  updated_at             DateTime              @updatedAt
+  Subprops               subCategoryProperties @relation(fields: [subCategoryProperty_id], references: [id])
+  ad                     Advertisment          @relation(fields: [ad_id], references: [id])
+}
+
+
+model socialUsers {
+  id Int @id @default(autoincrement())
+  name String
+  gender Int
+  created_at DateTime @default(now())
+  updated_at DateTime @updatedAt
+  Posts Posts[]
+}
+
+model Posts {
+  id Int @id @default(autoincrement())
+  post_content String @db.LongText
+  user_id Int 
+  User socialUsers @relation(fields: [user_id], references: [id])
+  created_at DateTime @default(now())
+  updated_at DateTime @updatedAt
+  comments Comments[]
+  likes    PostLikes[]
+}
+
+model Comments {
+  id Int @id @default(autoincrement())
+  user_id Int
+  post_id Int
+  comment String  @db.LongText
+  created_at DateTime @default(now())
+  updated_at DateTime @updatedAt
+  post Posts @relation(fields: [post_id], references: [id])
+}
+
+model PostLikes {
+  id Int @id @default(autoincrement())
+  user_id Int
+  post_id Int
+  created_at DateTime @default(now())
+  updated_at DateTime @updatedAt 
+  post Posts @relation(fields: [post_id], references: [id]) 
+}
+
+

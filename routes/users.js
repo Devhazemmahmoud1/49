@@ -12,21 +12,17 @@ router.get('/', function(req, res, next) {
   res.send('respond with a resource');
 });
 
-/* Registration route  */
-
+/* Registration ٍٍٍٍoute  */
 router.post('/register', auth.register);
 
 /*  Login Route  */
-
 router.post('/login', auth.login);
 
 /*  Change password Route  */
-
 router.post('/change-password', guard, auth.changePassword);
 
 /*  Reset password Route  */
-
-//router.post('/password-reset', auth.resetPassword);
+//crouter.post('/password-reset', auth.resetPassword);
 
 /*  Send verfication code for email Route  */
 

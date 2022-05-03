@@ -5,7 +5,7 @@ const moment = require('moment')
 
 /* Add a new Rider according to the giving informaiton */
 var addRider = async (request, response) => {
-    const { carModel , pricePerDistance, attachments} = request.body
+    const { carModel , pricePerDistance, attachments, category_id} = request.body
 
     if (!carModel || !pricePerDistance || pricePerDistance == 0) {
         return response.status(403).json({
@@ -35,7 +35,8 @@ var addRider = async (request, response) => {
         data: {
             user_id: request.user.id,
             distancePerKilo:  parseInt(pricePerDistance),
-            carModel: carModel.toString(), 
+            carModel: carModel.toString(),
+            category_id: parseInt(category_id), 
         }
     });
 
