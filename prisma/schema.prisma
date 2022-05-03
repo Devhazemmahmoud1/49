@@ -21,6 +21,8 @@ model Users {
   password      String           @db.VarChar(255)
   is_locked     Int              @default(0)
   ref_number    String           @db.VarChar(255)
+  device_id     String?           @db.VarChar(100)
+  fcm           String?          @db.VarChar(300)
   country       String?
   created_at    DateTime         @default(now())
   updated_at    DateTime         @updatedAt
@@ -28,7 +30,7 @@ model Users {
   Ride          ride[]
   subscriptions subscriptions[]
   agent         ridesRequested[]
-  ads           Advertisment[]
+  ads           Advertisment[]  
 }
 
 model Blocked_users {
@@ -471,44 +473,5 @@ model userPropValues {
   ad                     Advertisment          @relation(fields: [ad_id], references: [id])
 }
 
-
-model socialUsers {
-  id Int @id @default(autoincrement())
-  name String
-  gender Int
-  created_at DateTime @default(now())
-  updated_at DateTime @updatedAt
-  Posts Posts[]
-}
-
-model Posts {
-  id Int @id @default(autoincrement())
-  post_content String @db.LongText
-  user_id Int 
-  User socialUsers @relation(fields: [user_id], references: [id])
-  created_at DateTime @default(now())
-  updated_at DateTime @updatedAt
-  comments Comments[]
-  likes    PostLikes[]
-}
-
-model Comments {
-  id Int @id @default(autoincrement())
-  user_id Int
-  post_id Int
-  comment String  @db.LongText
-  created_at DateTime @default(now())
-  updated_at DateTime @updatedAt
-  post Posts @relation(fields: [post_id], references: [id])
-}
-
-model PostLikes {
-  id Int @id @default(autoincrement())
-  user_id Int
-  post_id Int
-  created_at DateTime @default(now())
-  updated_at DateTime @updatedAt 
-  post Posts @relation(fields: [post_id], references: [id]) 
-}
 
 

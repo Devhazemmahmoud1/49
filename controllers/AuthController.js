@@ -10,7 +10,7 @@ const hash = require('bcrypt')
 /* Register Method  */
 
 let register = async (req, res, next) => {
-    const { firstName, lastName , password, passwordConfirmation, gender , refNumber, phone, email, country  } = req.body
+    const { firstName, lastName , password, passwordConfirmation, gender , refNumber, phone, email, country, fcm, device_id } = req.body
 
     // check if the body is empty for username and password otherwise procced 
     if (!password || !firstName || !lastName || !passwordConfirmation || !phone || !email || !gender) {
@@ -20,6 +20,10 @@ let register = async (req, res, next) => {
                 error_en: 'Please fill out all the fields avaliable'
             }
         });
+    }
+
+    if (!fcm || !device_id) {
+        return res.status(403).send('FCM TOKEN AND DEVICE ID ARE REQUIRED');        
     }
 
     // validate the password
@@ -98,7 +102,9 @@ let register = async (req, res, next) => {
             is_locked: 0,
             gender: gender ?? 0,
             ref_number: refNumber ?? '',
-            country: country
+            country: country,
+            fcm: fcm,
+            device_id: device_id
         }
     });
 
@@ -191,7 +197,7 @@ let register = async (req, res, next) => {
 /* login Method using your credintionals  */
 
 let login = async (req, res, next) => {
-    const { email , phone , password } = req.body
+    const { email , phone , password , fcm, device_id} = req.body
 
     // check if the body is empty for username and password otherwise procced 
     if (!email && !phone) {
@@ -235,6 +241,17 @@ let login = async (req, res, next) => {
             gender: true,
         }
     });
+
+    // update fcm token and device ID
+    await db.users.update({
+        where: {
+            id: checkUser.id
+        }, 
+        data: {
+            fcm: fcm,
+            device_id: device_id
+        }
+    })
     
     // check if the user exists
     if (!checkUser) {
