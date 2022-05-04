@@ -7,8 +7,8 @@ generator client {
 
 datasource db {
   provider = "mysql"
-  //url      = "mysql://root:root@localhost:3306/fourtynine?schema=public"
-  url      = "mysql://49hub1:Database49hub@64.225.101.68:3306/fourtynine?schema=public"
+  url      = "mysql://root:root@localhost:3306/fourtynine?schema=public"
+  //url      = "mysql://49hub1:Database49hub@64.225.101.68:3306/fourtynine?schema=public"
 }
 
 model Users {
@@ -16,21 +16,21 @@ model Users {
   firstName     String           @db.VarChar(255)
   lastName      String           @db.VarChar(255)
   email         String           @db.VarChar(5000)
-  gender        Int              @default(1)
   phone         String           @db.VarChar(255)
   password      String           @db.VarChar(255)
   is_locked     Int              @default(0)
   ref_number    String           @db.VarChar(255)
-  device_id     String?           @db.VarChar(100)
+  device_id     String?          @db.VarChar(100)
   fcm           String?          @db.VarChar(300)
-  country       String?
   created_at    DateTime         @default(now())
   updated_at    DateTime         @updatedAt
   Wallet        Wallet?
   Ride          ride[]
   subscriptions subscriptions[]
   agent         ridesRequested[]
-  ads           Advertisment[]  
+  ads           Advertisment[]
+  userSettings  userSettings[]
+  userPrivacy   userPrivacy[]
 }
 
 model Blocked_users {
@@ -433,12 +433,14 @@ model Advertisment {
   mainCategory_id Int
   subCategory_id  Int
   user_id         Int
+  is_pending      Int              @default(0)
   created_at      DateTime         @default(now())
   updated_at      DateTime         @updatedAt
   user            Users            @relation(fields: [user_id], references: [id])
   sub             SubCategories    @relation(fields: [subCategory_id], references: [id])
   attachments     AdsAttachments[]
   values          userPropValues[]
+  favo            favorates[]
 }
 
 model AdsAttachments {
@@ -473,5 +475,48 @@ model userPropValues {
   ad                     Advertisment          @relation(fields: [ad_id], references: [id])
 }
 
+model favorates {
+  id         Int          @id @default(autoincrement())
+  ad_id      Int
+  user_id    Int
+  created_at DateTime     @default(now())
+  updated_at DateTime     @updatedAt
+  ads        Advertisment @relation(fields: [ad_id], references: [id])
+}
 
+// model customAds {
+//   id Int @id @default(autoincrement())
+//   package
+// }
 
+model userSettings {
+  id             Int      @id @default(autoincrement())
+  user_id        Int
+  settingName_ar String?
+  settingName_en String?
+  value          String?
+  status         Int
+  created_at     DateTime @default(now())
+  updated_at     DateTime @updatedAt
+  user           Users    @relation(fields: [user_id], references: [id])
+}
+
+model userPrivacy {
+  id             Int      @id @default(autoincrement())
+  user_id        Int
+  settingName_ar String?
+  settingName_en String?
+  status         Int
+  type           Int
+  created_at     DateTime @default(now())
+  updated_at     DateTime @updatedAt
+  user           Users    @relation(fields: [user_id], references: [id])
+}
+
+// country       String?
+// birthDate     DateTime         @default(now())
+// status        String?
+// job           String?
+// city          String?
+// address       String           @db.Text
+//  gender        Int              @default(1)

@@ -5,10 +5,10 @@ var cookieParser = require('cookie-parser');
 var logger = require('morgan');
 const { PrismaClient } = require('@prisma/client');
 const db = new PrismaClient();
-var io = require('socket.io')(3001), socket = []
+var socketio = require("socket.io");
 
 var cronJob = require('./controllers/cronJobController')
-
+var socket = require('./controllers/socketController')
 var indexRouter = require('./routes/index');
 var usersRouter = require('./routes/users');
 var categoriesRouter = require('./routes/categories');
@@ -20,8 +20,28 @@ var loading = require('./routes/loading')
 var resturants = require('./routes/resturants')
 var health = require('./routes/Health')
 var ads = require('./routes/ads')
+var so = require('./routes/socketHandler')
+var settings = require('./routes/setting')
 
 var app = express();
+
+// Create the http server
+const server = require('http').createServer(app);
+  
+// Create the Socket IO server on 
+// the top of http server
+const io = socketio(server, {
+  cors: {
+    origin: "http://localhost:8888",
+    methods: ["GET", "POST"]
+  }
+});
+
+app.use((req, res, next) => {
+  req.io = io;
+  return next();
+}); 
+
 
 // view engine setup
 app.set('views', path.join(__dirname, 'views'));
@@ -44,12 +64,13 @@ app.use('/loading', loading)
 app.use('/resturants', resturants)
 app.use('/health', health)
 app.use('/ads', ads)
+app.use('/socket', so)
+app.use('/setting', settings);
 
 // catch 404 and forward to error handler
 app.use(function(req, res, next) {
   next(createError(404));
 });
-
 // error handler
 app.use(function(err, req, res, next) {
   // set locals, only providing error in development
@@ -61,4 +82,18 @@ app.use(function(err, req, res, next) {
   res.render('error');
 });
 
-module.exports = app;
+ var sockets = []
+
+io.on('connection', (socket) => {
+  sockets.push({
+    socket_id: socket.id,
+    user_id: 10,
+  })
+  console.log(socket.id + ' Has connected to the channel')
+
+  socket.on('disconnect', () => {
+    console.log(socket.id + ' is out from here')
+  })
+})
+
+module.exports = { app, server };

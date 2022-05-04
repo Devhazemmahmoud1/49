@@ -10,7 +10,7 @@ const hash = require('bcrypt')
 /* Register Method  */
 
 let register = async (req, res, next) => {
-    const { firstName, lastName , password, passwordConfirmation, gender , refNumber, phone, email, country, fcm, device_id } = req.body
+    const { firstName, lastName, password, passwordConfirmation, gender, refNumber, phone, email, country, fcm, device_id } = req.body
 
     // check if the body is empty for username and password otherwise procced 
     if (!password || !firstName || !lastName || !passwordConfirmation || !phone || !email || !gender) {
@@ -23,7 +23,7 @@ let register = async (req, res, next) => {
     }
 
     if (!fcm || !device_id) {
-        return res.status(403).send('FCM TOKEN AND DEVICE ID ARE REQUIRED');        
+        return res.status(403).send('FCM TOKEN AND DEVICE ID ARE REQUIRED');
     }
 
     // validate the password
@@ -58,7 +58,7 @@ let register = async (req, res, next) => {
     let checkUser = await db.users.findFirst({
         where: {
             phone: phone,
-        }, 
+        },
         select: {
             phone: true,
             id: true
@@ -100,9 +100,9 @@ let register = async (req, res, next) => {
             email: email,
             lastName: lastName,
             is_locked: 0,
-            gender: gender ?? 0,
+            //gender: gender ?? 0,
             ref_number: refNumber ?? '',
-            country: country,
+            //country: country,
             fcm: fcm,
             device_id: device_id
         }
@@ -161,6 +161,179 @@ let register = async (req, res, next) => {
             }
         }); */
 
+        // add new Settings to this user
+        await db.userSettings.createMany({
+            data: [
+                {
+                    user_id: create.id,
+                    settingName_ar: ' البلد',
+                    settingName_en: 'Country',
+                    value: country,
+                    status: 0,
+                },                
+                {
+                    user_id: create.id,
+                    settingName_ar: 'البريد الالكتروني',
+                    settingName_en: 'Email address',
+                    value: email,
+                    status: 0,
+                },                
+                {
+                    user_id: create.id,
+                    settingName_ar: 'رقم الهاتف',
+                    settingName_en: 'Phone number',
+                    value: phone,
+                    status: 0,
+                },
+                {
+                    user_id: create.id,
+                    settingName_ar: 'تاريخ الميلاد',
+                    settingName_en: 'Birth Date',
+                    value: '',
+                    status: 0,
+                },
+                {
+                    user_id: create.id,
+                    settingName_ar: 'الحاله الاجتماعيه',
+                    settingName_en: 'Social status',
+                    value: '',
+                    status: 0,
+                },
+                {
+                    user_id: create.id,
+                    settingName_ar: 'الوظيفه',
+                    settingName_en: 'Job',
+                    value: '',
+                    status: 0,
+                },
+                {
+                    user_id: create.id,
+                    settingName_ar: 'المدينه',
+                    settingName_en: 'City',
+                    value: '',
+                    status: 0,
+                },
+                // {
+                //     user_id: create.id,
+                //     settingName_ar: 'العنوان',
+                //     settingName_en: 'Address',
+                //     value: '',
+                //     status: 0,
+                // },
+                {
+                    user_id: create.id,
+                    settingName_ar: 'النوع',
+                    settingName_en: 'Gender',
+                    value: '',
+                    status: 0,
+                },
+            ]
+        })
+
+        // create a new Privacy for the giving user
+
+        await db.userPrivacy.createMany({
+            data: [
+                {
+                    user_id: create.id,
+                    settingName_ar: 'استقبال رسايل',
+                    settingName_en: 'Recieve messages',
+                    type:  0,
+                    status: 0,
+                },
+                {
+                    user_id: create.id,
+                    settingName_ar: 'اخر ظهور',
+                    settingName_en: 'Last seen',
+                    type: 0,
+                    status: 0,
+                },
+                {
+                    user_id: create.id,
+                    settingName_ar: 'ظهور قرا،ه الرساله',
+                    settingName_en: 'Read messages',
+                    type: 0,
+                    status: 0,
+                },
+                {
+                    user_id: create.id,
+                    settingName_ar: 'ظهور بيانات شخصيه',
+                    settingName_en: 'Personal information',
+                    type: 0,
+                    status: 0,
+                },
+                {
+                    user_id: create.id,
+                    settingName_ar: 'ظهور الصوره الشخصيه',
+                    settingName_en: 'Profile Picture',
+                    type: 0,
+                    status: 0,
+                },
+                {
+                    user_id: create.id,
+                    settingName_ar: 'الصور الشخصيه',
+                    settingName_en: 'Photos',
+                    type: 0,
+                    status: 0,
+                },
+                {
+                    user_id: create.id,
+                    settingName_ar: 'ظهور منشورات',
+                    settingName_en: 'Posts',
+                    type: 0,
+                    status: 0,
+                },
+                {
+                    user_id: create.id,
+                    settingName_ar: 'ظهور قصص',
+                    settingName_en: 'Stories',
+                    type: 0,
+                    status: 0,
+                },
+                {
+                    user_id: create.id,
+                    settingName_ar: 'ظهور قايمه الاصدقا،',
+                    settingName_en: 'Friend list',
+                    type: 0,
+                    status: 0,
+                },
+                {
+                    user_id: create.id,
+                    settingName_ar: 'ظهور قايمه المتابعيين',
+                    settingName_en: 'Followers list',
+                    type: 0,
+                    status: 0,
+                },
+                {
+                    user_id: create.id,
+                    settingName_ar: 'ظهور نشاطيه',
+                    settingName_en: 'Activity',
+                    type: 0,
+                    status: 0,
+                },
+                {
+                    user_id: create.id,
+                    settingName_ar: 'ظهور عشوايي',
+                    settingName_en: 'Random appearance',
+                    type: 0,
+                    status: 0,
+                },
+                {
+                    user_id: create.id,
+                    settingName_ar: 'طلبات الصداقه',
+                    settingName_en: 'Friend requests',
+                    type: 1,
+                    status: 0,
+                },
+                {
+                    user_id: create.id,
+                    settingName_ar: 'طلبات المتابعه',
+                    settingName_en: 'Follow requests',
+                    type: 1,
+                    status: 0,
+                },
+            ]            
+        })
 
         // create a new wallet instance for this user
 
@@ -178,7 +351,7 @@ let register = async (req, res, next) => {
                 FiveYears: "0",
             }
         })
-        
+
         // Create a new profit profile for this user
 
         await db.profit.create({
@@ -197,7 +370,7 @@ let register = async (req, res, next) => {
 /* login Method using your credintionals  */
 
 let login = async (req, res, next) => {
-    const { email , phone , password , fcm, device_id} = req.body
+    const { email, phone, password, fcm, device_id } = req.body
 
     // check if the body is empty for username and password otherwise procced 
     if (!email && !phone) {
@@ -215,7 +388,7 @@ let login = async (req, res, next) => {
                 error_ar: 'كلمه المرور غير صحيحه',
                 error_en: 'Password is not correct'
             }
-        });      
+        });
     }
 
     // validate the user
@@ -238,30 +411,30 @@ let login = async (req, res, next) => {
             lastName: true,
             is_locked: true,
             password: true,
-            gender: true,
+            //gender: true,
         }
     });
 
-    // update fcm token and device ID
-    await db.users.update({
-        where: {
-            id: checkUser.id
-        }, 
-        data: {
-            fcm: fcm,
-            device_id: device_id
-        }
-    })
-    
-    // check if the user exists
-    if (!checkUser) {
+     // check if the user exists
+     if (!checkUser) {
         return res.status(401).json({
             error: {
                 error_ar: "المستخدم غير موجود",
                 error_en: "User not found"
             }
         })
-    }
+    }   
+
+    // update fcm token and device ID
+    await db.users.update({
+        where: {
+            id: checkUser.id
+        },
+        data: {
+            fcm: fcm,
+            device_id: device_id
+        }
+    })
 
     // validate the password 
     if (password) {
@@ -326,7 +499,7 @@ let getToken = async (req, res, create) => {
 }
 
 let changePassword = async (req, res, next) => {
-    const { oldPassword , newPassword , newPasswordConfirmation } = req.body
+    const { oldPassword, newPassword, newPasswordConfirmation } = req.body
 
     if (!oldPassword || !newPassword || !newPasswordConfirmation) {
         return res.status(403).json({
@@ -345,7 +518,7 @@ let changePassword = async (req, res, next) => {
             password: true
         }
     })
-    
+
     let validPassword = hash.compareSync(oldPassword, user.password)
 
     if (!validPassword) {
@@ -360,7 +533,7 @@ let changePassword = async (req, res, next) => {
     }
 
     let newpassword = hash.hashSync(newPassword, 10);
-    
+
     await db.users.update({
         where: {
             id: req.user.id
@@ -376,4 +549,43 @@ let changePassword = async (req, res, next) => {
     })
 }
 
-module.exports = { register , login, changePassword }
+let  resetPassword = async (req, res) => {
+    const { newPassword, passwordConfirmation } = req.body
+
+    if (! newPassword || ! passwordConfirmation) {
+        return res.status(403).json({
+            error: {
+                error_ar: 'كلمه السر مطلوبه.',
+                error_en: 'Passwords are required.'
+            }
+        });
+    }
+
+    if (newPassword !== passwordConfirmation) {
+        return res.status(403).json({
+            error: {
+                error_en: 'Passwords do not match.',
+                error_ar: 'كلمه السر غير صحيحه',
+            }
+        })
+    }
+
+    await db.users.update({
+        where: {
+            id: req.user.id
+        },
+        data: {
+            password: hash.hashSync(newPassword, 10)
+        }
+    })
+
+    return res.status(403).json({
+        success: {
+            success_ar: 'تم استعاده كلمه السر.',
+            success_en: 'Password has been updated.'
+        }
+    });
+    
+}
+
+module.exports = { register, login, changePassword, resetPassword }

@@ -22,7 +22,7 @@ router.post('/login', auth.login);
 router.post('/change-password', guard, auth.changePassword);
 
 /*  Reset password Route  */
-//crouter.post('/password-reset', auth.resetPassword);
+router.post('/password-reset', guard, auth.resetPassword);
 
 /*  Send verfication code for email Route  */
 

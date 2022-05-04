@@ -41,5 +41,14 @@ router.get('/props/:id', ads.getProperties);
 router.get('/single/:id', ads.getAd)
 
 /* Create a new ad */
+router.post('/create-ad', guard, ads.createNewAd)
+
+/* Edit a specific ad */
+
+/* add a specific ad to favo list */
+router.post('/add-favo', guard, ads.addFavo)
+
+/* remove a specific ad from favo list */
+router.delete('/remove-favo', guard, ads.removeFavo)
 
 module.exports = router
