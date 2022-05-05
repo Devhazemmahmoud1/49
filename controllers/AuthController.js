@@ -373,7 +373,7 @@ let login = async (req, res, next) => {
     const { cred, password, fcm, device_id } = req.body
 
     // check if the body is empty for username and password otherwise procced 
-    if (!email && !phone) {
+    if (!cred) {
         return res.status(403).json({
             error: {
                 error_ar: 'اسم المستخدم مطلوب',
