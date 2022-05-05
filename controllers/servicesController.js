@@ -928,7 +928,7 @@ let transferTo = async (req, res) => {
 
     let newBalance = (parseInt(checkWallet.balance)) - parseInt(newamount)
 
-    let newStartBalance = parseInt(req.user.Wallet.startBalance) - 2
+    //let newStartBalance = parseInt(req.user.Wallet.startBalance) - 2
 
     await db.wallet.update({
         where: {
@@ -936,13 +936,13 @@ let transferTo = async (req, res) => {
         },
         data: {
             balance: "" + newBalance + "",
-            startBalance: "" + newStartBalance + ""
+            //startBalance: "" + newStartBalance + ""
         }
     })
 
     let newAmount = parseInt(checkPhone.Wallet.balance) + parseInt(amount)
 
-    let newStartBalanceuser = parseInt(checkPhone.Wallet.startBalance) + parseInt(amount)
+    //let newStartBalanceuser = parseInt(checkPhone.Wallet.startBalance) + parseInt(amount)
 
     await db.wallet.update({
         where: {
@@ -950,7 +950,7 @@ let transferTo = async (req, res) => {
         },
         data: {
             balance: "" + newAmount + "",
-            startBalance: "" + newStartBalanceuser + ""
+            //startBalance: "" + newStartBalanceuser + ""
         }
     })
 

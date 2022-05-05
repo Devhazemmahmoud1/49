@@ -370,7 +370,7 @@ let register = async (req, res, next) => {
 /* login Method using your credintionals  */
 
 let login = async (req, res, next) => {
-    const { email, phone, password, fcm, device_id } = req.body
+    const { cred, password, fcm, device_id } = req.body
 
     // check if the body is empty for username and password otherwise procced 
     if (!email && !phone) {
@@ -396,10 +396,10 @@ let login = async (req, res, next) => {
         where: {
             OR: [
                 {
-                    phone: phone ?? undefined,
+                    phone: cred ?? undefined,
                 },
                 {
-                    email: email ?? undefined
+                    email: cred ?? undefined
                 }
             ]
         },
