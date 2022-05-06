@@ -4,7 +4,6 @@ const { PrismaClient } = require('@prisma/client');
 const db = new PrismaClient();
 
 /* Make a new loading according to the giving informarion */
-
 let makeNewLoading = async (req, res) => {
     const { carModel, lng, lat , category_id} = req.body
 
@@ -67,7 +66,7 @@ let makeNewLoading = async (req, res) => {
     })
 }
 
-
+/* Create a new loading request */
 let createNewLoadingRequest = async (request, response) => {
     const { checkPointLng, checkPointLat, deliverPointLng, deliverPointLat, date, description, price, attachment } = req.body
 

@@ -10,7 +10,7 @@ const { initializeApp } = require('firebase-admin/app');
 
 
 
-initializeApp({
+/*initializeApp({
   credential: applicationDefault(),
   databaseURL: '',
   "type": "service_account",
@@ -23,7 +23,7 @@ initializeApp({
   "token_uri": "https://oauth2.googleapis.com/token",
   "auth_provider_x509_cert_url": "https://www.googleapis.com/oauth2/v1/certs",
   "client_x509_cert_url": "https://www.googleapis.com/robot/v1/metadata/x509/firebase-adminsdk-u6af4%40fortynine-f60ad.iam.gserviceaccount.com"
-});
+}); */
 
 
 var cronJob = require('./controllers/cronJobController')
@@ -41,6 +41,7 @@ var health = require('./routes/Health')
 var ads = require('./routes/ads')
 var so = require('./routes/socketHandler')
 var settings = require('./routes/setting')
+var socialProfile = require('./routes/socialMediaRoutes/profile')
 
 var app = express();
 
@@ -85,6 +86,7 @@ app.use('/health', health)
 app.use('/ads', ads)
 app.use('/socket', so)
 app.use('/setting', settings);
+app.use('/social/profile', socialProfile)
 
 // catch 404 and forward to error handler
 app.use(function(req, res, next) {

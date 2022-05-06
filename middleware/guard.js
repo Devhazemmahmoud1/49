@@ -5,7 +5,6 @@ const secretKey = "fourtyninehub495051fourtynine";
 module.exports = ((req, res, next) => {
     if (req.headers && req.headers.authorization) {
         var authorization = req.headers.authorization.split('Bearer ')[1]
-        console.log(authorization)
         try {
             let checkToken = Jwt.verify(authorization, secretKey, async(err, data) => {
                 if (err) throw err;
@@ -17,12 +16,19 @@ module.exports = ((req, res, next) => {
                         firstName: true,
                         lastName: true,
                         email: true,
+                        profilePicture: true,
+                        coverPicture: true,
                         phone: true,
                         id: true,
                         is_locked: true,
                         Wallet: true,
                         userSettings: true,
                         userPrivacy: true,
+                        fcm: true,
+                        // posts: true,
+                        // friends: true,
+                        // followers: true,
+                        // blocked: true,
                     }
                 });
                 req.user = user;

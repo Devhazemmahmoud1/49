@@ -12,25 +12,32 @@ datasource db {
 }
 
 model Users {
-  id            Int              @id @default(autoincrement())
-  firstName     String           @db.VarChar(255)
-  lastName      String           @db.VarChar(255)
-  email         String           @db.VarChar(5000)
-  phone         String           @db.VarChar(255)
-  password      String           @db.VarChar(255)
-  is_locked     Int              @default(0)
-  ref_number    String           @db.VarChar(255)
-  device_id     String?          @db.VarChar(100)
-  fcm           String?          @db.VarChar(300)
-  created_at    DateTime         @default(now())
-  updated_at    DateTime         @updatedAt
-  Wallet        Wallet?
-  Ride          ride[]
-  subscriptions subscriptions[]
-  agent         ridesRequested[]
-  ads           Advertisment[]
-  userSettings  userSettings[]
-  userPrivacy   userPrivacy[]
+  id             Int                  @id @default(autoincrement())
+  firstName      String               @db.VarChar(255)
+  lastName       String               @db.VarChar(255)
+  email          String               @db.VarChar(5000)
+  phone          String               @db.VarChar(255)
+  password       String               @db.VarChar(255)
+  is_locked      Int                  @default(0)
+  ref_number     String               @db.VarChar(255)
+  device_id      String?              @db.VarChar(100)
+  fcm            String?              @db.VarChar(300)
+  created_at     DateTime             @default(now())
+  updated_at     DateTime             @updatedAt
+  Wallet         Wallet?
+  profilePicture String?
+  coverPicture   String?
+  Ride           ride[]
+  subscriptions  subscriptions[]
+  agent          ridesRequested[]
+  ads            Advertisment[]
+  userSettings   userSettings[]
+  userPrivacy    userPrivacy[]
+  posts          Posts[]
+  friends        friends[]
+  followers      followers[]
+  blocked        socialBlockedUsers[]
+  notifications  notifications[]
 }
 
 model Blocked_users {
@@ -402,6 +409,8 @@ model HealthCare {
   price          String
   category_id    Int
   waitingPeriod  String?
+  created_at     DateTime                @default(now())
+  updated_at     DateTime                @updatedAt
   workingDays    DocWorkingDays[]
   attachments    HealthCareAttachments[]
 }
@@ -484,11 +493,6 @@ model favorates {
   ads        Advertisment @relation(fields: [ad_id], references: [id])
 }
 
-// model customAds {
-//   id Int @id @default(autoincrement())
-//   package
-// }
-
 model userSettings {
   id             Int      @id @default(autoincrement())
   user_id        Int
@@ -519,4 +523,146 @@ model userPrivacy {
 // job           String?
 // city          String?
 // address       String           @db.Text
-//  gender        Int              @default(1)
+// gender        Int              @default(1)
+
+model Posts {
+  id              Int               @id @default(autoincrement())
+  post_content    String            @db.LongText
+  user_id         Int
+  total_reactions Int               @default(0)
+  total_comments  Int               @default(0)
+  feeling_id      Int
+  activity_id     Int               @default(0)
+  location        String?
+  lng             String?
+  lat             String?
+  type            Int               @default(0)
+  created_at      DateTime          @default(now())
+  updated_at      DateTime          @updatedAt
+  attachments     postAttachments[]
+  user            Users             @relation(fields: [user_id], references: [id])
+  //feeling         postFeelings[]
+  //activity        postActivity[]
+  tags            postTags[]
+}
+
+model postFeelings {
+  id         Int      @id @default(autoincrement())
+  feeling_ar String
+  feeling_en String
+  url        String
+  type       Int
+  //postFeeling Posts    @relation(fields: [id], references: [feeling_id])
+  created_at DateTime @default(now())
+  updated_at DateTime @updatedAt
+}
+
+model postActivity {
+  id          Int      @id @default(autoincrement())
+  activity_ar String
+  activity_en String
+  url         String
+  type        Int
+  //postActivity Posts    @relation(fields: [id], references: [activity_id])
+  created_at  DateTime @default(now())
+  updated_at  DateTime @updatedAt
+}
+
+model postTags {
+  id          Int      @id @default(autoincrement())
+  post_id     Int
+  user_id     Int
+  created_at  DateTime @default(now())
+  updated_at  DateTime @updatedAt
+  taggedUsers Posts    @relation(fields: [post_id], references: [id])
+}
+
+model socialBlockedUsers {
+  id           Int      @id @default(autoincrement())
+  user_id      Int
+  blocked_user Int
+  created_at   DateTime @default(now())
+  updated_at   DateTime @updatedAt
+  users        Users    @relation(fields: [blocked_user], references: [id])
+}
+
+model postAttachments {
+  id         Int      @id @default(autoincrement())
+  post_id    Int
+  url        String
+  type       Int
+  created_at DateTime @default(now())
+  updated_at DateTime @updatedAt
+  post       Posts    @relation(fields: [post_id], references: [id])
+}
+
+// pagination is required for comments
+model Comments {
+  id              Int      @id @default(autoincrement())
+  user_id         Int
+  comment_content String   @db.Text
+  post_id         Int
+  total_reactions Int
+  created_at      DateTime @default(now())
+  updated_at      DateTime @updatedAt
+}
+
+model reactions {
+  id         Int      @id @default(autoincrement())
+  user_id    Int
+  post_id    Int
+  comment_id Int?
+  type       Int
+  created_at DateTime @default(now())
+  updated_at DateTime @updatedAt
+}
+
+model stories {
+  id               Int          @id @default(autoincrement())
+  user_id          Int
+  storyType        Int
+  storyContent     String?
+  story_attachment String?
+  created_at       DateTime     @default(now())
+  updated_at       DateTime     @updatedAt
+  views            storyViews[]
+}
+
+model storyViews {
+  id         Int      @id @default(autoincrement())
+  userViewer Int
+  story_id   Int
+  created_at DateTime @default(now())
+  updated_at DateTime @updatedAt
+  story      stories  @relation(fields: [story_id], references: [id])
+}
+
+model friends {
+  id         Int      @id @default(autoincrement())
+  user_id    Int
+  friend_id  Int
+  created_at DateTime @default(now())
+  updated_at DateTime @updatedAt
+  user       Users    @relation(fields: [friend_id], references: [id])
+}
+
+model followers {
+  id          Int      @id @default(autoincrement())
+  user_id     Int
+  follower_id Int
+  created_at  DateTime @default(now())
+  updated_at  DateTime @updatedAt
+  user        Users    @relation(fields: [follower_id], references: [id])
+}
+
+model notifications {
+  id          Int      @id @default(autoincrement())
+  sender_id   Int
+  reciever_id Int
+  message_en  String
+  messgae_ar  String
+  is_read     Int      @default(0)
+  created_at  DateTime @default(now())
+  updated_at  DateTime @updatedAt
+  user        Users    @relation(fields: [reciever_id], references: [id])
+}

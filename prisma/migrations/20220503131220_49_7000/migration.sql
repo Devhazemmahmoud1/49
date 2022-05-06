@@ -1,3 +1,0 @@
--- AlterTable
-ALTER TABLE `Users` ADD COLUMN `device_id` VARCHAR(100) NULL,
-    ADD COLUMN `fcm` VARCHAR(300) NULL;
