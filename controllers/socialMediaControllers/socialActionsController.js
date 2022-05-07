@@ -312,6 +312,6 @@ let unblockUser = async (req, res) => {
     })       
 }
 
-/* */
+/* add a Friend according to the giving informatio */
 
 module.exports = { editComment, addNewComment, sendFriendRequest, UndoFriendRequest, removeFriendRequestInMyList, unfriendUser, unfollowUser, unblockUser }

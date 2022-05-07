@@ -24,7 +24,7 @@ router.post('/change-password', guard, auth.changePassword);
 /*  Reset password Route  */
 router.post('/password-reset', guard, auth.resetPassword);
 
-router.delete('/delete-user', (req, res) => {
+router.delete('/delete-user', async (req, res) => {
   const { phone } = req.body
 
   let checkUser = await db.users.findFirst({

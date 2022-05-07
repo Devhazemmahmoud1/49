@@ -9,6 +9,9 @@ const db = new PrismaClient();
 /* Send a friend request */
 router.post('/send-friend-request', guard, action.sendFriendRequest);
 
+/* accept add request */
+router.post('/accept-friend', guard, )
+
 /* remove friend request */
 router.delete('/remove-friend-request', guard, action.removeFriendRequestInMyList);
 
