@@ -74,17 +74,17 @@ let createNewAd = async (req, res) => {
         }
     })
 
-    let attachment = [
-        {
-            filename: 'Static data'
-        },
-        {
-            filename: 'Dynamic data'
-        }
-    ];
+    // let attachment = [
+    //     {
+    //         filename: 'Static data'
+    //     },
+    //     {
+    //         filename: 'Dynamic data'
+    //     }
+    // ];
 
     // creating attachments for this ad
-    for (item of attachment) {
+    for (item of attachments) {
         let createAttachments = await db.adsAttachments.create({
             data: {
                 ad_id: creatingAd.id,
@@ -93,9 +93,9 @@ let createNewAd = async (req, res) => {
         })
     }
 
-    let props = [
+    /*let props = [
         { subCategory_id: 1, ad_id: creatingAd.id, subCategoryProperty_id: 1, value: 200 },
-    ]
+    ]*/
 
     // creating props for this ad
     for (item of props) {
@@ -203,4 +203,9 @@ let removeFavo = async (req, res) => {
 
 }
 
-module.exports = { getProperties, getAd, createNewAd, addFavo, removeFavo }
+/*  Edit an ad  */
+let EditAd = async (req, res) => {
+    
+}
+
+module.exports = { getProperties, getAd, createNewAd, addFavo, removeFavo, EditAd }

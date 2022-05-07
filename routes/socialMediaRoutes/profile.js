@@ -81,7 +81,16 @@ router.get('/friends/:id', users.getUserFriends)
 // get followers Lists
 router.get('/followers/:id', users.getUserFollowers)
 
+// get list of feelings to post 
+router.get('/feelings', profile.getFeelings)
+
+// get list of activities to post 
+router.get('/activity', profile.getActivities)
+
 // get friendLists
 router.get('/posts/:id', users.getUserPosts)
+
+// get all my friend Requests
+router.get('/friend-requests', guard, profile.getFriendRequests)
 
 module.exports = router

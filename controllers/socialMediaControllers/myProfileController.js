@@ -88,6 +88,28 @@ let getMyFollowers = async (req, res) => {
     return res.status(200).json(getFollowersList)
 }
 
+/* get my friend requests */   
+let getFriendRequests = async (req, res) => {
+    let { page } = req.query
+    if (! page) page = 1;
+    let maxAds = 20;
+    let getFriendsRequests = await db.friendRequests.findMany({
+        where: {
+            friendRequestTo: req.user.id
+        },
+        orderBy: {
+            updated_at: 'desc'
+        },
+        skip: page == 1 ? 0 : (page * maxAds) - maxAds,
+        take: maxAds,
+        include: {
+            user: true
+        }
+    })
+
+    return res.status(200).json(getFriendsRequests)   
+}
+
 /* Get My blocked users */
 let getMyBlockedUsers = async (req, res) => {
     let { page } = req.query
@@ -213,4 +235,15 @@ let editPost = async (req, res) => {
     }
 }
 
-module.exports = { getMyProfile, getMyFriends, getMyFollowers, getMyPosts, getMyBlockedUsers, createPost, editPost }
+// get list of feeling 
+let getFeelings = async (req, res) => {
+    return res.status(200).json((await db.postFeelings.findMany()))
+}
+
+// get list of activities
+let getActivities = async (req, res) => {
+    return res.status(200).json((await db.postActivity.findMany()))
+}
+
+
+module.exports = { getMyProfile, getMyFriends, getMyFollowers, getMyPosts, getMyBlockedUsers, createPost, editPost, getActivities, getFeelings, getFriendRequests }

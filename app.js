@@ -42,6 +42,7 @@ var ads = require('./routes/ads')
 var so = require('./routes/socketHandler')
 var settings = require('./routes/setting')
 var socialProfile = require('./routes/socialMediaRoutes/profile')
+var actions = require('./routes/socialMediaRoutes/usersAction')
 
 var app = express();
 
@@ -87,6 +88,7 @@ app.use('/ads', ads)
 app.use('/socket', so)
 app.use('/setting', settings);
 app.use('/social/profile', socialProfile)
+app.use('/social/actions', actions)
 
 // catch 404 and forward to error handler
 app.use(function(req, res, next) {

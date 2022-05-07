@@ -44,6 +44,7 @@ router.get('/single/:id', ads.getAd)
 router.post('/create-ad', guard, ads.createNewAd)
 
 /* Edit a specific ad */
+router.post('/edit-ad', guard, ads.EditAd)
 
 /* add a specific ad to favo list */
 router.post('/add-favo', guard, ads.addFavo)

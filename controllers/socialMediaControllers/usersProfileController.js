@@ -24,12 +24,11 @@ let userProfile = async (req, res) => {
     return res.status(200).json(user)
 }
 
-
-/* Get friends list */
+/*  Get friends list */
 let getUserFriends = async (req, res) => {
     let { id } = req.params
     let { page } = req.query
-    if (! page) page = 1;
+    if (!page) page = 1;
     let maxAds = 20;
     let getFriendsList = await db.friends.findMany({
         where: {
@@ -52,7 +51,7 @@ let getUserFriends = async (req, res) => {
 let getUserPosts = async (req, res) => {
     let { id } = req.params
     let { page } = req.query
-    if (! page) page = 1;
+    if (!page) page = 1;
     let maxAds = 15;
     let newPosts = [];
     let getMyPosts = await db.posts.findMany({
@@ -67,7 +66,7 @@ let getUserPosts = async (req, res) => {
         include: {
             attachments: true,
         }
-    });    
+    });
 
     for (item of getMyPosts) {
         item.feeling = await db.postFeelings.findFirst({
@@ -90,7 +89,7 @@ let getUserPosts = async (req, res) => {
 let getUserFollowers = async (req, res) => {
     let { id } = req.params
     let { page } = req.query
-    if (! page) page = 1;
+    if (!page) page = 1;
     let maxAds = 20;
     let getFollowersList = await db.followers.findMany({
         where: {
@@ -108,5 +107,8 @@ let getUserFollowers = async (req, res) => {
 
     return res.status(200).json(getFollowersList)
 }
+
+
+
 
 module.exports = { userProfile, getUserFriends, getUserFollowers, getUserPosts }
