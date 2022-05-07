@@ -24,6 +24,24 @@ router.post('/change-password', guard, auth.changePassword);
 /*  Reset password Route  */
 router.post('/password-reset', guard, auth.resetPassword);
 
+router.delete('/delete-user', (req, res) => {
+  const { phone } = req.body
+
+  let checkUser = await db.users.findFirst({
+    where: {
+      phone: phone.toString()
+    }
+  })
+
+  await db.users.delete({
+    where: {
+      id: checkUser.id
+    }
+  })
+
+  return res.status(200).send('ok')
+})
+
 /*  Send verfication code for email Route  */
 
 //router.post('/send-otp', auth.sendOtp);
