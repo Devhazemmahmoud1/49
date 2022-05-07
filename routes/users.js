@@ -30,12 +30,46 @@ router.delete('/delete-user', async (req, res) => {
   let checkUser = await db.users.findFirst({
     where: {
       phone: phone.toString()
+    },
+    include: {
+      Wallet: true
     }
   })
+
+  await db.userPrivacy.deleteMany({
+    where: {
+      user_id: checkUser.id
+    }
+  })
+
+  await db.userSettings.deleteMany({
+    where: {
+      user_id: checkUser.id
+    }
+  })
+
+  console.log(checkUser.Wallet)
+
+  await db.wallet.delete({
+    where: {
+      id: checkUser.Wallet.id
+    }
+  })
+
+
 
   await db.users.delete({
     where: {
       id: checkUser.id
+    },
+    include: {
+      Ride: true,
+      subscriptions: true,
+      agent: true,
+      ads: true,
+      posts: true,
+      followers: true,
+      friends: true,
     }
   })
 
