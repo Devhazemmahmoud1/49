@@ -28,10 +28,12 @@ let getAllCategories = async (req, res, next) => {
             }
         })
 
-        newCategoriesWithTotal.push(total)
+        item.total = total
+
+        return item;
     }
 
-    return res.status(200).json(newCategoriesWithTotal)
+    return res.status(200).json(categories)
 }
 
 /* Fetch all sub categories according to the giving parent id */
@@ -57,14 +59,15 @@ let getSubCats = async (req, res, next) => {
     for (item of categories) {
         let total = await db.advertisment.aggregate({
             where: {
-                mainCategory_id: item.id
+                subCategory_id: item.id
             }
         })
+        item.total = total
 
-        newCategoriesWithTotal.push(total)
+        return item;
     }
     
-    return res.status(200).json(newCategoriesWithTotal)    
+    return res.status(200).json(categories)    
 }
 
 
