@@ -6,6 +6,7 @@ var logger = require('morgan');
 const { PrismaClient } = require('@prisma/client');
 const db = new PrismaClient();
 var socketio = require("socket.io");
+const s3 = require('./controllers/s3Controller/s3Configiration')
 const { initializeApp } = require('firebase-admin/app');
 
 
@@ -119,4 +120,4 @@ io.on('connection', (socket) => {
   })
 })
 
-module.exports = { app, server };
+module.exports = { app, server }

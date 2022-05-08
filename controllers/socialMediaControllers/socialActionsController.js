@@ -1,4 +1,5 @@
 const { PrismaClient } = require('@prisma/client');
+const { sendNotification } = require( '../notificationsController/SocialNotification.js' );
 const db = new PrismaClient();
 
 // add a comment to an existing post 
@@ -22,12 +23,26 @@ let addNewComment = async (req, res) => {
             }
         })
 
-        return res.status(200).send('ok')
-
     } catch (e) {
         console.log(e);
         return;
     }
+
+    // Notification is required
+    if (req.user.id != checkPostId.user_id) {
+        let notify = {
+            notification_ar: '' + req.user.firstName + ' ' + req.user.lastName + ' قام بالتعليق علي منشورك.',
+            notification_en: '' + req.user.firstName + ' ' + req.user.lastName + ' has commented on your post.',
+            sender: req.user.id,
+            reciever: checkPostId.user_id,
+            postId: postId,
+            type: 1,
+        }
+
+        sendNotification(notify);
+    }
+
+    return res.status(200).send('ok')
 }
 
 // edit on a comment according to the giving informaiton
@@ -88,6 +103,20 @@ let sendFriendRequest = async (req, res) => {
     } catch (e) {
         console.log(e)
         return false;
+    }
+
+    // Notification is required
+    if (req.user.id != parseInt(friendId)) {
+        let notify = {
+            notification_ar: '' + req.user.firstName + ' ' + req.user.lastName + ' قام بارسال طلب صداقه.',
+            notification_en: '' + req.user.firstName + ' ' + req.user.lastName + ' has sent you a friend request.',
+            sender: req.user.id,
+            reciever: parseInt(friendId),
+            postId: null,
+            type: 2,
+        }
+
+        sendNotification(notify);
     }
 
     return res.status(200).json({
@@ -171,6 +200,13 @@ let unfriendUser = async (req, res) => {
         }
     })
 
+    let checkIfTheyAreFriends2 = await db.friends.findFirst({
+        where: {
+            user_id: parseInt(checkUser.id),
+            friend_id: req.user.id
+        }
+    })
+
     if (!checkIfTheyAreFriends) {
         return res.status(403).json({
             error: {
@@ -190,6 +226,12 @@ let unfriendUser = async (req, res) => {
             }
         })
 
+        await db.friends.delete({
+            where: {
+                id: checkIfTheyAreFriends2.id
+            }
+        })
+
     } catch (e) {
         console.log(e)
         return false;
@@ -198,7 +240,74 @@ let unfriendUser = async (req, res) => {
     return res.status(200).json({
         success: {
             success_ar: '${ checkUser.firstName } تم حذفه من الاصدقا',
-            success_en: '${ checkUser.firstName } has been removed from your friend list.' 
+            success_en: '${ checkUser.firstName } has been removed from your friend list.'
+        }
+    })
+}
+
+/* make a follow to a specifc user */
+let makeFollow = async (req, res) => {
+    const { userId } = req.body
+
+    if (!userId) return;
+
+    let checkUser = await db.users.findFirst({ where: { id: parseInt(userId) } })
+
+    if (!checkUser) {
+        return res.status(403).json({
+            error: {
+                error_ar: 'المستخدم غير موجود.',
+                error_en: 'User not found.'
+            }
+        })
+    }
+
+    // check if already followed before
+
+    let checkFollow = await db.followers.findFirst({
+        where: {
+            user_id: req.user.id,
+            follower_id: parseInt(userId)
+        }
+    })
+
+    if (checkFollow) {
+        return res.status(403).json({
+            error: {
+                error_ar: 'انت بالفعل متابع لهذا المستخدم.',
+                error_en: 'You have already followed this user.'
+            }
+        })
+    }
+
+    try {
+        await db.followers.create({
+            data: {
+                user_id: req.user.id,
+                follower_id: parseInt(userId)
+            }
+        })
+    } catch (e) {
+        console.log(e)
+        return false;
+    }
+
+    // Notification is required
+    let notify = {
+        notification_ar: '' + req.user.firstName + ' ' + req.user.lastName + ' قام بمتابعتك.',
+        notification_en: '' + req.user.firstName + ' ' + req.user.lastName + ' has followed you',
+        sender: req.user.id,
+        reciever: parseInt(userId),
+        postId: parseInt(userId),
+        type: 3,
+    }
+
+    sendNotification(notify);
+
+    return res.status(200).json({
+        success: {
+            success_en: 'You have followed this user.',
+            success_ar: 'انت الان متابع.'
         }
     })
 }
@@ -226,7 +335,7 @@ let unfollowUser = async (req, res) => {
         }
     })
 
-    if (! checkIfTheyAreFollowers) {
+    if (!checkIfTheyAreFollowers) {
         return res.status(403).json({
             error: {
                 error_en: 'You are not a follower with ${checkUser.firstName}',
@@ -253,9 +362,9 @@ let unfollowUser = async (req, res) => {
     return res.status(200).json({
         success: {
             success_ar: '${ checkUser.firstName } تم حذفه من المتابعه',
-            success_en: '${ checkUser.firstName } has been removed from your follow list.' 
+            success_en: '${ checkUser.firstName } has been removed from your follow list.'
         }
-    })   
+    })
 }
 
 /* Unblock a specific user  */
@@ -281,7 +390,7 @@ let unblockUser = async (req, res) => {
         }
     })
 
-    if (! checkIfTheyAreFollowers) {
+    if (!checkIfTheyAreFollowers) {
         return res.status(403).json({
             error: {
                 error_en: 'You are not a follower with ${checkUser.firstName}',
@@ -307,11 +416,256 @@ let unblockUser = async (req, res) => {
     return res.status(200).json({
         success: {
             success_ar: '${ checkUser.firstName } تم حذفه من قايمه الحظر',
-            success_en: '${ checkUser.firstName } has been removed from your block list.' 
+            success_en: '${ checkUser.firstName } has been removed from your block list.'
         }
-    })       
+    })
 }
 
-/* add a Friend according to the giving informatio */
+/* add a Friend according to the giving information */
+let acceptFriendRequest = async (req, res) => {
+    const { friendId } = req.body
 
-module.exports = { editComment, addNewComment, sendFriendRequest, UndoFriendRequest, removeFriendRequestInMyList, unfriendUser, unfollowUser, unblockUser }
+    if (!friendId) return;
+
+    let checkIsFriend = await db.friends.findFirst({
+        where: {
+            user_id: req.user.id,
+            friend_id: parseInt(friendId)
+        }
+    })
+
+    if (checkIsFriend) {
+        return res.status(403).json({
+            error: {
+                error_ar: 'انت بالفعل صديق للمستخدم المختار.',
+                error_en: 'You are already a friend with the selected user.'
+            }
+        })
+    }
+
+    try {
+        await db.friends.create({
+            data: {
+                user_id: req.user.id,
+                friend_id: parseInt(friendId)
+            }
+        })
+        await db.friends.create({
+            data: {
+                user_id: parseInt(friendId),
+                friend_id: req.user.id
+            }
+        })
+
+        let checkuser = await db.friendRequests.findFirst({
+            where: {
+                user_id: req.user.id,
+                friendRequestTo: parseInt(friendId)
+            }
+        })
+
+        if (checkuser) {
+            await db.friendRequests.delete({
+                where: {
+                    id: parseInt(checkuser.id)
+                }
+            })
+        } else {
+            let checkAnotherUser = await db.friendRequests.findFirst({
+                where: {
+                    user_id: parseInt(friendId),
+                    friendRequestTo: req.user.id
+                }
+            })
+
+            if (checkAnotherUser) {
+                await db.friendRequests.delete({
+                    where: {
+                        id: checkAnotherUser.id
+                    }
+                })
+            }
+        }
+    } catch (e) {
+        console.log(e);
+        return false;
+    }
+
+    // Notification is required
+    let notify = {
+        notification_ar: '' + req.user.firstName + ' ' + req.user.lastName + ' قام بقبول طلب الصداقه.',
+        notification_en: '' + req.user.firstName + ' ' + req.user.lastName + ' has accepted your friend request.',
+        sender: req.user.id,
+        reciever: parseInt(userId),
+        postId: req.user.id,
+        type: 4,
+    }
+
+    sendNotification(notify);
+
+    return res.status(200).json({
+        success: {
+            success_ar: 'تم تاكيد اضافه الصديق المختار.',
+            success_en: 'You are now friends.'
+        }
+    })
+
+}
+
+/* Make block to user */
+let makeBlock = async (req, res) => {
+    const { userId } = req.body
+
+    if (!userId) return false;
+    let checkUser = await db.users.findFirst({ where: { id: parseInt(id) } })
+
+    if (!checkUser) {
+        return res.status(403).json({
+            error: {
+                error_ar: 'المستخدم غير موجود',
+                error_en: 'User not found.'
+            }
+        })
+    }
+
+    // op 1 
+    let getFirstUser = await db.friends.findFirst({
+        where: {
+            user_id: req.user.id,
+            friend_id: parseInt(userId)
+        }
+    })
+
+    // op 2
+
+    let getSecUser = await db.friends.findFirst({
+        where: {
+            user_id: parseInt(userId),
+            friend_id: req.user.id
+        }
+    })
+
+    let blockProccess1 = await db.friends.delete({
+        where: {
+            id: getFirstUser.id
+        }
+    })
+
+    let blockProccess2 = await db.friends.delete({
+        where: {
+            id: getSecUser.id
+        }
+    })
+
+    if (!blockProccess1 || !blockProccess2) {
+        return res.status(400).send('something went wrong');
+    }
+
+    await db.socialBlockedUsers.create({
+        data: {
+            user_id: req.user.id,
+            blocked_user: parseInt(userId)
+        }
+    })
+
+    return res.status(200).json({
+        success: {
+            success_ar: 'تم حظر هذا المستخدم.',
+            success_en: 'User has been blocked.'
+        }
+    })
+}
+
+/* remove a comment */
+let removeComment = async (req, res) => {
+    const { commentId } = req.body
+
+    if (!commentId) {
+        return res.status(403).send('comment id is not vaild');
+    }
+
+    let checkCommentId = await db.comments.findFirst({
+        where: {
+            id: parseInt(id)
+        }
+    })
+
+    if (!checkCommentId) {
+        return res.status(403).send('comment id is not vaild');
+    }
+
+    // deleting proccess
+
+    try {
+        await db.comments.delete({
+            where: {
+                id: parseInt(commentId)
+            }
+        })
+    } catch (e) {
+        console.log(e);
+        return false;
+    }
+
+    // Deleting notification is required 
+
+    return res.status(200).json({
+        success: {
+            success_ar: 'تم حذف التعليق.',
+            success_en: 'Comment has been deletd.'
+        }
+    })
+}
+
+/* Add a saraha content */
+let addSaraha = async (req, res) => {
+    const { content, userId, picturesRate, postsRate, engagmentRate, totalRate } = req.body
+
+    if (!content || !userId) return res.status(403).send('comment and user id are required')
+
+    let checkUserId = await db.users.findFirst({ where: { id: parseInt(userId) } })
+
+    if (!checkUserId) return res.status(403).json({
+        error: {
+            error_ar: 'المستخدم غير موجود.',
+            error_en: 'User not found'
+        }
+    })
+
+    try {
+        await db.saraha.create({
+            data: {
+                user_id: req.user.id,
+                sentTo: parseInt(userId),
+                picturesRate: picturesRate ?? undefined,
+                postsRate: postsRate ?? undefined,
+                engagment: engagmentRate ?? undefined,
+                totalRate: totalRate ?? undefined
+            }
+        })
+    } catch (e) {
+        console.log(e)
+        return false;
+    }
+
+    // Notification is required
+    let notify = {
+        notification_ar: 'احدهم قام بارسال رساله لك.',
+        notification_en: 'A message has been sent from Annomance user',
+        sender: req.user.id,
+        reciever: parseInt(userId),
+        postId: 0,
+        type: 5,
+    }
+
+    sendNotification(notify);
+
+    return res.status(200).json({
+        success: {
+            success_ar: 'تم ارسال رسالتك بنجاح.',
+            success_en: 'Your message has been sent successfully',
+        }
+    })
+}
+
+module.exports = { editComment, addNewComment, sendFriendRequest, UndoFriendRequest, removeFriendRequestInMyList, unfriendUser, unfollowUser, unblockUser, acceptFriendRequest, makeFollow, makeBlock, removeComment, addSaraha }

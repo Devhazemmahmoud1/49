@@ -25,7 +25,6 @@ let getMyFriends = async (req, res) => {
             user: true
         }
     })
-
     return res.status(200).json(getFriendsList)
 }
 
@@ -73,7 +72,7 @@ let getMyFollowers = async (req, res) => {
     let maxAds = 20;
     let getFollowersList = await db.followers.findMany({
         where: {
-            user_id: req.user.id
+            follower_id: req.user.id
         },
         orderBy: {
             updated_at: 'desc'

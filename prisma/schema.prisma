@@ -670,7 +670,22 @@ model notifications {
   message_en  String
   messgae_ar  String
   is_read     Int      @default(0)
+  type        Int
+  direction   Int
   created_at  DateTime @default(now())
   updated_at  DateTime @updatedAt
   user        Users    @relation(fields: [reciever_id], references: [id])
+}
+
+model saraha {
+  id           Int      @id @default(autoincrement())
+  message      String   @db.Text
+  user_id      Int
+  sentTo       Int
+  picturesRate Int      @default(0)
+  postsRate    Int      @default(0)
+  engagment    Int      @default(0)
+  totalRate    Int      @default(0)
+  created_at   DateTime @default(now())
+  updated_at   DateTime @updatedAt
 }

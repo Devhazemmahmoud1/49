@@ -1,8 +1,8 @@
 const express = require('express')
-
 const { PrismaClient } = require('@prisma/client');
 const db = new PrismaClient();
 
+let newCategoriesWithTotal = []
 
 /* Fetch all categories from the Database */
 
@@ -17,13 +17,26 @@ let getAllCategories = async (req, res, next) => {
             photo: true
         }
     })
-    return res.status(200).json(categories)
+
+    for (item of categories) {
+        let total = await db.advertisment.aggregate({
+            where: {
+                mainCategory_id: item.id
+            }
+        })
+
+        newCategoriesWithTotal.push(total)
+    }
+
+    return res.status(200).json(newCategoriesWithTotal)
 }
 
 /* Fetch all sub categories according to the giving parent id */
 let getSubCats = async (req, res, next) => {
 
     const { id } = req.params
+
+    let newCategoriesWithTotal = []
 
     let categories = await db.subCategories.findMany({
         where: {
@@ -33,7 +46,18 @@ let getSubCats = async (req, res, next) => {
             photo: true
         }
     })
-    return res.status(200).json(categories)    
+
+    for (item of categories) {
+        let total = await db.advertisment.aggregate({
+            where: {
+                mainCategory_id: item.id
+            }
+        })
+
+        newCategoriesWithTotal.push(total)
+    }
+    
+    return res.status(200).json(newCategoriesWithTotal)    
 }
 
 

@@ -4,13 +4,20 @@ const action = require('../../controllers/socialMediaControllers/socialActionsCo
 const multer = require('multer')
 const { PrismaClient } = require('@prisma/client');
 const db = new PrismaClient();
+const test = require('../../controllers/s3Controller/uploadS3Controller')
 
 /* Social user action goes here */
 /* Send a friend request */
 router.post('/send-friend-request', guard, action.sendFriendRequest);
 
 /* accept add request */
-router.post('/accept-friend', guard, )
+router.post('/accept-friend', guard, action.acceptFriendRequest)
+
+/* Follow a user */
+router.post('/make-follow', guard, action.makeFollow)
+
+/* Make a block to a user */
+router.post('/make-block', guard, action.makeBlock)
 
 /* remove friend request */
 router.delete('/remove-friend-request', guard, action.removeFriendRequestInMyList);
@@ -32,5 +39,13 @@ router.post('/add-comment', guard, action.addNewComment);
 
 // edit on existing comment //
 router.post('/edit-comment', guard, action.editComment);
+
+// delete an existing comment
+router.delete('/remove-comment', guard, action.removeComment)
+
+/* Add a saraha comment */
+router.post('/saraha', guard, action.addSaraha)
+
+router.get('/test', test.run)
 
 module.exports = router

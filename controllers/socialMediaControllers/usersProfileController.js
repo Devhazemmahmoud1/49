@@ -89,7 +89,9 @@ let getUserPosts = async (req, res) => {
 let getUserFollowers = async (req, res) => {
     let { id } = req.params
     let { page } = req.query
+
     if (!page) page = 1;
+    
     let maxAds = 20;
     let getFollowersList = await db.followers.findMany({
         where: {
@@ -107,8 +109,5 @@ let getUserFollowers = async (req, res) => {
 
     return res.status(200).json(getFollowersList)
 }
-
-
-
 
 module.exports = { userProfile, getUserFriends, getUserFollowers, getUserPosts }
