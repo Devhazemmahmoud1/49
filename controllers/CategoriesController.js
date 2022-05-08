@@ -29,8 +29,6 @@ let getAllCategories = async (req, res, next) => {
         })
 
         item.total = total
-
-        return item;
     }
 
     return res.status(200).json(categories)
@@ -63,8 +61,6 @@ let getSubCats = async (req, res, next) => {
             }
         })
         item.total = total
-
-        return item;
     }
     
     return res.status(200).json(categories)    
