@@ -20,6 +20,9 @@ let getAllCategories = async (req, res, next) => {
 
     for (item of categories) {
         let total = await db.advertisment.aggregate({
+            _count: {
+                id: true
+            },
             where: {
                 mainCategory_id: item.id
             }
@@ -39,12 +42,16 @@ let getSubCats = async (req, res, next) => {
     let newCategoriesWithTotal = []
 
     let categories = await db.subCategories.findMany({
+        _count: {
+            id: true
+        },
         where: {
             parent: parseInt(id)
         },
         include: {
             photo: true
         }
+        
     })
 
     for (item of categories) {
