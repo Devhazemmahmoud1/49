@@ -29,16 +29,10 @@ var upload = multer({
 });
 
 /* Uploading Images using Multter Package */
-router.post('/upload-ads-attahcments' ,upload.array('attachments', 12), (req, res, next) => {
-    res.status(200).json(req.files)
-});
-
-/* Uploading Images using Multter Package */
-router.post('/upload-test' ,upload.array('attachments', 12), async (req, res, next) => {
+router.post('/upload-ads-attahcments' ,upload.array('attachments', 12), async (req, res, next) => {
     let file = req.files
     let result = await getFileStream(file)
-    //let finalResult = await run()
-    console.log(result)
+    return res.status(200).json(result)
 });
 
 /* Ads API goes here */

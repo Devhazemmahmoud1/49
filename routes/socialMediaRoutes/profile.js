@@ -33,13 +33,17 @@ var upload = multer({
 });
 
 /* Uploading Profilepicture using Multter Package */
-router.post('/upload-profile-picture' ,upload.array('attachments', 12), (req, res, next) => {
-    return res.status(200).json(req.files)
+router.post('/upload-profile-picture' ,upload.array('attachments', 12), async (req, res, next) => {
+    let file = req.files
+    let result = await getFileStream(file)
+    return res.status(200).json(result)
 });
 
 /* Uploading cover using Multter Package */
-router.post('/upload-cover-picture' ,upload.array('attachments', 12), (req, res, next) => {
-    return res.status(200).json(req.files)
+router.post('/upload-cover-picture' ,upload.array('attachments', 12), async (req, res, next) => {
+    let file = req.files
+    let result = await getFileStream(file)
+    return res.status(200).json(result)
 });
 
 /* API for users profile goes over here */
@@ -66,8 +70,10 @@ router.post('/create-post', guard, profile.createPost)
 router.post('/edit-post', guard, profile.editPost)
 
 /* Uploading post image using Multter Package */
-router.post('/upload-post-image' ,upload.array('attachments', 12), (req, res, next) => {
-    return res.status(200).json(req.files)
+router.post('/upload-post-image' ,upload.array('attachments', 12), async (req, res, next) => {
+    let file = req.files
+    let result = await getFileStream(file)
+    return res.status(200).json(result)
 });
 
 /*   This section is for other users profile   */

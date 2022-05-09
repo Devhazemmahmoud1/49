@@ -22,6 +22,8 @@ model Users {
   ref_number     String               @db.VarChar(255)
   device_id      String?              @db.VarChar(100)
   fcm            String?              @db.VarChar(300)
+  countryCode    String?
+  hashCode       String?
   created_at     DateTime             @default(now())
   updated_at     DateTime             @updatedAt
   Wallet         Wallet?
@@ -38,6 +40,15 @@ model Users {
   followers      followers[]
   blocked        socialBlockedUsers[]
   notifications  notifications[]
+}
+
+model ref {
+  id      Int @id @default(autoincrement())
+  inviter Int
+  invited Int
+  is_new  Int @default(0)
+  created_at     DateTime             @default(now())
+  updated_at     DateTime             @updatedAt  
 }
 
 model Blocked_users {

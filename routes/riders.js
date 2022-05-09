@@ -31,8 +31,10 @@ var upload = multer({
 });
 
 /* Uploading Images using Multter Package */
-router.post('/upload-rider-attahcments' ,upload.array('attachments', 12), (req, res, next) => {
-    res.status(200).json(req.files)
+router.post('/upload-rider-attahcments' ,upload.array('attachments', 12), async (req, res, next) => {
+    let file = req.files
+    let result = await getFileStream(file)
+    return res.status(200).json(result)
 });
 
 /* This route is for registering a new Rider */

@@ -25,6 +25,7 @@ module.exports = ((req, res, next) => {
                         userSettings: true,
                         userPrivacy: true,
                         fcm: true,
+                        hashCode: true,
                         // posts: true,
                         // friends: true,
                         // followers: true,

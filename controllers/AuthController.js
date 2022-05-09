@@ -9,8 +9,8 @@ const hash = require('bcrypt')
 
 /* Register Method  */
 
-let register = async (req, res, next) => {
-    const { firstName, lastName, password, passwordConfirmation, gender, refNumber, phone, email, country, fcm, device_id } = req.body
+let register = async (req, res) => {
+    const { firstName, lastName, password, passwordConfirmation, gender, refNumber, phone, email, country, fcm, device_id, hashCode, countryCode } = req.body
 
     // check if the body is empty for username and password otherwise procced 
     if (!password || !firstName || !lastName || !passwordConfirmation || !phone || !email || !gender) {
@@ -57,7 +57,11 @@ let register = async (req, res, next) => {
 
     let checkUser = await db.users.findFirst({
         where: {
-            phone: phone,
+            OR: [
+                { phone: phone ?? undefined },
+                { email: email ?? undefined }
+            ]
+
         },
         select: {
             phone: true,
@@ -104,7 +108,9 @@ let register = async (req, res, next) => {
             ref_number: refNumber ?? '',
             //country: country,
             fcm: fcm,
-            device_id: device_id
+            device_id: device_id,
+            hashCode: Math.floor(Math.random() * 9000000000000).toString(),
+            countryCode: countryCode ?? '0'
         }
     });
 
@@ -113,7 +119,6 @@ let register = async (req, res, next) => {
     if (create) {
 
         /*var vcode = Math.floor(Math.random() * 900000).toString();
-
         let checkIfCodeExists = await db.codes.findFirst({
             where: {
                 code: vcode
@@ -161,6 +166,31 @@ let register = async (req, res, next) => {
             }
         }); */
 
+        // check if there is a hash code sent with registeration
+        if (hashCode) {
+            // there is a hashCode provided
+
+            // get the user provided id 
+            let checkHashCode  = await db.users.findFirst({
+                where: {
+                    hashCode: hashCode
+                }
+            })
+
+            if (checkHashCode) {
+                await db.ref.create({
+                    data: {
+                        inviter: checkHashCode.id,
+                        invited: create.id,
+                        is_new: 0,
+                    }
+                })
+
+                // do action with cashBack
+            }
+
+        }
+        
         // add new Settings to this user
         await db.userSettings.createMany({
             data: [
@@ -170,14 +200,14 @@ let register = async (req, res, next) => {
                     settingName_en: 'Country',
                     value: country,
                     status: 0,
-                },                
+                },
                 {
                     user_id: create.id,
                     settingName_ar: 'البريد الالكتروني',
                     settingName_en: 'Email address',
                     value: email,
                     status: 0,
-                },                
+                },
                 {
                     user_id: create.id,
                     settingName_ar: 'رقم الهاتف',
@@ -238,7 +268,7 @@ let register = async (req, res, next) => {
                     user_id: create.id,
                     settingName_ar: 'استقبال رسايل',
                     settingName_en: 'Recieve messages',
-                    type:  0,
+                    type: 0,
                     status: 0,
                 },
                 {
@@ -332,7 +362,7 @@ let register = async (req, res, next) => {
                     type: 1,
                     status: 0,
                 },
-            ]            
+            ]
         })
 
         // create a new wallet instance for this user
@@ -360,7 +390,6 @@ let register = async (req, res, next) => {
                 intest: (await db.appInfo.findFirst({})).intrest,
             }
         })
-
 
         // we need to add a verfication code plus avoid the user to login without the verf code!
         return getToken(req, res, create.id);
@@ -415,15 +444,15 @@ let login = async (req, res, next) => {
         }
     });
 
-     // check if the user exists
-     if (!checkUser) {
+    // check if the user exists
+    if (!checkUser) {
         return res.status(401).json({
             error: {
                 error_ar: "المستخدم غير موجود",
                 error_en: "User not found"
             }
         })
-    }   
+    }
 
     // update fcm token and device ID
     await db.users.update({
@@ -549,10 +578,10 @@ let changePassword = async (req, res, next) => {
     })
 }
 
-let  resetPassword = async (req, res) => {
+let resetPassword = async (req, res) => {
     const { newPassword, passwordConfirmation } = req.body
 
-    if (! newPassword || ! passwordConfirmation) {
+    if (!newPassword || !passwordConfirmation) {
         return res.status(403).json({
             error: {
                 error_ar: 'كلمه السر مطلوبه.',
@@ -585,7 +614,7 @@ let  resetPassword = async (req, res) => {
             success_en: 'Password has been updated.'
         }
     });
-    
+
 }
 
 module.exports = { register, login, changePassword, resetPassword }

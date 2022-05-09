@@ -3,7 +3,6 @@ const { PutObjectCommand } = require("@aws-sdk/client-s3");
 const { s3Client } = require('../s3Controller/s3Configiration');
 const fs = require("fs")
 
-
 // Specifies a path within your Space and the file to upload.
 const bucketParams = {
     ACL: 'public-read',
@@ -12,11 +11,21 @@ const bucketParams = {
     Body: '',
 };
 
-async function getFileStream (file) {
-    var fileStream = fs.createReadStream(file[0].path)
-    bucketParams.Key = file[0].filename
-    bucketParams.Body = fileStream
-    return  run()
+async function getFileStream(files) {
+
+    for (item of files) {
+        var fileStream = fs.createReadStream(item.path)
+        bucketParams.Key = item.filename
+        bucketParams.Body = fileStream
+        bucketParams.ContentType = item.mimetype
+
+        await run().then(() => {
+            fs.unlink('uploads/' + item.filename, () => {
+                console.log('deleted')
+            })
+        })
+    }
+    return files;
 }
 
 // Uploads the specified file to the chosen path.
