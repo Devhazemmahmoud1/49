@@ -100,4 +100,8 @@ router.get('/posts/:id', users.getUserPosts)
 // get all my friend Requests
 router.get('/friend-requests', guard, profile.getFriendRequests)
 
+// get post comments 
+router.get('/post-comments/:id', action.getComments)
+
+
 module.exports = router

@@ -291,5 +291,38 @@ let getActivities = async (req, res) => {
     return res.status(200).json((await db.postActivity.findMany()))
 }
 
+// get Main categories 
+let getComments = async (req, res) => {
+    const { postId } = req.params
+    let { page } = req.query
 
-module.exports = { getMyProfile, getMyFriends, getMyFollowers, getMyPosts, getMyBlockedUsers, createPost, editPost, getActivities, getFeelings, getFriendRequests }
+    if (! page ) {
+        page = 1
+    }
+
+    let maxComments = 20;
+
+    if (! postId) {
+        return res.status(403).send('post id is required');
+    }
+
+    let checkPost = await db.posts.findFirst({ where: { id: parseInt(postId) } })
+
+    if (! checkPost) {
+        return res.status(403).send('Post is not found');
+    }
+
+    let getPostComments = await db.comments.findMany({
+        where: {
+            post_id: parseInt(postId)
+        },
+        skip: page == 1 ? 0 : (page * maxComments) - maxComments,
+        take: maxComments,
+    })
+
+    return res.status(200).json(getPostComments)
+    
+}
+
+
+module.exports = { getMyProfile, getMyFriends, getMyFollowers, getMyPosts, getMyBlockedUsers, createPost, editPost, getActivities, getFeelings, getFriendRequests, getComments }

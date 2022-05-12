@@ -674,7 +674,7 @@ let addSaraha = async (req, res) => {
 
 /*  Search for users / posts  */
 let searchForResult = async (req, res) => {
-    const { people, posts, search } = req.query
+    let { people, posts, search } = req.query
 
     if (!people || !posts)  {
         people = 1;
