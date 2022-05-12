@@ -7,8 +7,8 @@ generator client {
 
 datasource db {
   provider = "mysql"
-  //url      = "mysql://root:root@localhost:3306/fourtynine?schema=public"
-  url      = "mysql://49hub1:Database49hub@64.225.101.68:3306/fourtynine?schema=public"
+  url      = "mysql://root:root@localhost:3306/fourtynine?schema=public"
+  //url      = "mysql://49hub1:Database49hub@64.225.101.68:3306/fourtynine?schema=public"
 }
 
 model Users {
@@ -548,6 +548,7 @@ model Posts {
   lng             String?
   lat             String?
   type            Int               @default(0)
+  privacy         Int               @default(0)
   created_at      DateTime          @default(now())
   updated_at      DateTime          @updatedAt
   attachments     postAttachments[]

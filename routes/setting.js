@@ -4,6 +4,9 @@ var guard = require('../middleware/guard')
 
 /* User settings APIS goes down below */
 
+/* Get user serttings */
+router.get('/user-settings', guard, settings.getSettings)
+
 /*  Edit on user settings  */
 router.post('/edit', guard, settings.editSettings)
 

@@ -1,0 +1,2 @@
+-- AlterTable
+ALTER TABLE `Posts` ADD COLUMN `privacy` INTEGER NOT NULL DEFAULT 0;

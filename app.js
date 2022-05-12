@@ -52,7 +52,7 @@ const server = require('http').createServer(app);
   
 // Create the Socket IO server on 
 // the top of http server
-const io = socketio(server, {
+/*const io = socketio(server, {
   cors: {
     origin: "http://localhost:8888",
     methods: ["GET", "POST"]
@@ -63,7 +63,7 @@ app.use((req, res, next) => {
   req.io = io;
   return next();
 }); 
-
+*/
 
 // view engine setup
 app.set('views', path.join(__dirname, 'views'));
@@ -106,7 +106,8 @@ app.use(function(err, req, res, next) {
   res.render('error');
 });
 
- var sockets = []
+/*
+var sockets = []
 
 io.on('connection', (socket) => {
   sockets.push({
@@ -119,5 +120,6 @@ io.on('connection', (socket) => {
     console.log(socket.id + ' is out from here')
   })
 })
+*/
 
 module.exports = { app, server }

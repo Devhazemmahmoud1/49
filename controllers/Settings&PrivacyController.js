@@ -92,4 +92,7 @@ let editPrivacy = async (req, res) => {
     }
 }
 
-module.exports = { editSettings, editPrivacy }
+/* Getting the settings information according to the guard was giving */
+let getSettings = (req, res) => {}
+
+module.exports = { editSettings, editPrivacy, getSettings }

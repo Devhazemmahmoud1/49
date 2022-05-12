@@ -1,10 +1,10 @@
 const router = require('express').Router()
 const guard = require('../../middleware/guard')
 const action = require('../../controllers/socialMediaControllers/socialActionsController')
-const multer = require('multer')
+const multer = require('multer');
 const { PrismaClient } = require('@prisma/client');
 const db = new PrismaClient();
-const test = require('../../controllers/s3Controller/uploadS3Controller')
+//const uploadMethod = require('../../controllers/s3Controller/uploadS3Controller');
 
 /* Social user action goes here */
 /* Send a friend request */
@@ -46,6 +46,9 @@ router.delete('/remove-comment', guard, action.removeComment)
 /* Add a saraha comment */
 router.post('/saraha', guard, action.addSaraha)
 
-router.get('/test', test.run)
+router.get('/search', action.searchForResult)
+
+router.post('/update-post-privacy', guard, action.updatePostPrivacy)
+
 
 module.exports = router

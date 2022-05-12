@@ -129,10 +129,10 @@ let sendFriendRequest = async (req, res) => {
 
 /* remove friend requests from my user side req.user.id => other user */
 let UndoFriendRequest = async (req, res) => {
-    const { requestId } = req.body
-    if (!requestId) return false;
+    const { requestedFriendId } = req.body
+    if (!requestedFriendId) return false;
     try {
-        let getRequestId = await db.friendRequests.findFirst({ where: { user_id: req.user.id, friendRequestTo: parseInt(requestId) } });
+        let getRequestId = await db.friendRequests.findFirst({ where: { user_id: req.user.id, friendRequestTo: parseInt(requestedFriendId) } });
         await db.friendRequests.delete({
             where: {
                 id: getRequestId.id
@@ -153,12 +153,12 @@ let UndoFriendRequest = async (req, res) => {
 
 /* removing friend requests from my list */
 let removeFriendRequestInMyList = async (req, res) => {
-    const { requestId } = req.body
+    const { requestedFriendId } = req.body
 
-    if (!requestId) return false;
+    if (! requestedFriendId) return false;
 
     try {
-        let getRequestId = await db.friendRequests.findFirst({ where: { user_id: parseInt(requestId), friendRequestTo: req.user.id } });
+        let getRequestId = await db.friendRequests.findFirst({ where: { user_id: parseInt(requestedFriendId), friendRequestTo: req.user.id } });
         await db.friendRequests.delete({
             where: {
                 id: getRequestId.id
@@ -210,8 +210,8 @@ let unfriendUser = async (req, res) => {
     if (!checkIfTheyAreFriends) {
         return res.status(403).json({
             error: {
-                error_en: 'You are not a friend with ${checkUser.firstName}',
-                error_ar: 'انت لست صديق مع ${ checkUser.firstName }'
+                error_en: 'You are not a friend with ' + checkUser.firstName ,
+                error_ar: 'انت لست صديق مع' + checkUser.firstName,
             }
         })
     }
@@ -239,8 +239,8 @@ let unfriendUser = async (req, res) => {
 
     return res.status(200).json({
         success: {
-            success_ar: '${ checkUser.firstName } تم حذفه من الاصدقا',
-            success_en: '${ checkUser.firstName } has been removed from your friend list.'
+            success_ar: checkUser.firstName  + ' تم حذفه من الاصدقا',
+            success_en: checkUser.firstName + ' has been removed from your friend list.'
         }
     })
 }
@@ -338,8 +338,8 @@ let unfollowUser = async (req, res) => {
     if (!checkIfTheyAreFollowers) {
         return res.status(403).json({
             error: {
-                error_en: 'You are not a follower with ${checkUser.firstName}',
-                error_ar: 'انت لست متابع ل ${ checkUser.firstName }'
+                error_en: 'You are not a follower with ' + checkUser.firstName,
+                error_ar: 'انت لست متابع ل ' + checkUser.firstName 
             }
         })
     }
@@ -390,11 +390,11 @@ let unblockUser = async (req, res) => {
         }
     })
 
-    if (!checkIfTheyAreFollowers) {
+    if (! checkIfBlocked) {
         return res.status(403).json({
             error: {
-                error_en: 'You are not a follower with ${checkUser.firstName}',
-                error_ar: 'انت لست متابع ل ${ checkUser.firstName }'
+                error_en: 'This user is not blocked.',
+                error_ar: 'هذا المستخدم ليس محظور.' 
             }
         })
     }
@@ -415,8 +415,8 @@ let unblockUser = async (req, res) => {
 
     return res.status(200).json({
         success: {
-            success_ar: '${ checkUser.firstName } تم حذفه من قايمه الحظر',
-            success_en: '${ checkUser.firstName } has been removed from your block list.'
+            success_ar: checkUser.firstName  + ' تم حذفه من قايمه الحظر',
+            success_en: checkUser.firstName  + ' has been removed from your block list.'
         }
     })
 }
@@ -496,7 +496,7 @@ let acceptFriendRequest = async (req, res) => {
         notification_ar: '' + req.user.firstName + ' ' + req.user.lastName + ' قام بقبول طلب الصداقه.',
         notification_en: '' + req.user.firstName + ' ' + req.user.lastName + ' has accepted your friend request.',
         sender: req.user.id,
-        reciever: parseInt(userId),
+        reciever: parseInt(checkuser.id),
         postId: req.user.id,
         type: 4,
     }
@@ -517,7 +517,7 @@ let makeBlock = async (req, res) => {
     const { userId } = req.body
 
     if (!userId) return false;
-    let checkUser = await db.users.findFirst({ where: { id: parseInt(id) } })
+    let checkUser = await db.users.findFirst({ where: { id: parseInt(userId) } })
 
     if (!checkUser) {
         return res.status(403).json({
@@ -545,20 +545,23 @@ let makeBlock = async (req, res) => {
         }
     })
 
-    let blockProccess1 = await db.friends.delete({
-        where: {
-            id: getFirstUser.id
+    if (getSecUser && getFirstUser) {
+        let blockProccess1 = await db.friends.delete({
+            where: {
+                id: getFirstUser.id
+            }
+        })
+    
+        let blockProccess2 = await db.friends.delete({
+            where: {
+                id: getSecUser.id
+            }
+        })
+    
+        if (!blockProccess1 || !blockProccess2) {
+            return res.status(400).send('something went wrong');
         }
-    })
-
-    let blockProccess2 = await db.friends.delete({
-        where: {
-            id: getSecUser.id
-        }
-    })
-
-    if (!blockProccess1 || !blockProccess2) {
-        return res.status(400).send('something went wrong');
+    
     }
 
     await db.socialBlockedUsers.create({
@@ -586,7 +589,7 @@ let removeComment = async (req, res) => {
 
     let checkCommentId = await db.comments.findFirst({
         where: {
-            id: parseInt(id)
+            id: parseInt(commentId)
         }
     })
 
@@ -619,7 +622,7 @@ let removeComment = async (req, res) => {
 
 /* Add a saraha content */
 let addSaraha = async (req, res) => {
-    const { content, userId, picturesRate, postsRate, engagmentRate, totalRate } = req.body
+    const { content, userId } = req.body
 
     if (!content || !userId) return res.status(403).send('comment and user id are required')
 
@@ -637,10 +640,11 @@ let addSaraha = async (req, res) => {
             data: {
                 user_id: req.user.id,
                 sentTo: parseInt(userId),
-                picturesRate: picturesRate ?? undefined,
-                postsRate: postsRate ?? undefined,
-                engagment: engagmentRate ?? undefined,
-                totalRate: totalRate ?? undefined
+                message: content,
+                picturesRate: 0,
+                postsRate: 0,
+                engagment: 0,
+                totalRate: 0
             }
         })
     } catch (e) {
@@ -668,4 +672,99 @@ let addSaraha = async (req, res) => {
     })
 }
 
-module.exports = { editComment, addNewComment, sendFriendRequest, UndoFriendRequest, removeFriendRequestInMyList, unfriendUser, unfollowUser, unblockUser, acceptFriendRequest, makeFollow, makeBlock, removeComment, addSaraha }
+/*  Search for users / posts  */
+let searchForResult = async (req, res) => {
+    const { people, posts, search } = req.query
+
+    if (!people || !posts)  {
+        people = 1;
+        posts = 1;
+    }
+
+    let maxAds = 20;
+
+    let getPeople = await db.users.findMany({
+        where: {
+            OR: [
+                {
+                    firstName: {
+                        contains: search
+                    }
+                },
+                {
+                    email: {
+                        contains: search 
+                    }
+                },
+                {
+                    phone: {
+                        contains: search
+                    }
+                }
+            ]
+        },
+        skip: people == 1 ? 0 : (people * maxAds) - maxAds,
+        take: maxAds,
+    })
+
+    let getPosts = await db.posts.findMany({
+        where: {
+            post_content: {
+                contains: search
+            }
+        },
+        include: {
+            attachments: true,
+        }
+    })
+
+    return res.status(200).json({
+        people: getPeople,
+        posts: getPosts
+    })
+}
+
+/* Update the privacy of a specific post */
+let updatePostPrivacy = async (req, res) => {
+    const { postId, privacy } = req.body
+
+    if (!postId || !privacy) {
+        return res.status(403).send('Post id and privacy type id are required');
+    }
+
+    // check if post id is correct
+    let check = await db.posts.findFirst({
+        where: {
+            id: parseInt(postId),
+            user_id: req.user.id
+        }
+    })
+
+    if (!check) {
+        return res.status(403).send('post id is not correct or you are not the owner of the post');
+    }
+
+    let updatePrivacy = await db.posts.update({
+        where: {
+            id: parseInt(postId),
+        },
+        data: {
+            privacy: parseInt(privacy)
+        }
+    })
+
+    if (updatePrivacy) {
+        return res.status(200).json({
+            success: {
+                success_en: "Post privacy has been changed.",
+                success_ar: "تم تعديل خصوصيه المنشور"
+            }
+        })
+    } else {
+        return false;
+    }
+
+
+}
+
+module.exports = { editComment, addNewComment, sendFriendRequest, UndoFriendRequest, removeFriendRequestInMyList, unfriendUser, unfollowUser, unblockUser, acceptFriendRequest, makeFollow, makeBlock, removeComment, addSaraha, searchForResult, updatePostPrivacy }

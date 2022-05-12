@@ -4,7 +4,33 @@ const db = new PrismaClient();
 
 /* Get my own profile */
 let getMyProfile = async (req, res) => {
-    return res.status(200).json(req.user)
+    return res.status(200).json({
+        userInfo: req.user, 
+        total_friends: await db.friends.aggregate({
+            where: {
+                user_id: req.user.id
+            },
+            _count: {
+                id: true,
+            }
+        }),
+        total_followers: await db.followers.aggregate({
+            where: {
+                follower_id: req.user.id
+            },
+            _count: {
+                id: true,
+            }
+        }),
+        total_following: await db.followers.aggregate({
+            where: {
+                user_id: req.user.id
+            },
+            _count: {
+                id: true,
+            }
+        })
+    })
 }
 
 /* Get friends list */
@@ -124,7 +150,7 @@ let getMyBlockedUsers = async (req, res) => {
         skip: page == 1 ? 0 : (page * maxAds) - maxAds,
         take: maxAds,
         include: {
-            user: true
+            users: true
         }
     })
 
@@ -213,13 +239,34 @@ let createPost = async (req, res) => {
 let editPost = async (req, res) => {
     const { title, type, postId } = req.body
 
+    if (! postId) {
+        return res.status(403).send('Post id is required');
+    }
+
+    let checkPostAuthor = await db.posts.findFirst({
+        where: {
+            id: Number(postId),
+            user_id: req.user.id
+        }
+    })
+
+    if (! checkPostAuthor) {
+        return res.status(403).json({
+            error: {
+                error_en: 'You are not this post author',
+                error_ar: 'انت لست صاحب المنشور'
+            }
+        })
+    }
+
     try {
         await db.posts.update({
             where: {
                 id: parseInt(postId)
             },
             data: {
-                title: title ?? ''
+                post_content: title ?? '',
+                type: type ?? undefined
             }
         })
         return res.status(200).json({

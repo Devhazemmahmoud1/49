@@ -48,7 +48,7 @@ router.delete('/delete-user', async (req, res) => {
     }
   })
 
-  console.log(checkUser.Wallet)
+  //console.log(checkUser.Wallet)
 
   await db.wallet.delete({
     where: {

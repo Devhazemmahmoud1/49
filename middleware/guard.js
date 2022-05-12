@@ -10,7 +10,7 @@ module.exports = ((req, res, next) => {
                 if (err) throw err;
                 let user = await db.users.findFirst({
                     where: {
-                        id: data.id
+                        id: parseInt(data.id)
                     },
                     select: {
                         firstName: true,
@@ -27,10 +27,6 @@ module.exports = ((req, res, next) => {
                         fcm: true,
                         hashCode: true,
                         countryCode: true,
-                        // posts: true,
-                        // friends: true,
-                        // followers: true,
-                        // blocked: true,
                     }
                 });
                 req.user = user;

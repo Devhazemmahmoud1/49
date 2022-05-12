@@ -2,6 +2,7 @@ var router = require('express').Router()
 var ride = require('../controllers/ridersController')
 var guard = require('../middleware/guard')
 var multer = require('multer')
+var { getFileStream, run } = require('../controllers/s3Controller/uploadS3Controller')
 
 /* Ride APis Goes down here */
 

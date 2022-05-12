@@ -2,6 +2,7 @@ const router = require('express').Router()
 const guard = require('../middleware/guard')
 const health = require('../controllers/HealthCareController')
 var multer = require('multer')
+var { getFileStream, run } = require('../controllers/s3Controller/uploadS3Controller')
 
 /* Add a multter API FOR UPLLOADING IMAGES  */
 var store = multer.diskStorage({

@@ -2,6 +2,7 @@ const router = require('express').Router()
 var guard = require('../middleware/guard')
 var loading = require('../controllers/loadingController')
 var multer = require('multer')
+var { getFileStream, run } = require('../controllers/s3Controller/uploadS3Controller')
 
 /* This Router file represents loading transportation */
 

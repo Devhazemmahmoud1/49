@@ -2,6 +2,7 @@ const router = require('express').Router()
 const guard = require('../../middleware/guard')
 const profile = require('../../controllers/socialMediaControllers/myProfileController')
 const users = require('../../controllers/socialMediaControllers/usersProfileController')
+const uploadMethod = require('../../controllers/s3Controller/uploadS3Controller');
 const multer = require('multer')
 const { PrismaClient } = require('@prisma/client');
 const db = new PrismaClient();
@@ -35,14 +36,14 @@ var upload = multer({
 /* Uploading Profilepicture using Multter Package */
 router.post('/upload-profile-picture' ,upload.array('attachments', 12), async (req, res, next) => {
     let file = req.files
-    let result = await getFileStream(file)
+    let result = await uploadMethod.getFileStream(file)
     return res.status(200).json(result)
 });
 
 /* Uploading cover using Multter Package */
 router.post('/upload-cover-picture' ,upload.array('attachments', 12), async (req, res, next) => {
     let file = req.files
-    let result = await getFileStream(file)
+    let result = await uploadMethod.getFileStream(file)
     return res.status(200).json(result)
 });
 
@@ -72,7 +73,7 @@ router.post('/edit-post', guard, profile.editPost)
 /* Uploading post image using Multter Package */
 router.post('/upload-post-image' ,upload.array('attachments', 12), async (req, res, next) => {
     let file = req.files
-    let result = await getFileStream(file)
+    let result = await uploadMethod.getFileStream(file)
     return res.status(200).json(result)
 });
 
@@ -88,12 +89,12 @@ router.get('/friends/:id', users.getUserFriends)
 router.get('/followers/:id', users.getUserFollowers)
 
 // get list of feelings to post 
-router.get('/feelings', profile.getFeelings)
+router.get('/get-feelings/for-posts', profile.getFeelings)
 
 // get list of activities to post 
-router.get('/activity', profile.getActivities)
+router.get('/get-activities/for-post', profile.getActivities)
 
-// get friendLists
+// get Post List
 router.get('/posts/:id', users.getUserPosts)
 
 // get all my friend Requests
