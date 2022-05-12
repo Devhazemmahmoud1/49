@@ -293,7 +293,7 @@ let getActivities = async (req, res) => {
 
 // get Main categories 
 let getComments = async (req, res) => {
-    const { postId } = req.params
+    const { id } = req.params
     let { page } = req.query
 
     if (! page ) {
@@ -302,11 +302,11 @@ let getComments = async (req, res) => {
 
     let maxComments = 20;
 
-    if (! postId) {
+    if (! id) {
         return res.status(403).send('post id is required');
     }
 
-    let checkPost = await db.posts.findFirst({ where: { id: parseInt(postId) } })
+    let checkPost = await db.posts.findFirst({ where: { id: parseInt(id) } })
 
     if (! checkPost) {
         return res.status(403).send('Post is not found');
@@ -314,14 +314,14 @@ let getComments = async (req, res) => {
 
     let getPostComments = await db.comments.findMany({
         where: {
-            post_id: parseInt(postId)
+            post_id: parseInt(id)
         },
         skip: page == 1 ? 0 : (page * maxComments) - maxComments,
         take: maxComments,
     })
 
     return res.status(200).json(getPostComments)
-    
+
 }
 
 
