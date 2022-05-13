@@ -17,9 +17,41 @@ let userProfile = async (req, res) => {
         }
     })
 
+    if (! user) return res.status(403).send('user not found')
+
+    let total_friends = await db.friends.aggregate({
+        where: {
+            user_id: parseInt(id)
+        },
+        _count: {
+            id: true,
+        }
+    })
+
+    let total_followers = await db.followers.aggregate({
+        where: {
+            follower_id: parseInt(id)
+        },
+        _count: {
+            id: true,
+        }
+    }) 
+    let total_following = await db.followers.aggregate({
+        where: {
+            user_id: parseInt(id)
+        },
+        _count: {
+            id: true,
+        }
+    })
+
     delete user.password
     delete user.fcm
     delete user.device_id
+
+    user.total_friends = total_friends
+    user.total_following = total_following
+    user.total_followers = total_followers
 
     return res.status(200).json(user)
 }

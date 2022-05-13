@@ -195,6 +195,7 @@ let register = async (req, res) => {
         await db.userSettings.createMany({
             data: [
                 {
+                    identifier: 1,
                     user_id: create.id,
                     settingName_ar: ' البلد',
                     settingName_en: 'Country',
@@ -202,6 +203,7 @@ let register = async (req, res) => {
                     status: 0,
                 },
                 {
+                    identifier: 2,
                     user_id: create.id,
                     settingName_ar: 'البريد الالكتروني',
                     settingName_en: 'Email address',
@@ -209,6 +211,7 @@ let register = async (req, res) => {
                     status: 0,
                 },
                 {
+                    identifier: 3,
                     user_id: create.id,
                     settingName_ar: 'رقم الهاتف',
                     settingName_en: 'Phone number',
@@ -216,6 +219,7 @@ let register = async (req, res) => {
                     status: 0,
                 },
                 {
+                    identifier: 4,
                     user_id: create.id,
                     settingName_ar: 'تاريخ الميلاد',
                     settingName_en: 'Birth Date',
@@ -223,6 +227,7 @@ let register = async (req, res) => {
                     status: 0,
                 },
                 {
+                    identifier: 5,
                     user_id: create.id,
                     settingName_ar: 'الحاله الاجتماعيه',
                     settingName_en: 'Social status',
@@ -230,6 +235,7 @@ let register = async (req, res) => {
                     status: 0,
                 },
                 {
+                    identifier: 6,
                     user_id: create.id,
                     settingName_ar: 'الوظيفه',
                     settingName_en: 'Job',
@@ -237,6 +243,7 @@ let register = async (req, res) => {
                     status: 0,
                 },
                 {
+                    identifier: 7,
                     user_id: create.id,
                     settingName_ar: 'المدينه',
                     settingName_en: 'City',
@@ -251,6 +258,7 @@ let register = async (req, res) => {
                 //     status: 0,
                 // },
                 {
+                    identifier: 8,
                     user_id: create.id,
                     settingName_ar: 'النوع',
                     settingName_en: 'Gender',
@@ -266,6 +274,7 @@ let register = async (req, res) => {
             data: [
                 {
                     user_id: create.id,
+                    identifier: 1,
                     settingName_ar: 'استقبال رسايل',
                     settingName_en: 'Recieve messages',
                     type: 0,
@@ -273,6 +282,7 @@ let register = async (req, res) => {
                 },
                 {
                     user_id: create.id,
+                    identifier: 2,
                     settingName_ar: 'اخر ظهور',
                     settingName_en: 'Last seen',
                     type: 0,
@@ -280,13 +290,15 @@ let register = async (req, res) => {
                 },
                 {
                     user_id: create.id,
+                    identifier: 3,
                     settingName_ar: 'ظهور قرا،ه الرساله',
                     settingName_en: 'Read messages',
                     type: 0,
                     status: 0,
                 },
-                {
+                {   
                     user_id: create.id,
+                    identifier: 4,
                     settingName_ar: 'ظهور بيانات شخصيه',
                     settingName_en: 'Personal information',
                     type: 0,
@@ -294,6 +306,7 @@ let register = async (req, res) => {
                 },
                 {
                     user_id: create.id,
+                    identifier: 5,
                     settingName_ar: 'ظهور الصوره الشخصيه',
                     settingName_en: 'Profile Picture',
                     type: 0,
@@ -301,6 +314,7 @@ let register = async (req, res) => {
                 },
                 {
                     user_id: create.id,
+                    identifier: 6,
                     settingName_ar: 'الصور الشخصيه',
                     settingName_en: 'Photos',
                     type: 0,
@@ -308,6 +322,7 @@ let register = async (req, res) => {
                 },
                 {
                     user_id: create.id,
+                    identifier: 7,
                     settingName_ar: 'ظهور منشورات',
                     settingName_en: 'Posts',
                     type: 0,
@@ -315,6 +330,7 @@ let register = async (req, res) => {
                 },
                 {
                     user_id: create.id,
+                    identifier: 8,
                     settingName_ar: 'ظهور قصص',
                     settingName_en: 'Stories',
                     type: 0,
@@ -322,6 +338,7 @@ let register = async (req, res) => {
                 },
                 {
                     user_id: create.id,
+                    identifier: 9,
                     settingName_ar: 'ظهور قايمه الاصدقا،',
                     settingName_en: 'Friend list',
                     type: 0,
@@ -329,6 +346,7 @@ let register = async (req, res) => {
                 },
                 {
                     user_id: create.id,
+                    identifier: 10,
                     settingName_ar: 'ظهور قايمه المتابعيين',
                     settingName_en: 'Followers list',
                     type: 0,
@@ -336,6 +354,7 @@ let register = async (req, res) => {
                 },
                 {
                     user_id: create.id,
+                    identifier: 11,
                     settingName_ar: 'ظهور نشاطيه',
                     settingName_en: 'Activity',
                     type: 0,
@@ -343,6 +362,7 @@ let register = async (req, res) => {
                 },
                 {
                     user_id: create.id,
+                    identifier: 12,
                     settingName_ar: 'ظهور عشوايي',
                     settingName_en: 'Random appearance',
                     type: 0,
@@ -350,6 +370,7 @@ let register = async (req, res) => {
                 },
                 {
                     user_id: create.id,
+                    identifier: 13,
                     settingName_ar: 'طلبات الصداقه',
                     settingName_en: 'Friend requests',
                     type: 1,
@@ -357,6 +378,7 @@ let register = async (req, res) => {
                 },
                 {
                     user_id: create.id,
+                    identifier: 14,
                     settingName_ar: 'طلبات المتابعه',
                     settingName_en: 'Follow requests',
                     type: 1,

@@ -7,8 +7,8 @@ generator client {
 
 datasource db {
   provider = "mysql"
-  //url      = "mysql://root:root@localhost:3306/fourtynine?schema=public"
-  url      = "mysql://49hub1:Database49hub@64.225.101.68:3306/fourtynine?schema=public"
+  url      = "mysql://root:root@localhost:3306/fourtynine?schema=public"
+  //url      = "mysql://49hub1:Database49hub@64.225.101.68:3306/fourtynine?schema=public"
 }
 
 model Users {
@@ -43,12 +43,12 @@ model Users {
 }
 
 model ref {
-  id      Int @id @default(autoincrement())
-  inviter Int
-  invited Int
-  is_new  Int @default(0)
-  created_at     DateTime             @default(now())
-  updated_at     DateTime             @updatedAt  
+  id         Int      @id @default(autoincrement())
+  inviter    Int
+  invited    Int
+  is_new     Int      @default(0)
+  created_at DateTime @default(now())
+  updated_at DateTime @updatedAt
 }
 
 model Blocked_users {
@@ -507,6 +507,7 @@ model favorates {
 model userSettings {
   id             Int      @id @default(autoincrement())
   user_id        Int
+  identifier     Int      @default(0)
   settingName_ar String?
   settingName_en String?
   value          String?
@@ -518,6 +519,7 @@ model userSettings {
 
 model userPrivacy {
   id             Int      @id @default(autoincrement())
+  identifier     Int      @default(0)
   user_id        Int
   settingName_ar String?
   settingName_en String?
@@ -554,14 +556,27 @@ model Posts {
   attachments     postAttachments[]
   user            Users             @relation(fields: [user_id], references: [id])
   tags            postTags[]
+  hidden          postsPrivacy?
 }
 
 model postsPrivacy {
-  id Int @id @default(autoincrement())
-  post_id Int
-  user_id Int
-  created_at DateTime @default(now())
-  updated_at DateTime @updatedAt
+  id           Int      @id @default(autoincrement())
+  post_id      Int      @unique
+  user_id      Int
+  hidden       Boolean  @default(true)
+  isPostHidden Posts    @relation(fields: [post_id], references: [id])
+  created_at   DateTime @default(now())
+  updated_at   DateTime @updatedAt
+}
+
+model Reports {
+  id            Int      @id @default(autoincrement())
+  user_id       Int
+  reported_user Int
+  reason        String?
+  message       String?
+  created_at    DateTime @default(now())
+  updated_at    DateTime @updatedAt
 }
 
 model postFeelings {
@@ -628,8 +643,12 @@ model Comments {
 model reactions {
   id         Int      @id @default(autoincrement())
   user_id    Int
-  post_id    Int
+  post_id    Int?
   comment_id Int?
+  totalLikes Int?
+  totalWoW   Int?
+  totalAngry Int?
+  totalSad   Int?
   type       Int
   created_at DateTime @default(now())
   updated_at DateTime @updatedAt

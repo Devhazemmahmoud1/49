@@ -55,5 +55,20 @@ router.post('/update-post-privacy', guard, action.updatePostPrivacy)
 // Hide a specific post 
 router.post('/hide-post', guard, action.hidePost)
 
+// Report a specific User 
+router.post('/report-user', guard, action.reportUser)
+
+// Make like on post
+router.post('/like-on-post', guard, action.makeLikeOnPost)
+
+// make unlike on post
+router.delete('/unlike-post', guard, action.makeUnlikeOnPost)
+
+// Make like on comment
+router.post('/like-on-comment', guard, action.makeLikeOnComment)
+
+// make unlike on comment
+router.delete('/unlike-on-comment', guard, action.makeUnlikeOnComment)
+
 
 module.exports = router

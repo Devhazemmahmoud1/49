@@ -1,5 +1,5 @@
 const { PrismaClient } = require('@prisma/client');
-const { sendNotification } = require( '../notificationsController/SocialNotification.js' );
+const { sendNotification } = require('../notificationsController/SocialNotification.js');
 const db = new PrismaClient();
 
 // add a comment to an existing post 
@@ -155,7 +155,7 @@ let UndoFriendRequest = async (req, res) => {
 let removeFriendRequestInMyList = async (req, res) => {
     const { requestedFriendId } = req.body
 
-    if (! requestedFriendId) return false;
+    if (!requestedFriendId) return false;
 
     try {
         let getRequestId = await db.friendRequests.findFirst({ where: { user_id: parseInt(requestedFriendId), friendRequestTo: req.user.id } });
@@ -210,7 +210,7 @@ let unfriendUser = async (req, res) => {
     if (!checkIfTheyAreFriends) {
         return res.status(403).json({
             error: {
-                error_en: 'You are not a friend with ' + checkUser.firstName ,
+                error_en: 'You are not a friend with ' + checkUser.firstName,
                 error_ar: 'انت لست صديق مع' + checkUser.firstName,
             }
         })
@@ -239,7 +239,7 @@ let unfriendUser = async (req, res) => {
 
     return res.status(200).json({
         success: {
-            success_ar: checkUser.firstName  + ' تم حذفه من الاصدقا',
+            success_ar: checkUser.firstName + ' تم حذفه من الاصدقا',
             success_en: checkUser.firstName + ' has been removed from your friend list.'
         }
     })
@@ -339,7 +339,7 @@ let unfollowUser = async (req, res) => {
         return res.status(403).json({
             error: {
                 error_en: 'You are not a follower with ' + checkUser.firstName,
-                error_ar: 'انت لست متابع ل ' + checkUser.firstName 
+                error_ar: 'انت لست متابع ل ' + checkUser.firstName
             }
         })
     }
@@ -390,11 +390,11 @@ let unblockUser = async (req, res) => {
         }
     })
 
-    if (! checkIfBlocked) {
+    if (!checkIfBlocked) {
         return res.status(403).json({
             error: {
                 error_en: 'This user is not blocked.',
-                error_ar: 'هذا المستخدم ليس محظور.' 
+                error_ar: 'هذا المستخدم ليس محظور.'
             }
         })
     }
@@ -415,8 +415,8 @@ let unblockUser = async (req, res) => {
 
     return res.status(200).json({
         success: {
-            success_ar: checkUser.firstName  + ' تم حذفه من قايمه الحظر',
-            success_en: checkUser.firstName  + ' has been removed from your block list.'
+            success_ar: checkUser.firstName + ' تم حذفه من قايمه الحظر',
+            success_en: checkUser.firstName + ' has been removed from your block list.'
         }
     })
 }
@@ -551,17 +551,17 @@ let makeBlock = async (req, res) => {
                 id: getFirstUser.id
             }
         })
-    
+
         let blockProccess2 = await db.friends.delete({
             where: {
                 id: getSecUser.id
             }
         })
-    
+
         if (!blockProccess1 || !blockProccess2) {
             return res.status(400).send('something went wrong');
         }
-    
+
     }
 
     await db.socialBlockedUsers.create({
@@ -676,7 +676,7 @@ let addSaraha = async (req, res) => {
 let searchForResult = async (req, res) => {
     let { people, posts, search } = req.query
 
-    if (!people || !posts)  {
+    if (!people || !posts) {
         people = 1;
         posts = 1;
     }
@@ -693,7 +693,7 @@ let searchForResult = async (req, res) => {
                 },
                 {
                     email: {
-                        contains: search 
+                        contains: search
                     }
                 },
                 {
@@ -760,7 +760,7 @@ let updatePostPrivacy = async (req, res) => {
                 success_ar: "تم تعديل خصوصيه المنشور"
             }
         })
-    } 
+    }
 
     return false;
 }
@@ -769,32 +769,144 @@ let updatePostPrivacy = async (req, res) => {
 let hidePost = async (req, res) => {
     const { postId } = req.body
 
-    if (! postId) {
+    if (!postId) {
         return res.status(403).send('Post id is missing');
     }
 
     let postCheck = await db.posts.findFirst({ where: { id: parseInt(postId) } })
 
-    if (! postCheck) return res.status(403).send('Something went wrong');
+    if (!postCheck) return res.status(403).send('Something went wrong');
 
-     
+    let checkIfHiddenBefore = await db.postsPrivacy.findFirst({ 
+        where: { 
+            post_id: parseInt(postId),
+            user_id: req.user.id, 
+        } 
+    })
+
+    if (checkIfHiddenBefore) {
+        return res.status(403).json({
+            error: {
+                error_ar: 'تم بالفعل اخفا هذا المنشور.',
+                error_en: 'Post has been already marked as hidden.'
+            }
+        })
+    }
+
+    await db.postsPrivacy.create({
+        data: {
+            user_id: req.user.id,
+            post_id: parseInt(postId)
+        }
+    })
+
+    return res.status(200).json({
+        success: {
+            success_ar: 'تم اخفا المنشور.',
+            success_en: 'Post is hidden.'
+        }
+    })
 }
 
-module.exports = { 
-    editComment, 
-    addNewComment, 
-    sendFriendRequest, 
-    UndoFriendRequest, 
-    removeFriendRequestInMyList, 
-    unfriendUser, 
-    unfollowUser, 
-    unblockUser, 
-    acceptFriendRequest, 
-    makeFollow, 
-    makeBlock, 
-    removeComment, 
-    addSaraha, 
-    searchForResult, 
+let reportUser = async (req ,res) => {
+    const { reportedUserId, message, reason } = req.body
+
+    if (! reportedUserId) return res.status(403).send('user id is required');
+
+    // check on user 
+    let reportedUserCheck = await db.users.findFirst({
+        where: {
+            id: parseInt(reportedUserId)
+        }
+    })
+
+    if (! reportedUserCheck) {
+        return res.status(403).json({
+            error: {
+                error_en: 'User not found.',
+                error_ar: 'المستخدم غير موجود.'
+            }
+        })
+    }
+
+    await db.reports.create({
+        data: {
+            user_id: req.user.id,
+            reported_user: parseInt(reportedUserId),
+            message: message ?? undefined,
+            reason: reason ?? undefined
+        }
+    })
+
+    return res.status(200).json({
+        success: {
+            success_en: 'You have reported this user.',
+            success_ar: 'لقد قمت بالابلاغ عن هذا المستخدم.'
+        }
+    })
+}
+
+let makeLikeOnPost = async (req, res) => {
+    const { postId, reaction } = req.body
+
+    if (! postId || ! reaction) {
+        return res.status(403).json({
+            error: {
+                error_ar: 'رقم المنشور و نوع ال',
+                error_en: 'Post id and reaction type are required.'
+            }
+        })
+    }
+
+    try {
+
+        let createReation = await db.reactions.create({
+            data: {
+
+            }
+        })
+
+    } catch (e) {
+        console.log(e)
+        return false;
+    }
+}
+
+// Make unlike a specific post
+let makeUnlikeOnPost = async (req, res) => {
+
+}
+
+// like on comments
+let makeLikeOnComment = async (req, res) => {
+
+}
+
+// unlike on comment
+let makeUnlikeOnComment = async (req ,res) => {
+
+}
+
+module.exports = {
+    editComment,
+    addNewComment,
+    sendFriendRequest,
+    UndoFriendRequest,
+    removeFriendRequestInMyList,
+    unfriendUser,
+    unfollowUser,
+    unblockUser,
+    acceptFriendRequest,
+    makeFollow,
+    makeBlock,
+    removeComment,
+    addSaraha,
+    searchForResult,
     updatePostPrivacy,
-    hidePost, 
+    hidePost,
+    reportUser,
+    makeLikeOnPost,
+    makeUnlikeOnPost,
+    makeLikeOnComment,
+    makeUnlikeOnComment
 }

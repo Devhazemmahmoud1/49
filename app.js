@@ -11,7 +11,8 @@ const { initializeApp } = require('firebase-admin/app');
 
 
 
-/*initializeApp({
+/*
+initializeApp({
   credential: applicationDefault(),
   databaseURL: '',
   "type": "service_account",
@@ -24,7 +25,8 @@ const { initializeApp } = require('firebase-admin/app');
   "token_uri": "https://oauth2.googleapis.com/token",
   "auth_provider_x509_cert_url": "https://www.googleapis.com/oauth2/v1/certs",
   "client_x509_cert_url": "https://www.googleapis.com/robot/v1/metadata/x509/firebase-adminsdk-u6af4%40fortynine-f60ad.iam.gserviceaccount.com"
-}); */
+}); 
+*/
 
 
 var cronJob = require('./controllers/cronJobController')

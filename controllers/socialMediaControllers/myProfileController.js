@@ -29,6 +29,14 @@ let getMyProfile = async (req, res) => {
             _count: {
                 id: true,
             }
+        }),
+        total_posts: await db.posts.aggregate({
+            where: {
+                user_id: req.user.id
+            },
+            _count: {
+                id: true,
+            }            
         })
     })
 }
@@ -321,7 +329,26 @@ let getComments = async (req, res) => {
         take: maxComments,
     })
 
-    return res.status(200).json(getPostComments)
+    let postsWithUser = [];
+    // get user information
+    for ( item of getPostComments ) {
+        let user = await db.users.findFirst({
+            where: {
+                id: item.user_id
+            }, 
+            select: {
+                id: true,
+                profilePicture: true,
+                firstName: true,
+                lastName: true,
+            }
+        })
+
+        item.userInfo = user
+        postsWithUser.push(item)
+    }
+
+    return res.status(200).json(postsWithUser)
 
 }
 
