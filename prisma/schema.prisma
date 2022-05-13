@@ -553,9 +553,15 @@ model Posts {
   updated_at      DateTime          @updatedAt
   attachments     postAttachments[]
   user            Users             @relation(fields: [user_id], references: [id])
-  //feeling         postFeelings[]
-  //activity        postActivity[]
   tags            postTags[]
+}
+
+model postsPrivacy {
+  id Int @id @default(autoincrement())
+  post_id Int
+  user_id Int
+  created_at DateTime @default(now())
+  updated_at DateTime @updatedAt
 }
 
 model postFeelings {

@@ -760,11 +760,41 @@ let updatePostPrivacy = async (req, res) => {
                 success_ar: "تم تعديل خصوصيه المنشور"
             }
         })
-    } else {
-        return false;
-    }
+    } 
 
-
+    return false;
 }
 
-module.exports = { editComment, addNewComment, sendFriendRequest, UndoFriendRequest, removeFriendRequestInMyList, unfriendUser, unfollowUser, unblockUser, acceptFriendRequest, makeFollow, makeBlock, removeComment, addSaraha, searchForResult, updatePostPrivacy }
+// hide a specifc post according to the giving information
+let hidePost = async (req, res) => {
+    const { postId } = req.body
+
+    if (! postId) {
+        return res.status(403).send('Post id is missing');
+    }
+
+    let postCheck = await db.posts.findFirst({ where: { id: parseInt(postId) } })
+
+    if (! postCheck) return res.status(403).send('Something went wrong');
+
+     
+}
+
+module.exports = { 
+    editComment, 
+    addNewComment, 
+    sendFriendRequest, 
+    UndoFriendRequest, 
+    removeFriendRequestInMyList, 
+    unfriendUser, 
+    unfollowUser, 
+    unblockUser, 
+    acceptFriendRequest, 
+    makeFollow, 
+    makeBlock, 
+    removeComment, 
+    addSaraha, 
+    searchForResult, 
+    updatePostPrivacy,
+    hidePost, 
+}

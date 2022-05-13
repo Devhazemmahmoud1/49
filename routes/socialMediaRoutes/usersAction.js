@@ -46,9 +46,14 @@ router.delete('/remove-comment', guard, action.removeComment)
 /* Add a saraha comment */
 router.post('/saraha', guard, action.addSaraha)
 
+// search field for social media
 router.get('/search', action.searchForResult)
 
+// edting my own privacy of post
 router.post('/update-post-privacy', guard, action.updatePostPrivacy)
+
+// Hide a specific post 
+router.post('/hide-post', guard, action.hidePost)
 
 
 module.exports = router

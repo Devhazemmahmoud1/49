@@ -167,7 +167,6 @@ let makeSubscriptionPayments = async (req, res, next) => {
             }
         })
         // total fees for paymob
-
         let fees = (parseInt(amount) * (methods[0].gatewayPercentage / 100)) + parseInt(methods[0].gatewayConstant)
 
         let perviousFees = await db.paymentGateWayFees.findFirst({
@@ -218,7 +217,7 @@ let makeSubscriptionPayments = async (req, res, next) => {
 
         // Start Balance , Total
 
-        let newBalance = parseInt(req.user.Wallet.balance) - parseInt(amount)
+        /*let newBalance = parseInt(req.user.Wallet.balance) - parseInt(amount)
         let total = parseInt(req.user.Wallet.total) - parseInt(amount)
 
         await db.wallet.update({
@@ -231,7 +230,7 @@ let makeSubscriptionPayments = async (req, res, next) => {
                 startBalance: "" + parseInt(req.user.Wallet.startBalance) - parseInt(amount) + ""
                 //generatedBal: "" + total + "",
             }
-        })
+        })*/
 
         // Profit
 

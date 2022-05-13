@@ -140,6 +140,7 @@ let getMyBlockedUsers = async (req, res) => {
     let { page } = req.query
     if (! page) page = 1;
     let maxAds = 20;
+    
     let getBlockedList = await db.socialBlockedUsers.findMany({
         where: {
             user_id: req.user.id
