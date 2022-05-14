@@ -44,6 +44,14 @@ let userProfile = async (req, res) => {
             id: true,
         }
     })
+    let total_posts = await db.posts.aggregate({
+        where: {
+            user_id: parseInt(id)
+        },
+        _count: {
+            id: true,
+        }
+    })
 
     delete user.password
     delete user.fcm
@@ -52,7 +60,32 @@ let userProfile = async (req, res) => {
     user.total_friends = total_friends
     user.total_following = total_following
     user.total_followers = total_followers
+    user.total_posts = total_posts
 
+    let checkIfFriend = await db.friends.findFirst({
+        where: {
+            user_id: req.user.id,
+            friend_id: parseInt(id)
+        }
+    })
+
+    let checkIffollower = await db.followers.findFirst({
+        where: {
+            user_id: req.user.id,
+            follower_id: parseInt(id)
+        }
+    })
+
+    let checkIfFriendRequestSent = await db.friendRequests.findFirst({
+        where: {
+            user_id: req.user.id,
+            friendRequestTo: parseInt(id)
+        }
+    })
+
+    user.isFriend = checkIfFriend ? true : false
+    user.isFollower = checkIffollower ? true : false
+    user.friendRequestSent = checkIfFriendRequestSent ? true : false
     return res.status(200).json(user)
 }
 

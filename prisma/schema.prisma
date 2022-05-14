@@ -7,8 +7,8 @@ generator client {
 
 datasource db {
   provider = "mysql"
-  //url      = "mysql://root:root@localhost:3306/fourtynine?schema=public"
-  url      = "mysql://49hub1:Database49hub@64.225.101.68:3306/fourtynine?schema=public"
+  url      = "mysql://root:root@localhost:3306/fourtynine?schema=public"
+  //url      = "mysql://49hub1:Database49hub@64.225.101.68:3306/fourtynine?schema=public"
 }
 
 model Users {
@@ -549,6 +549,11 @@ model Posts {
   location        String?
   lng             String?
   lat             String?
+  totalLikes      Int?
+  totalWoW        Int?
+  totalAngry      Int?
+  totalSad        Int?
+  totalLove       Int?
   type            Int               @default(0)
   privacy         Int               @default(0)
   created_at      DateTime          @default(now())
@@ -636,6 +641,11 @@ model Comments {
   comment_content String   @db.Text
   post_id         Int
   total_reactions Int
+  totalLikes      Int?    @default(0)
+  totalWoW        Int?    @default(0)
+  totalAngry      Int?    @default(0)
+  totalSad        Int?    @default(0)
+  totalLove       Int?    @default(0)
   created_at      DateTime @default(now())
   updated_at      DateTime @updatedAt
 }
@@ -645,10 +655,6 @@ model reactions {
   user_id    Int
   post_id    Int?
   comment_id Int?
-  totalLikes Int?
-  totalWoW   Int?
-  totalAngry Int?
-  totalSad   Int?
   type       Int
   created_at DateTime @default(now())
   updated_at DateTime @updatedAt

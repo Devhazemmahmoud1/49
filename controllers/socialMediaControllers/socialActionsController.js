@@ -777,11 +777,11 @@ let hidePost = async (req, res) => {
 
     if (!postCheck) return res.status(403).send('Something went wrong');
 
-    let checkIfHiddenBefore = await db.postsPrivacy.findFirst({ 
-        where: { 
+    let checkIfHiddenBefore = await db.postsPrivacy.findFirst({
+        where: {
             post_id: parseInt(postId),
-            user_id: req.user.id, 
-        } 
+            user_id: req.user.id,
+        }
     })
 
     if (checkIfHiddenBefore) {
@@ -808,10 +808,10 @@ let hidePost = async (req, res) => {
     })
 }
 
-let reportUser = async (req ,res) => {
+let reportUser = async (req, res) => {
     const { reportedUserId, message, reason } = req.body
 
-    if (! reportedUserId) return res.status(403).send('user id is required');
+    if (!reportedUserId) return res.status(403).send('user id is required');
 
     // check on user 
     let reportedUserCheck = await db.users.findFirst({
@@ -820,7 +820,7 @@ let reportUser = async (req ,res) => {
         }
     })
 
-    if (! reportedUserCheck) {
+    if (!reportedUserCheck) {
         return res.status(403).json({
             error: {
                 error_en: 'User not found.',
@@ -849,7 +849,7 @@ let reportUser = async (req ,res) => {
 let makeLikeOnPost = async (req, res) => {
     const { postId, reaction } = req.body
 
-    if (! postId || ! reaction) {
+    if (!postId || !reaction) {
         return res.status(403).json({
             error: {
                 error_ar: 'رقم المنشور و نوع ال',
@@ -860,9 +860,43 @@ let makeLikeOnPost = async (req, res) => {
 
     try {
 
+        let checkIfLiked = await db.reactions.findFirst({
+            where: {
+                user_id: req.user.id,
+                post_id: parseInt(postId),
+                type: parseInt(reaction)            
+            }
+        })
+
+        if (checkIfLiked) return res.status(403).send('Something went wrong');
+
         let createReation = await db.reactions.create({
             data: {
+                user_id: req.user.id,
+                post_id: parseInt(postId),
+                comment_id: 0,
+                type: parseInt(reaction)
+            }
+        })
 
+        if (! createReation) return res.status(403).send('something went wrong')
+
+        var getReactionsForPost = await db.posts.findFirst({
+            where: {
+                id: parseInt(postId)
+            }
+        })
+
+        let updateReactionForPost = await db.posts.update({
+            where: {
+                id: parseInt(postId)
+            },
+            data: {
+                totalLikes: reaction == 1 ? (getReactionsForPost.totalLikes + 1) : undefined,
+                totalLove: reaction == 2 ? (getReactionsForPost.totalLove + 1) : undefined,
+                totalWoW: reaction == 3 ? (getReactionsForPost.totalWoW + 1) : undefined,
+                totalSad: reaction == 4 ? (getReactionsForPost.totalSad + 1) : undefined,
+                totalAngry: reaction == 5 ? (getReactionsForPost.totalAngry + 1) : undefined,
             }
         })
 
@@ -870,21 +904,274 @@ let makeLikeOnPost = async (req, res) => {
         console.log(e)
         return false;
     }
+
+    let notify = {
+        notification_ar: '' + req.user.firstName + ' ' + req.user.lastName + ' قام بالاعجاب علي منشورك',
+        notification_en: '' + req.user.firstName + ' ' + req.user.lastName + ' has liked your post',
+        sender: req.user.id,
+        reciever: parseInt(getReactionsForPost.user_id),
+        postId: parseInt(postId),
+        type: 1,
+    }
+
+    sendNotification(notify);
+
+    return res.status(200).json({
+        success: {
+            success_ar: 'You have liked a post.',
+            success_en: 'لقد قمت بالاعجاب علي هذا المنشور.'
+        }
+    })
 }
 
 // Make unlike a specific post
 let makeUnlikeOnPost = async (req, res) => {
+    const { postId, reaction } = req.body
 
+    if (!postId || ! reaction) {
+        return res.status(403).json({
+            error: {
+                error_ar: 'رقم المنشور و نوع ال',
+                error_en: 'Post id and reaction type are required.'
+            }
+        })
+    }
+
+    try {
+
+        let getPostReaction = await db.reactions.findFirst({
+            where: {
+                user_id: req.user.id,
+                post_id: parseInt(postId),
+                type: parseInt(reaction)
+            }
+        })
+
+        if (! getPostReaction) return res.status(403).send('something went wrong')
+
+        let deleteReaction = await db.reactions.delete({
+            where: {
+                id: getPostReaction.id
+            }
+        })
+
+        if (! deleteReaction) return res.status(403).send('something went wrong')
+
+        let getReactionsForPost = await db.posts.findFirst({
+            where: {
+                id: parseInt(postId)
+            }
+        })
+
+        let updateReactionForPost = await db.posts.update({
+            where: {
+                id: parseInt(postId)
+            },
+            data: {
+                totalLikes: reaction == 1 ? (getReactionsForPost.totalLikes - 1) : undefined,
+                totalLove: reaction == 2 ? (getReactionsForPost.totalLove - 1) : undefined,
+                totalWoW: reaction == 3 ? (getReactionsForPost.totalWoW - 1) : undefined,
+                totalSad: reaction == 4 ? (getReactionsForPost.totalSad - 1) : undefined,
+                totalAngry: reaction == 5 ? (getReactionsForPost.totalAngry - 1) : undefined,
+                total_reactions: getReactionsForPost.total_reactions - 1
+            }
+        })
+
+        let deleteNotification = await db.notifications.findFirst({
+            where: {
+                sender_id: req.user.id,
+                direction: parseInt(postId),
+                type: 1
+            }
+        })
+
+        await db.notifications.delete({
+            where: {
+                id: deleteNotification.id
+            }
+        })
+
+    } catch (e) {
+        console.log(e)
+        return false;
+    }
+
+
+
+    return res.status(200).json({
+        success: {
+            success_ar: 'ok',
+            success_en: 'ok'
+        }
+    })
 }
 
 // like on comments
 let makeLikeOnComment = async (req, res) => {
+    const { postId,  commentId, reaction } = req.body
 
+    if (!postId || !reaction || !commentId) {
+        return res.status(403).json({
+            error: {
+                error_ar: 'رقم المنشور و نوع ال',
+                error_en: 'Post id and reaction type are required.'
+            }
+        })
+    }
+
+    try {
+
+        let checkIfLiked = await db.reactions.findFirst({
+            where: {
+                user_id: req.user.id,
+                post_id: parseInt(postId),
+                comment_id: parseInt(commentId),
+                type: parseInt(reaction),            
+            }
+        })
+
+        if (checkIfLiked) return res.status(403).send('Something went wrong');
+
+        let createReation = await db.reactions.create({
+            data: {
+                user_id: req.user.id,
+                post_id: parseInt(postId),
+                comment_id: parseInt(commentId),
+                type: parseInt(reaction)
+            }
+        })
+
+        if (! createReation) return res.status(403).send('something went wrong')
+
+        var getReactionsForPost = await db.comments.findFirst({
+            where: {
+                id: parseInt(commentId),
+            }
+        });
+
+        let getRecentReactions = await db.comments.findFirst({
+            where: {
+                id: parseInt(commentId)
+            }
+        })
+
+        let updateReactionForPost = await db.comments.update({
+            where: {
+                id: parseInt(commentId)
+            },
+            data: {
+                totalLikes: reaction == 1 ? (getReactionsForPost.totalLikes + 1) : undefined,
+                totalLove: reaction == 2 ? (getReactionsForPost.totalLove + 1) : undefined,
+                totalWoW: reaction == 3 ? (getReactionsForPost.totalWoW + 1) : undefined,
+                totalSad: reaction == 4 ? (getReactionsForPost.totalSad + 1) : undefined,
+                totalAngry: reaction == 5 ? (getReactionsForPost.totalAngry + 1) : undefined,
+                total_reactions: getRecentReactions.total_reactions + 1
+            }
+        })
+
+    } catch (e) {
+        console.log(e)
+        return false;
+    }
+
+    let notify = {
+        notification_ar: '' + req.user.firstName + ' ' + req.user.lastName + ' قام بالاعجاب علي تعليقك',
+        notification_en: '' + req.user.firstName + ' ' + req.user.lastName + ' has liked your comment',
+        sender: req.user.id,
+        reciever: parseInt(getReactionsForPost.user_id),
+        postId: parseInt(postId),
+        type: 1,
+    }
+
+    sendNotification(notify);
+
+    return res.status(200).json({
+        success: {
+            success_ar: 'You have liked this comment.',
+            success_en: 'لقد قمت بالاعجاب علي هذا التعليق.'
+        }
+    })
 }
 
 // unlike on comment
-let makeUnlikeOnComment = async (req ,res) => {
+let makeUnlikeOnComment = async (req, res) => {
+    const { postId,  commentId, reaction } = req.body
 
+    if (!postId || !reaction || !commentId) {
+        return res.status(403).json({
+            error: {
+                error_ar: 'رقم المنشور و نوع ال',
+                error_en: 'Post id and reaction type are required.'
+            }
+        })
+    }
+
+    try {
+
+        let checkIfLiked = await db.reactions.findFirst({
+            where: {
+                user_id: req.user.id,
+                post_id: parseInt(postId),
+                comment_id: parseInt(commentId),
+                type: parseInt(reaction),            
+            }
+        })
+
+        if (! checkIfLiked) return res.status(403).send('Something went wrong');
+
+        let createReation = await db.reactions.delete({
+            where: {
+                id: parseInt(checkIfLiked.id)
+            }
+        })
+
+        if (! createReation) return res.status(403).send('something went wrong')
+
+        let getRecentReactions = await db.comments.findFirst({
+            where: {
+                id: parseInt(commentId)
+            }
+        })
+
+        let updateReactionForPost = await db.comments.update({
+            where: {
+                id: parseInt(commentId)
+            },
+            data: {
+                totalLikes: reaction == 1 ? (getRecentReactions.totalLikes - 1) : undefined,
+                totalLove: reaction == 2 ? (getRecentReactions.totalLove - 1) : undefined,
+                totalWoW: reaction == 3 ? (getRecentReactions.totalWoW - 1) : undefined,
+                totalSad: reaction == 4 ? (getRecentReactions.totalSad - 1) : undefined,
+                totalAngry: reaction == 5 ? (getRecentReactions.totalAngry - 1) : undefined,
+                total_reactions: getRecentReactions.total_reactions - 1
+            }
+        })
+
+    } catch (e) {
+        console.log(e)
+        return false;
+    }
+
+    let deleteNotification = await db.notifications.findFirst({
+        where: {
+            sender_id: req.user.id,
+            direction: parseInt(postId),
+            type: 1
+        }
+    })
+
+    await db.notifications.delete({
+        where: {
+            id: deleteNotification.id
+        }
+    })
+
+    return res.status(200).json({
+        success: {
+            success_ar: 'ok.',
+            success_en: 'ok.'
+        }
+    })
 }
 
 module.exports = {
@@ -908,5 +1195,5 @@ module.exports = {
     makeLikeOnPost,
     makeUnlikeOnPost,
     makeLikeOnComment,
-    makeUnlikeOnComment
+    makeUnlikeOnComment,
 }
