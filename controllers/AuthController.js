@@ -537,6 +537,8 @@ let getToken = async (req, res, create) => {
             email: true,
             id: true,
             is_locked: true,
+            profilePicture: true,
+            coverPicture: true,
         }
     });
 
