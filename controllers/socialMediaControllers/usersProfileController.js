@@ -17,7 +17,7 @@ let userProfile = async (req, res) => {
         }
     })
 
-    if (! user) return res.status(403).send('user not found')
+    if (!user) return res.status(403).send('user not found')
 
     let total_friends = await db.friends.aggregate({
         where: {
@@ -35,7 +35,7 @@ let userProfile = async (req, res) => {
         _count: {
             id: true,
         }
-    }) 
+    })
     let total_following = await db.followers.aggregate({
         where: {
             user_id: parseInt(id)
@@ -145,6 +145,22 @@ let getUserPosts = async (req, res) => {
                 id: item.activity_id
             }
         })
+
+        item.userInfo = await db.users.findFirst({
+            where: {
+                id: parseInt(item.user_id)
+            }
+        })
+
+        // get reacted or not.
+        item.isReacted = await db.reactions.findFirst({
+            where: {
+                post_id: parseInt(item.id),
+                comment_id: 0,
+                user_id: req.user.id
+            }
+        })
+
         newPosts.push(item)
     }
     return res.status(200).json(newPosts)
@@ -156,7 +172,7 @@ let getUserFollowers = async (req, res) => {
     let { page } = req.query
 
     if (!page) page = 1;
-    
+
     let maxAds = 20;
     let getFollowersList = await db.followers.findMany({
         where: {
@@ -175,4 +191,42 @@ let getUserFollowers = async (req, res) => {
     return res.status(200).json(getFollowersList)
 }
 
-module.exports = { userProfile, getUserFriends, getUserFollowers, getUserPosts }
+/* Get a specific post according to the giving informaiton */
+let getPost = async (req, res) => {
+    const { id } = req.params
+
+    if (!id) return false;
+
+    // check post id
+    let checkPostInfo = await db.posts.findFirst({ 
+        where: { 
+            id: parseInt(id) 
+        },
+        include: {
+            attachments: true
+        }
+    })
+
+    if (!checkPostInfo) return false;
+
+    // get reacted or not.
+    if (req.user.id) {
+        checkPostInfo.isReacted = await db.reactions.findFirst({
+            where: {
+                post_id: parseInt(id),
+                comment_id: 0,
+                user_id: req.user.id 
+            }
+        })
+    }
+
+    checkPostInfo.userInfo = await db.users.findFirst({
+        where: {
+            id: checkPostInfo.user_id
+        }
+    })
+
+    return res.status(200).json(checkPostInfo)
+}
+
+module.exports = { userProfile, getUserFriends, getUserFollowers, getUserPosts, getPost }

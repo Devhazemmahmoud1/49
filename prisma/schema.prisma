@@ -655,7 +655,7 @@ model reactions {
   id         Int      @id @default(autoincrement())
   user_id    Int
   post_id    Int?
-  comment_id Int?
+  comment_id Int?     @default(0)
   type       Int
   created_at DateTime @default(now())
   updated_at DateTime @updatedAt

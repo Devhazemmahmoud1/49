@@ -47,7 +47,7 @@ router.delete('/remove-comment', guard, action.removeComment)
 router.post('/saraha', guard, action.addSaraha)
 
 // search field for social media
-router.get('/search', action.searchForResult)
+router.get('/search', guard, action.searchForResult)
 
 // edting my own privacy of post
 router.post('/update-post-privacy', guard, action.updatePostPrivacy)
@@ -69,6 +69,8 @@ router.post('/like-on-comment', guard, action.makeLikeOnComment)
 
 // make unlike on comment
 router.delete('/unlike-on-comment', guard, action.makeUnlikeOnComment)
+
+// 
 
 
 module.exports = router

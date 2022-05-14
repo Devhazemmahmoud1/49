@@ -37,6 +37,14 @@ var upload = multer({
 router.post('/upload-profile-picture' ,upload.array('attachments', 12), async (req, res, next) => {
     let file = req.files
     let result = await uploadMethod.getFileStream(file)
+    await db.users.update({
+        where: {
+            id: parseInt(req.body.id)
+        }, 
+        data: {
+            profilePicture: file[0].filename
+        }
+    })
     return res.status(200).json(result)
 });
 
@@ -44,6 +52,14 @@ router.post('/upload-profile-picture' ,upload.array('attachments', 12), async (r
 router.post('/upload-cover-picture' ,upload.array('attachments', 12), async (req, res, next) => {
     let file = req.files
     let result = await uploadMethod.getFileStream(file)
+    await db.users.update({
+        where: {
+            id: parseInt(req.body.id)
+        }, 
+        data: {
+            coverPicture: file[0].filename
+        }
+    })
     return res.status(200).json(result)
 });
 
@@ -70,6 +86,9 @@ router.post('/create-post', guard, profile.createPost)
 /* Edit on my post  */
 router.post('/edit-post', guard, profile.editPost)
 
+/* Delete my post */
+router.delete('/delete-single-post', guard, profile.deletePost)
+
 /* Uploading post image using Multter Package */
 router.post('/upload-post-image' ,upload.array('attachments', 12), async (req, res, next) => {
     let file = req.files
@@ -80,30 +99,34 @@ router.post('/upload-post-image' ,upload.array('attachments', 12), async (req, r
 /*   This section is for other users profile   */
 
 // get other user's profile
-router.get('/:id', users.userProfile)
+router.get('/:id' , guard ,users.userProfile)
 
 // get friendLists
-router.get('/friends/:id', users.getUserFriends)
+router.get('/friends/:id' , guard, users.getUserFriends)
 
 // get followers Lists
-router.get('/followers/:id', users.getUserFollowers)
+router.get('/followers/:id', guard, users.getUserFollowers)
 
 // get list of feelings to post 
-router.get('/get-feelings/for-posts', profile.getFeelings)
+router.get('/get-feelings/for-posts', guard, profile.getFeelings)
 
 // get list of activities to post 
-router.get('/get-activities/for-post', profile.getActivities)
+router.get('/get-activities/for-post', guard, profile.getActivities)
 
 // get Post List
-router.get('/posts/:id', users.getUserPosts)
+router.get('/posts/:id', guard ,users.getUserPosts)
 
 // get a specific post 
+router.get('/get/specific-post/:id', guard, users.getPost)
 
 // get all my friend Requests
 router.get('/get/friend-requests-all', guard, profile.getFriendRequests)
 
 // get post comments 
-router.get('/post-comments/:id', profile.getComments)
+router.get('/post-comments/:id', guard, profile.getComments)
+
+// get a specifc comment reactions
+router.get('/get/comment-reactions/:id', guard, profile.getCommentReactions)
 
 
 module.exports = router

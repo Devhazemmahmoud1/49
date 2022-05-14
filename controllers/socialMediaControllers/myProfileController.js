@@ -94,8 +94,20 @@ let getMyPosts = async (req, res) => {
                 id: item.activity_id
             }
         })
+
+            // get reacted or not.
+            item.isReacted = await db.reactions.findFirst({
+                where: {
+                    post_id: parseInt(item.id),
+                    comment_id: 0,
+                    user_id: req.user.id
+                }
+            })
+
         newPosts.push(item)
     }
+
+
     return res.status(200).json(newPosts)
 }
 
@@ -290,6 +302,54 @@ let editPost = async (req, res) => {
     }
 }
 
+// Delete my post
+let deletePost = async (req, res) => {
+    const { id } = req.body
+
+    if (! id ) return res.stauts(403).send('Post id is required')
+
+    let checkPostId = await db.posts.findFirst({ where: { id: parseInt(id), user_id: req.user.id } })
+
+    if (! checkPostId) return res.status(403).send('Post is not found , Or you are not the author of the post')
+
+    // delete attachments and privacy before deleting the post
+    try {
+
+        let deletingPostAttachments = await db.postAttachments.deleteMany({
+            where: {
+                post_id: parseInt(id)
+            }
+        })
+
+        if (! deletingPostAttachments) return res.status(403).send('Something went wrong.');
+
+        //let getPostPrivacyId = await db.post
+
+        let deletingPrivacy = await db.postsPrivacy.deleteMany({
+            where: {
+                post_id: parseInt(id),
+            }
+        })
+
+        await db.posts.delete({
+            where: {
+                id: parseInt(id)
+            }
+        })
+
+    } catch (e) {
+        console.log(e);
+        return false;
+    }
+
+    return res.status(200).json({
+        success: {
+            success_ar: 'تم مسح المنشور بنجاح',
+            success_en: 'Post has been deleted successfully.'
+        }
+    })
+}
+
 // get list of feeling 
 let getFeelings = async (req, res) => {
     return res.status(200).json((await db.postFeelings.findMany()))
@@ -352,5 +412,69 @@ let getComments = async (req, res) => {
 
 }
 
+// get comment reactions with users
+let getCommentReactions = async (req, res) => {
+    const { id } = req.params
 
-module.exports = { getMyProfile, getMyFriends, getMyFollowers, getMyPosts, getMyBlockedUsers, createPost, editPost, getActivities, getFeelings, getFriendRequests, getComments }
+    if (! id ) return false;
+
+    // check on the comment
+    let checkOnComment = await db.comments.findFirst( { where: { id: parseInt(id) } })
+
+    if (! checkOnComment) return false;
+
+    let getCommentReacts = await db.reactions.findMany({
+        where: {
+            comment_id: parseInt(id)
+        }
+    }) 
+
+    let finalResult = []
+
+    for (item of getCommentReacts) {
+        item.userInfo = await db.users.findFirst({
+            where: {
+                id: item.user_id
+            },
+            select: {
+                id: true,
+                profilePicture: true,
+                firstName: true,
+                lastName: true,
+            }
+        })
+
+        finalResult.push(item)
+    }
+
+    let totalLikesWithPeople = finalResult.filter( (item) => {
+        return item.type == 1
+    })
+
+    let totalLoveWithPeople = finalResult.filter( (item) => {
+        return item.type == 2
+    })
+    let totalWowWithPeople = finalResult.filter( (item) => {
+        return item.type == 3
+    })
+
+    let totalSadWithPeople = finalResult.filter( (item) => {
+        return item.type == 4
+    })
+
+    let totalAngryWithPeople = finalResult.filter( (item) => {
+        return item.type == 5
+    })
+
+    return res.status(200).json({
+        totalLikes: totalLikesWithPeople,
+        totalLove: totalLoveWithPeople,
+        totalWow: totalWowWithPeople,
+        totalSad: totalSadWithPeople,
+        totalAngry: totalAngryWithPeople
+    })
+}
+
+
+
+module.exports = { getMyProfile, getMyFriends, getMyFollowers, getMyPosts, getMyBlockedUsers, createPost, editPost, deletePost, getActivities, getFeelings, getFriendRequests, getComments, getCommentReactions }
