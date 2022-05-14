@@ -462,6 +462,8 @@ let login = async (req, res, next) => {
             lastName: true,
             is_locked: true,
             password: true,
+            profilePicture: true,
+            coverPicture: true,
             //gender: true,
         }
     });
