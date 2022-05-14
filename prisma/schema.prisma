@@ -38,6 +38,7 @@ model Users {
   posts          Posts[]
   friends        friends[]
   followers      followers[]
+  friendRequests friendRequests[]
   blocked        socialBlockedUsers[]
   notifications  notifications[]
 }
@@ -704,6 +705,7 @@ model friendRequests {
   friendRequestTo Int
   created_at      DateTime @default(now())
   updated_at      DateTime @updatedAt
+  user        Users    @relation(fields: [friendRequestTo], references: [id])
 }
 
 model notifications {

@@ -100,7 +100,7 @@ router.get('/posts/:id', users.getUserPosts)
 // get a specific post 
 
 // get all my friend Requests
-router.get('/get/friend-requests', guard, profile.getFriendRequests)
+router.get('/get/friend-requests-all', guard, profile.getFriendRequests)
 
 // get post comments 
 router.get('/post-comments/:id', profile.getComments)
