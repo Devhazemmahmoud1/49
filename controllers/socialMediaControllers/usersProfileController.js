@@ -161,7 +161,52 @@ let getUserPosts = async (req, res) => {
             }
         })
 
-        newPosts.push(item)
+        let getPostsReactions = await db.reactions.findMany({
+            where: {
+                post_id: parseInt(item.id),
+                comment_id: 0,
+            }
+        })
+
+        for (item of getPostsReactions) {
+            finalResult = []
+            item.userInfo = await db.users.findFirst({
+                where: {
+                    id: parseInt(item.user_id)
+                }
+            })        
+            finalResult.push(item)    
+        }
+
+        let totalLikesWithPeople = finalResult.filter((item) => {
+            return item.type == 1
+        })
+    
+        let totalLoveWithPeople = finalResult.filter((item) => {
+            return item.type == 2
+        })
+        let totalWowWithPeople = finalResult.filter((item) => {
+            return item.type == 3
+        })
+    
+        let totalSadWithPeople = finalResult.filter((item) => {
+            return item.type == 4
+        })
+    
+        let totalAngryWithPeople = finalResult.filter((item) => {
+            return item.type == 5
+        })
+
+        finalResult = []
+
+        newPosts.push({
+            post: item,
+            totalLikes: totalLikesWithPeople,
+            totalLove: totalLoveWithPeople,
+            totalWow: totalWowWithPeople,
+            totalSad: totalSadWithPeople,
+            totalAngry: totalAngryWithPeople
+        })
     }
     return res.status(200).json(newPosts)
 }
@@ -198,9 +243,9 @@ let getPost = async (req, res) => {
     if (!id) return false;
 
     // check post id
-    let checkPostInfo = await db.posts.findFirst({ 
-        where: { 
-            id: parseInt(id) 
+    let checkPostInfo = await db.posts.findFirst({
+        where: {
+            id: parseInt(id)
         },
         include: {
             attachments: true
@@ -215,7 +260,7 @@ let getPost = async (req, res) => {
             where: {
                 post_id: parseInt(id),
                 comment_id: 0,
-                user_id: req.user.id 
+                user_id: req.user.id
             }
         })
     }
@@ -226,7 +271,58 @@ let getPost = async (req, res) => {
         }
     })
 
-    return res.status(200).json(checkPostInfo)
+    let getPostReacts = await db.reactions.findMany({
+        where: {
+            post_id: parseInt(id)
+        }
+    })
+
+    let finalResult = []
+
+    for (item of getPostReacts) {
+        item.userInfo = await db.users.findFirst({
+            where: {
+                id: item.user_id
+            },
+            select: {
+                id: true,
+                profilePicture: true,
+                firstName: true,
+                lastName: true,
+            }
+        })
+
+        finalResult.push(item)
+    }
+
+    let totalLikesWithPeople = finalResult.filter((item) => {
+        return item.type == 1
+    })
+
+    let totalLoveWithPeople = finalResult.filter((item) => {
+        return item.type == 2
+    })
+    let totalWowWithPeople = finalResult.filter((item) => {
+        return item.type == 3
+    })
+
+    let totalSadWithPeople = finalResult.filter((item) => {
+        return item.type == 4
+    })
+
+    let totalAngryWithPeople = finalResult.filter((item) => {
+        return item.type == 5
+    })
+
+    return res.status(200).json({
+        post: checkPostInfo,
+        totalLikes: totalLikesWithPeople,
+        totalLove: totalLoveWithPeople,
+        totalWow: totalWowWithPeople,
+        totalSad: totalSadWithPeople,
+        totalAngry: totalAngryWithPeople
+    })
+
 }
 
 module.exports = { userProfile, getUserFriends, getUserFollowers, getUserPosts, getPost }

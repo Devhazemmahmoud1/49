@@ -60,6 +60,9 @@ router.post('/upload-cover-picture' ,upload.array('attachments', 12), async (req
             coverPicture: file[0].filename
         }
     })
+    await db.posts.create({
+        
+    })
     return res.status(200).json(result)
 });
 
@@ -127,6 +130,9 @@ router.get('/post-comments/:id', guard, profile.getComments)
 
 // get a specifc comment reactions
 router.get('/get/comment-reactions/:id', guard, profile.getCommentReactions)
+
+// get a specifc post reactions
+router.get('/get/post-reactions/:id', guard, profile.getPostsReactions)
 
 
 module.exports = router

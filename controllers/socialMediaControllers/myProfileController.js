@@ -5,7 +5,7 @@ const db = new PrismaClient();
 /* Get my own profile */
 let getMyProfile = async (req, res) => {
     return res.status(200).json({
-        userInfo: req.user, 
+        userInfo: req.user,
         total_friends: await db.friends.aggregate({
             where: {
                 user_id: req.user.id
@@ -36,7 +36,7 @@ let getMyProfile = async (req, res) => {
             },
             _count: {
                 id: true,
-            }            
+            }
         })
     })
 }
@@ -44,7 +44,7 @@ let getMyProfile = async (req, res) => {
 /* Get friends list */
 let getMyFriends = async (req, res) => {
     let { page } = req.query
-    if (! page) page = 1;
+    if (!page) page = 1;
     let maxAds = 20;
     let getFriendsList = await db.friends.findMany({
         where: {
@@ -65,7 +65,7 @@ let getMyFriends = async (req, res) => {
 /*  Get My Posts */
 let getMyPosts = async (req, res) => {
     let { page } = req.query
-    if (! page) page = 1;
+    if (!page) page = 1;
     let maxAds = 15;
     let newPosts = [];
     let getMyPosts = await db.posts.findMany({
@@ -80,9 +80,10 @@ let getMyPosts = async (req, res) => {
         include: {
             attachments: true,
         }
-    });    
+    });
 
     for (item of getMyPosts) {
+        let finalResult = []
         item.feeling = await db.postFeelings.findFirst({
             where: {
                 id: item.feeling_id
@@ -95,18 +96,80 @@ let getMyPosts = async (req, res) => {
             }
         })
 
-            // get reacted or not.
-            item.isReacted = await db.reactions.findFirst({
+        // get reacted or not.
+        item.isReacted = await db.reactions.findFirst({
+            where: {
+                post_id: parseInt(item.id),
+                comment_id: 0,
+                user_id: req.user.id
+            }
+        })
+
+        item.userInfo = await db.users.findFirst({
+            where: {
+                id: item.user_id
+            },
+            select: {
+                id: true,
+                profilePicture: true,
+                firstName: true,
+                lastName: true,
+            }
+        })
+
+        let getPostReacts = await db.reactions.findMany({
+            where: {
+                post_id: parseInt(item.id),
+                comment_id: 0,
+            }
+        })
+
+        for (item of getPostReacts) {
+            item.userInfo = await db.users.findFirst({
                 where: {
-                    post_id: parseInt(item.id),
-                    comment_id: 0,
-                    user_id: req.user.id
+                    id: item.user_id
+                },
+                select: {
+                    id: true,
+                    profilePicture: true,
+                    firstName: true,
+                    lastName: true,
                 }
             })
+                    
+            finalResult.push(item)
+        }
 
-        newPosts.push(item)
+
+        let totalLikesWithPeople = finalResult.filter((item) => {
+            return item.type == 1
+        })
+
+        let totalLoveWithPeople = finalResult.filter((item) => {
+            return item.type == 2
+        })
+        let totalWowWithPeople = finalResult.filter((item) => {
+            return item.type == 3
+        })
+
+        let totalSadWithPeople = finalResult.filter((item) => {
+            return item.type == 4
+        })
+
+        let totalAngryWithPeople = finalResult.filter((item) => {
+            return item.type == 5
+        })
+
+
+        newPosts.push({
+            post: item,
+            totalLikes: totalLikesWithPeople,
+            totalLove: totalLoveWithPeople,
+            totalWow: totalWowWithPeople,
+            totalSad: totalSadWithPeople,
+            totalAngry: totalAngryWithPeople
+        })
     }
-
 
     return res.status(200).json(newPosts)
 }
@@ -114,7 +177,7 @@ let getMyPosts = async (req, res) => {
 /* get My Followers */
 let getMyFollowers = async (req, res) => {
     let { page } = req.query
-    if (! page) page = 1;
+    if (!page) page = 1;
     let maxAds = 20;
     let getFollowersList = await db.followers.findMany({
         where: {
@@ -133,10 +196,10 @@ let getMyFollowers = async (req, res) => {
     return res.status(200).json(getFollowersList)
 }
 
-/* get my friend requests */   
+/* get my friend requests */
 let getFriendRequests = async (req, res) => {
     let { page } = req.query
-    if (! page) page = 1;
+    if (!page) page = 1;
     let maxAds = 20;
     let getFriendsRequests = await db.friendRequests.findMany({
         where: {
@@ -152,15 +215,15 @@ let getFriendRequests = async (req, res) => {
         }
     })
 
-    return res.status(200).json(getFriendsRequests)   
+    return res.status(200).json(getFriendsRequests)
 }
 
 /* Get My blocked users */
 let getMyBlockedUsers = async (req, res) => {
     let { page } = req.query
-    if (! page) page = 1;
+    if (!page) page = 1;
     let maxAds = 20;
-    
+
     let getBlockedList = await db.socialBlockedUsers.findMany({
         where: {
             user_id: req.user.id
@@ -180,16 +243,16 @@ let getMyBlockedUsers = async (req, res) => {
 
 /* Create a new post according to the giving informaiton */
 let createPost = async (req, res) => {
-    const { title, attachments , feeling, activity, location, lng, lat, type } = req.body
+    const { title, attachments, feeling, activity, location, lng, lat, type } = req.body
 
     if (feeling) {
         let check = await db.postFeelings.findFirst({ where: { id: feeling } })
-        if (! check) checkfeeling = 0
-    } 
+        if (!check) checkfeeling = 0
+    }
 
     if (activity) {
         let check = await db.postActivity.findFirst({ where: { id: feeling } })
-        if (! check) checkactivity = 0        
+        if (!check) checkactivity = 0
     }
 
     try {
@@ -207,29 +270,6 @@ let createPost = async (req, res) => {
                 type: parseInt(type) ?? 0
             }
         })
-
-        // let attachments = [
-        //     {
-        //         "fieldname": "attachments",
-        //         "originalname": "garden-logo.png",
-        //         "encoding": "7bit",
-        //         "mimetype": "image/png",
-        //         "destination": "./uploads/",
-        //         "filename": "1651770586234---garden-logo.png",
-        //         "path": "uploads/1651770586234---garden-logo.png",
-        //         "size": 17673
-        //     },
-        //     {
-        //         "fieldname": "attachments",
-        //         "originalname": "download.png",
-        //         "encoding": "7bit",
-        //         "mimetype": "image/png",
-        //         "destination": "./uploads/",
-        //         "filename": "1651770586234---download.png",
-        //         "path": "uploads/1651770586234---download.png",
-        //         "size": 2959
-        //     }
-        // ]
 
         // check if attachments exists 
         if (attachments) {
@@ -253,14 +293,14 @@ let createPost = async (req, res) => {
     } catch (e) {
         console.log(e)
         return;
-    } 
+    }
 }
 
 // Edit on my own post 
 let editPost = async (req, res) => {
     const { title, type, postId } = req.body
 
-    if (! postId) {
+    if (!postId) {
         return res.status(403).send('Post id is required');
     }
 
@@ -271,7 +311,7 @@ let editPost = async (req, res) => {
         }
     })
 
-    if (! checkPostAuthor) {
+    if (!checkPostAuthor) {
         return res.status(403).json({
             error: {
                 error_en: 'You are not this post author',
@@ -294,9 +334,9 @@ let editPost = async (req, res) => {
             success: {
                 success_en: 'Your posts has been edited successfully.',
                 success_ar: 'تم تعديل منشورك بنجاح.'
-            } 
+            }
         })
-    } catch(e) {
+    } catch (e) {
         console.log(e)
         return;
     }
@@ -306,11 +346,11 @@ let editPost = async (req, res) => {
 let deletePost = async (req, res) => {
     const { id } = req.body
 
-    if (! id ) return res.stauts(403).send('Post id is required')
+    if (!id) return res.stauts(403).send('Post id is required')
 
     let checkPostId = await db.posts.findFirst({ where: { id: parseInt(id), user_id: req.user.id } })
 
-    if (! checkPostId) return res.status(403).send('Post is not found , Or you are not the author of the post')
+    if (!checkPostId) return res.status(403).send('Post is not found , Or you are not the author of the post')
 
     // delete attachments and privacy before deleting the post
     try {
@@ -321,7 +361,7 @@ let deletePost = async (req, res) => {
             }
         })
 
-        if (! deletingPostAttachments) return res.status(403).send('Something went wrong.');
+        if (!deletingPostAttachments) return res.status(403).send('Something went wrong.');
 
         //let getPostPrivacyId = await db.post
 
@@ -365,19 +405,19 @@ let getComments = async (req, res) => {
     const { id } = req.params
     let { page } = req.query
 
-    if (! page ) {
+    if (!page) {
         page = 1
     }
 
     let maxComments = 20;
 
-    if (! id) {
+    if (!id) {
         return res.status(403).send('post id is required');
     }
 
     let checkPost = await db.posts.findFirst({ where: { id: parseInt(id) } })
 
-    if (! checkPost) {
+    if (!checkPost) {
         return res.status(403).send('Post is not found');
     }
 
@@ -391,11 +431,12 @@ let getComments = async (req, res) => {
 
     let postsWithUser = [];
     // get user information
-    for ( item of getPostComments ) {
-        let user = await db.users.findFirst({
+    for (item of getPostComments) {
+
+        item.userInfo = await db.users.findFirst({
             where: {
                 id: item.user_id
-            }, 
+            },
             select: {
                 id: true,
                 profilePicture: true,
@@ -404,9 +445,60 @@ let getComments = async (req, res) => {
             }
         })
 
-        item.userInfo = user
-        postsWithUser.push(item)
+        let getCommentReacts = await db.reactions.findMany({
+            where: {
+                comment_id: parseInt(item.id)
+            }
+        })
+
+        let finalResult = [];
+        for (item of getCommentReacts) {
+            item.userInfo = await db.users.findFirst({
+                where: {
+                    id: item.user_id
+                },
+                select: {
+                    id: true,
+                    profilePicture: true,
+                    firstName: true,
+                    lastName: true,
+                }
+            })
+            finalResult.push(item)
+        }
+
+
+
+        let totalLikesWithPeople = finalResult.filter((item) => {
+            return item.type == 1
+        })
+
+        let totalLoveWithPeople = finalResult.filter((item) => {
+            return item.type == 2
+        })
+        let totalWowWithPeople = finalResult.filter((item) => {
+            return item.type == 3
+        })
+
+        let totalSadWithPeople = finalResult.filter((item) => {
+            return item.type == 4
+        })
+
+        let totalAngryWithPeople = finalResult.filter((item) => {
+            return item.type == 5
+        })
+
+        postsWithUser.push({
+            comment: item,
+            totalLikes: totalLikesWithPeople,
+            totalLove: totalLoveWithPeople,
+            totalWow: totalWowWithPeople,
+            totalSad: totalSadWithPeople,
+            totalAngry: totalAngryWithPeople
+        })
     }
+
+
 
     return res.status(200).json(postsWithUser)
 
@@ -416,18 +508,18 @@ let getComments = async (req, res) => {
 let getCommentReactions = async (req, res) => {
     const { id } = req.params
 
-    if (! id ) return false;
+    if (!id) return false;
 
     // check on the comment
-    let checkOnComment = await db.comments.findFirst( { where: { id: parseInt(id) } })
+    let checkOnComment = await db.comments.findFirst({ where: { id: parseInt(id) } })
 
-    if (! checkOnComment) return false;
+    if (!checkOnComment) return false;
 
     let getCommentReacts = await db.reactions.findMany({
         where: {
             comment_id: parseInt(id)
         }
-    }) 
+    })
 
     let finalResult = []
 
@@ -447,22 +539,85 @@ let getCommentReactions = async (req, res) => {
         finalResult.push(item)
     }
 
-    let totalLikesWithPeople = finalResult.filter( (item) => {
+    let totalLikesWithPeople = finalResult.filter((item) => {
         return item.type == 1
     })
 
-    let totalLoveWithPeople = finalResult.filter( (item) => {
+    let totalLoveWithPeople = finalResult.filter((item) => {
         return item.type == 2
     })
-    let totalWowWithPeople = finalResult.filter( (item) => {
+    let totalWowWithPeople = finalResult.filter((item) => {
         return item.type == 3
     })
 
-    let totalSadWithPeople = finalResult.filter( (item) => {
+    let totalSadWithPeople = finalResult.filter((item) => {
         return item.type == 4
     })
 
-    let totalAngryWithPeople = finalResult.filter( (item) => {
+    let totalAngryWithPeople = finalResult.filter((item) => {
+        return item.type == 5
+    })
+
+    return res.status(200).json({
+        totalLikes: totalLikesWithPeople,
+        totalLove: totalLoveWithPeople,
+        totalWow: totalWowWithPeople,
+        totalSad: totalSadWithPeople,
+        totalAngry: totalAngryWithPeople
+    })
+}
+
+// get reactions of post 
+let getPostsReactions = async (req, res) => {
+    const { id } = req.params
+
+    if (!id) return false;
+
+    // check on the comment
+    let checkOnPost = await db.posts.findFirst({ where: { id: parseInt(id) } })
+
+    if (!checkOnPost) return false;
+
+    let getPostReacts = await db.reactions.findMany({
+        where: {
+            post_id: parseInt(id)
+        }
+    })
+
+    let finalResult = []
+
+    for (item of getPostReacts) {
+        item.userInfo = await db.users.findFirst({
+            where: {
+                id: item.user_id
+            },
+            select: {
+                id: true,
+                profilePicture: true,
+                firstName: true,
+                lastName: true,
+            }
+        })
+
+        finalResult.push(item)
+    }
+
+    let totalLikesWithPeople = finalResult.filter((item) => {
+        return item.type == 1
+    })
+
+    let totalLoveWithPeople = finalResult.filter((item) => {
+        return item.type == 2
+    })
+    let totalWowWithPeople = finalResult.filter((item) => {
+        return item.type == 3
+    })
+
+    let totalSadWithPeople = finalResult.filter((item) => {
+        return item.type == 4
+    })
+
+    let totalAngryWithPeople = finalResult.filter((item) => {
         return item.type == 5
     })
 
@@ -477,4 +632,4 @@ let getCommentReactions = async (req, res) => {
 
 
 
-module.exports = { getMyProfile, getMyFriends, getMyFollowers, getMyPosts, getMyBlockedUsers, createPost, editPost, deletePost, getActivities, getFeelings, getFriendRequests, getComments, getCommentReactions }
+module.exports = { getMyProfile, getMyFriends, getMyFollowers, getMyPosts, getMyBlockedUsers, createPost, editPost, deletePost, getActivities, getFeelings, getFriendRequests, getComments, getCommentReactions, getPostsReactions }
