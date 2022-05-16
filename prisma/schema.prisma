@@ -642,11 +642,11 @@ model Comments {
   comment_content String   @db.Text
   post_id         Int
   total_reactions Int
-  totalLikes      Int?    @default(0)
-  totalWoW        Int?    @default(0)
-  totalAngry      Int?    @default(0)
-  totalSad        Int?    @default(0)
-  totalLove       Int?    @default(0)
+  totalLikes      Int?     @default(0)
+  totalWoW        Int?     @default(0)
+  totalAngry      Int?     @default(0)
+  totalSad        Int?     @default(0)
+  totalLove       Int?     @default(0)
   created_at      DateTime @default(now())
   updated_at      DateTime @updatedAt
 }
@@ -705,7 +705,7 @@ model friendRequests {
   friendRequestTo Int
   created_at      DateTime @default(now())
   updated_at      DateTime @updatedAt
-  user        Users    @relation(fields: [friendRequestTo], references: [id])
+  user            Users    @relation(fields: [friendRequestTo], references: [id])
 }
 
 model notifications {
@@ -733,4 +733,14 @@ model saraha {
   totalRate    Int      @default(0)
   created_at   DateTime @default(now())
   updated_at   DateTime @updatedAt
+}
+
+model Gallary {
+  id         Int      @id @default(autoincrement())
+  user_id    Int
+  post_id    Int
+  url        String
+  type       Int      @default(1)
+  created_at DateTime @default(now())
+  updated_at DateTime @updatedAt
 }

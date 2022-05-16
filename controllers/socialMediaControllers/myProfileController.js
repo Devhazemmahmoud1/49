@@ -83,7 +83,6 @@ let getMyPosts = async (req, res) => {
     });
 
     for (item of getMyPosts) {
-        let finalResult = []
         item.feeling = await db.postFeelings.findFirst({
             where: {
                 id: item.feeling_id
@@ -102,73 +101,13 @@ let getMyPosts = async (req, res) => {
                 post_id: parseInt(item.id),
                 comment_id: 0,
                 user_id: req.user.id
-            }
-        })
-
-        item.userInfo = await db.users.findFirst({
-            where: {
-                id: item.user_id
             },
             select: {
-                id: true,
-                profilePicture: true,
-                firstName: true,
-                lastName: true,
+                type: true,
             }
         })
 
-        let getPostReacts = await db.reactions.findMany({
-            where: {
-                post_id: parseInt(item.id),
-                comment_id: 0,
-            }
-        })
-
-        for (item of getPostReacts) {
-            item.userInfo = await db.users.findFirst({
-                where: {
-                    id: item.user_id
-                },
-                select: {
-                    id: true,
-                    profilePicture: true,
-                    firstName: true,
-                    lastName: true,
-                }
-            })
-                    
-            finalResult.push(item)
-        }
-
-
-        let totalLikesWithPeople = finalResult.filter((item) => {
-            return item.type == 1
-        })
-
-        let totalLoveWithPeople = finalResult.filter((item) => {
-            return item.type == 2
-        })
-        let totalWowWithPeople = finalResult.filter((item) => {
-            return item.type == 3
-        })
-
-        let totalSadWithPeople = finalResult.filter((item) => {
-            return item.type == 4
-        })
-
-        let totalAngryWithPeople = finalResult.filter((item) => {
-            return item.type == 5
-        })
-
-
-        newPosts.push({
-            post: item,
-            totalLikes: totalLikesWithPeople,
-            totalLove: totalLoveWithPeople,
-            totalWow: totalWowWithPeople,
-            totalSad: totalSadWithPeople,
-            totalAngry: totalAngryWithPeople
-        })
+        newPosts.push(item)
     }
 
     return res.status(200).json(newPosts)
@@ -401,7 +340,7 @@ let getActivities = async (req, res) => {
 }
 
 // get Main categories 
-let getComments = async (req, res) => {
+let getComments = async (req, res) => { 
     const { id } = req.params
     let { page } = req.query
 
@@ -430,75 +369,26 @@ let getComments = async (req, res) => {
     })
 
     let postsWithUser = [];
-    // get user information
+ 
     for (item of getPostComments) {
-
         item.userInfo = await db.users.findFirst({
             where: {
                 id: item.user_id
-            },
-            select: {
-                id: true,
-                profilePicture: true,
-                firstName: true,
-                lastName: true,
             }
         })
 
-        let getCommentReacts = await db.reactions.findMany({
+        item.isReacted = await db.reactions.findFirst({
             where: {
-                comment_id: parseInt(item.id)
+                user_id: req.user.id,
+                comment_id: item.id
+            }, 
+            select: {
+                type: true,
             }
         })
 
-        let finalResult = [];
-        for (item of getCommentReacts) {
-            item.userInfo = await db.users.findFirst({
-                where: {
-                    id: item.user_id
-                },
-                select: {
-                    id: true,
-                    profilePicture: true,
-                    firstName: true,
-                    lastName: true,
-                }
-            })
-            finalResult.push(item)
-        }
-
-
-
-        let totalLikesWithPeople = finalResult.filter((item) => {
-            return item.type == 1
-        })
-
-        let totalLoveWithPeople = finalResult.filter((item) => {
-            return item.type == 2
-        })
-        let totalWowWithPeople = finalResult.filter((item) => {
-            return item.type == 3
-        })
-
-        let totalSadWithPeople = finalResult.filter((item) => {
-            return item.type == 4
-        })
-
-        let totalAngryWithPeople = finalResult.filter((item) => {
-            return item.type == 5
-        })
-
-        postsWithUser.push({
-            comment: item,
-            totalLikes: totalLikesWithPeople,
-            totalLove: totalLoveWithPeople,
-            totalWow: totalWowWithPeople,
-            totalSad: totalSadWithPeople,
-            totalAngry: totalAngryWithPeople
-        })
+        postsWithUser.push(item)
     }
-
-
 
     return res.status(200).json(postsWithUser)
 

@@ -45,6 +45,21 @@ router.post('/upload-profile-picture' ,upload.array('attachments', 12), async (r
             profilePicture: file[0].filename
         }
     })
+
+    let createNewAd = await db.posts.create({
+        type: 1,
+        user_id: req.user.id
+    })
+
+    for (item of file) {
+        await db.postAttachments.create({
+            data: {
+                post_id: createNewAd.id,
+                url: item.filename,
+                type: 1
+            }
+        })
+    }
     return res.status(200).json(result)
 });
 
@@ -60,9 +75,20 @@ router.post('/upload-cover-picture' ,upload.array('attachments', 12), async (req
             coverPicture: file[0].filename
         }
     })
-    await db.posts.create({
-        
+    let createNewAd = await db.posts.create({
+        type: 1,
+        user_id: req.user.id
     })
+
+    for (item of file) {
+        await db.postAttachments.create({
+            data: {
+                post_id: createNewAd.id,
+                url: item.filename,
+                type: 1
+            }
+        })
+    }
     return res.status(200).json(result)
 });
 
