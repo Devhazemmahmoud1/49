@@ -29,14 +29,14 @@ var upload = multer({
 });
 
 /* Uploading Images using Multter Package */
-router.post('/upload-resturant-attahcments' ,upload.array('attachment', 12), async (req, res, next) => {
+router.post('/upload-resturant-attahcments' ,upload.array('attachments', 12), async (req, res, next) => {
     let file = req.files
     let result = await getFileStream(file)
     return res.status(200).json(result)
 });
 
 /* Uploading Images using Multter Package */
-router.post('/upload-resturant-meal-attachments' ,upload.array('attachment', 12), async (req, res, next) => {
+router.post('/upload-resturant-meal-attachments' ,upload.array('attachments', 12), async (req, res, next) => {
     let file = req.files
     let result = await getFileStream(file)
     return res.status(200).json(result)
