@@ -133,13 +133,22 @@ let makeSubscriptionPayments = async (req, res, next) => {
                 },
                 data: {
                     fourtyNineGain: "" + newFourtyNineGain + "",
-                    providerCashBack: "" + newProviderCashBack + "",
+                    //providerCashBack: "" + newProviderCashBack + "",
                     requestCashBack: "" + newRequestCash + "",
                     callCashBack: "" + newCallCash + "",
                     likeCashBack: "" + newLikeCash + "",
                     shareCashBack: "" + newShareCash + "",
                     viewCashBack: "" + newViewCash + "",
                     anyCashBack: "" + newAnyCash + "",
+                }
+            })
+
+            await db.users.update({
+                where: {
+                    id: req.user.id
+                },
+                data: {
+                    providerCashBack: newProviderCashBack
                 }
             })
 
@@ -1105,4 +1114,565 @@ let userInfo = async (req, res) => {
     return res.json(req.user)
 }
 
-module.exports = { getSubCategoryPrices, makeSubscriptionPayments, withdrawMoney, chargeBalance, transferTo, userInfo }
+/* Request Call API [ CashBack ] */
+let callRequest = async (req, res) => {
+    let requestType = 'call'
+    try {
+        let checkIfAppOweMeMoney = await db.wallet.findFirst({
+            where: {
+                user_id: req.user.id
+            }
+        })
+
+        let getStep = await db.cashBackStep.findFirst();
+        let today = moment().format()
+        let totalStepsOfToday = await db.dailyCashBack.findMany({
+            where: {
+                created_at: {
+                    gt: today
+                }
+            }
+        })
+
+        ///////
+        var counter;
+
+        for (item of totalStepsOfToday) {
+            console.log(item)
+            counter =+ item.amount
+        }
+
+        if (totalStepsOfToday.amount >= 10) {
+            return false;
+        }
+
+
+        ////
+
+        if (checkIfAppOweMeMoney.refundStorage > 0) {
+            if (checkIfAppOweMeMoney.FreeClicksStorage >= 250) {
+                if (req.user.providerCashBack > 0) {
+                    if (pasrInt(req.user.providerCashBack) - getStep.amount >= 0) {
+                        await db.users.update({
+                            where: {
+                                id: req.user.id
+                            },
+                            data: {
+                                providerCashBack: parseInt(req.user.providerCashBack) - getStep.amount
+                            }
+                        })
+
+                        await db.wallet.update({
+                            where: {
+                                user_id: req.user.id,
+                            },
+                            data: {
+                                refundStorage: parseInt(req.user.wallet.refundStorage) - getStep.amount
+                            }
+                        })
+
+                        await db.dailyCashBack.create({
+                            data: {
+                                user_id: req.user.id,
+                                amount: getStep.amount
+                            }
+                        })
+                        return false; 
+                    } else {
+                        let getStorage = await db.cashBackStorage.findFirst({});
+                        if (req.user.providerCashBack <= 0) {
+                            var getCurrentProviderCashBack = 0
+                        } else {
+                            var getCurrentProviderCashBack = req.user.providerCashBack
+                        }
+
+                        let totalCalcu = parseInt(getStep.amount) - getCurrentProviderCashBack
+
+                        await db.users.update({
+                            where: {
+                                id: req.user.id
+                            },
+                            data: {
+                                providerCashBack: 0
+                            }
+                        })
+
+                        if (requestType == 'call') {
+                            let call = getStorage.callCashBack
+                            if (call <= 0) {
+                                return false;
+                            } else {
+                                if (parseInt(call) - parseInt(getStep.amount) >= 0) {
+                                    await db.cashBackStorage.update({
+                                        where: {
+                                            id: 1
+                                        }, data: {
+                                            callCashBack: parseInt(getStorage.callCashBack) - parseInt(totalCalcu)
+                                        }
+                                    })
+    
+                                    await db.wallet.update({
+                                        where: {
+                                            user_id: req.user.id
+                                        },
+                                        data: {
+                                            refundStorage: parseInt(req.user.wallet.refundStorage) - getStep.amount
+                                        }
+                                    })
+                                    await db.dailyCashBack.create({
+                                        data: {
+                                            user_id: req.user.id,
+                                            amount: getStep.amount
+                                        }
+                                    })
+                                } else {
+                                    await db.cashBackStorage.update({
+                                        where: {
+                                            id: 1
+                                        }, data: {
+                                            callCashBack: 0
+                                        }
+                                    })
+    
+                                    await db.wallet.update({
+                                        where: {
+                                            user_id: req.user.id
+                                        },
+                                        data: {
+                                            refundStorage: parseInt(req.user.wallet.refundStorage) - getStep.amount
+                                        }
+                                    })
+                                    await db.dailyCashBack.create({
+                                        data: {
+                                            user_id: req.user.id,
+                                            amount: getStep.amount
+                                        }
+                                    })
+                                }
+                            }
+                        }
+                    } 
+                } else {
+                    let getStorage = await db.cashBackStorage.findFirst({});
+
+                    if (requestType == 'call') {
+                        let call = getStorage.callCashBack
+                        if (call <= 0) {
+                            return false;
+                        } else {
+                            if (parseInt(call) - parseInt(getStep.amount) >= 0) {
+                                await db.cashBackStorage.update({
+                                    where: {
+                                        id: 1
+                                    }, data: {
+                                        callCashBack: parseInt(getStorage.callCashBack) - parseInt(getStep.amount)
+                                    }
+                                })
+
+                                await db.wallet.update({
+                                    where: {
+                                        user_id: req.user.id
+                                    },
+                                    data: {
+                                        refundStorage: parseInt(req.user.wallet.refundStorage) - getStep.amount
+                                    }
+                                })
+                                await db.dailyCashBack.create({
+                                    data: {
+                                        user_id: req.user.id,
+                                        amount: getStep.amount
+                                    }
+                                })
+                            } else {
+                                await db.cashBackStorage.update({
+                                    where: {
+                                        id: 1
+                                    }, data: {
+                                        callCashBack: 0
+                                    }
+                                })
+
+                                await db.wallet.update({
+                                    where: {
+                                        user_id: req.user.id
+                                    },
+                                    data: {
+                                        refundStorage: parseInt(req.user.wallet.refundStorage) - getStep.amount
+                                    }
+                                })
+                                await db.dailyCashBack.create({
+                                    data: {
+                                        user_id: req.user.id,
+                                        amount: getStep.amount
+                                    }
+                                })
+                            }
+                        }
+                    }
+                }
+            } else {
+                // check for if the first time of the day using this feater 
+                    // timer code is missing
+                //
+                if (true) {
+                    if (req.user.providerCashBack > 0) {
+                        if (pasrInt(req.user.providerCashBack) - getStep.amount >= 0) {
+                            await db.users.update({
+                                where: {
+                                    id: req.user.id
+                                },
+                                data: {
+                                    providerCashBack: parseInt(req.user.providerCashBack) - getStep.amount
+                                }
+                            })
+    
+                            await db.wallet.update({
+                                where: {
+                                    user_id: req.user.id,
+                                },
+                                data: {
+                                    refundStorage: parseInt(req.user.wallet.refundStorage) - getStep.amount
+                                }
+                            })
+    
+                            await db.dailyCashBack.create({
+                                data: {
+                                    user_id: req.user.id,
+                                    amount: getStep.amount
+                                }
+                            })
+                            return false; 
+                        } else {
+                            let getStorage = await db.cashBackStorage.findFirst({});
+                            if (req.user.providerCashBack <= 0) {
+                                var getCurrentProviderCashBack = 0
+                            } else {
+                                var getCurrentProviderCashBack = req.user.providerCashBack
+                            }
+    
+                            let totalCalcu = parseInt(getStep.amount) - getCurrentProviderCashBack
+    
+                            await db.users.update({
+                                where: {
+                                    id: req.user.id
+                                },
+                                data: {
+                                    providerCashBack: 0
+                                }
+                            })
+    
+                            if (requestType == 'call') {
+                                let call = getStorage.callCashBack
+                                if (call <= 0) {
+                                    return false;
+                                } else {
+                                    if (parseInt(call) - parseInt(getStep.amount) >= 0) {
+                                        await db.cashBackStorage.update({
+                                            where: {
+                                                id: 1
+                                            }, data: {
+                                                callCashBack: parseInt(getStorage.callCashBack) - parseInt(totalCalcu)
+                                            }
+                                        })
+        
+                                        await db.wallet.update({
+                                            where: {
+                                                user_id: req.user.id
+                                            },
+                                            data: {
+                                                refundStorage: parseInt(req.user.wallet.refundStorage) - getStep.amount
+                                            }
+                                        })
+                                        await db.dailyCashBack.create({
+                                            data: {
+                                                user_id: req.user.id,
+                                                amount: getStep.amount
+                                            }
+                                        })
+                                    } else {
+                                        await db.cashBackStorage.update({
+                                            where: {
+                                                id: 1
+                                            }, data: {
+                                                callCashBack: 0
+                                            }
+                                        })
+        
+                                        await db.wallet.update({
+                                            where: {
+                                                user_id: req.user.id
+                                            },
+                                            data: {
+                                                refundStorage: parseInt(req.user.wallet.refundStorage) - getStep.amount
+                                            }
+                                        })
+                                        await db.dailyCashBack.create({
+                                            data: {
+                                                user_id: req.user.id,
+                                                amount: getStep.amount
+                                            }
+                                        })
+                                    }
+                                }
+                            }
+                        } 
+                    } else {
+                        let getStorage = await db.cashBackStorage.findFirst({});
+    
+                        if (requestType == 'call') {
+                            let call = getStorage.callCashBack
+                            if (call <= 0) {
+                                return false;
+                            } else {
+                                if (parseInt(call) - parseInt(getStep.amount) >= 0) {
+                                    await db.cashBackStorage.update({
+                                        where: {
+                                            id: 1
+                                        }, data: {
+                                            callCashBack: parseInt(getStorage.callCashBack) - parseInt(getStep.amount)
+                                        }
+                                    })
+    
+                                    await db.wallet.update({
+                                        where: {
+                                            user_id: req.user.id
+                                        },
+                                        data: {
+                                            refundStorage: parseInt(req.user.wallet.refundStorage) - getStep.amount
+                                        }
+                                    })
+                                    await db.dailyCashBack.create({
+                                        data: {
+                                            user_id: req.user.id,
+                                            amount: getStep.amount
+                                        }
+                                    })
+                                } else {
+                                    await db.cashBackStorage.update({
+                                        where: {
+                                            id: 1
+                                        }, data: {
+                                            callCashBack: 0
+                                        }
+                                    })
+    
+                                    await db.wallet.update({
+                                        where: {
+                                            user_id: req.user.id
+                                        },
+                                        data: {
+                                            refundStorage: parseInt(req.user.wallet.refundStorage) - getStep.amount
+                                        }
+                                    })
+                                    await db.dailyCashBack.create({
+                                        data: {
+                                            user_id: req.user.id,
+                                            amount: getStep.amount
+                                        }
+                                    })
+                                }
+                            }
+                        }
+                    }                    
+                } else {
+
+                    await db.wallet.update({
+                        where: {
+                            user_id: req.user.id
+                        },
+                        data: {
+                            refundStorage: parseInt(req.user.Wallet.refundStorage) + getStep.amount,
+                            balance: parseInt(req.user.Wallet.balance) + parseInt(getStep.amount),
+                            FreeClicksStorage: parseInt(req.user.Wallet.FreeClicksStorage) + parseInt(getStep.amount)
+                        }
+                    })
+                    await db.dailyCashBack.create({
+                        data: {
+                            user_id: req.user.id,
+                            amount: getStep.amount
+                        }
+                    })                
+                }                
+            }
+        } else {
+            // check if you got a ref with you
+
+                    // Code is missing for ref 
+                    // check if this user has already gave the ref all the wanted amount [10L.E]
+                    // each time before the proccess we need to check if there is real cash in provider cash back or storagecashback
+                    // if no real money script will be down.
+                    // mark as one day payment .. and you cannot get money for yourself unless you already paid all the money to the ref
+            //
+            if (req.user.providerCashBack > 0) {
+                if (pasrInt(req.user.providerCashBack) - getStep.amount >= 0) {
+                    await db.users.update({
+                        where: {
+                            id: req.user.id
+                        },
+                        data: {
+                            providerCashBack: parseInt(req.user.providerCashBack) - getStep.amount
+                        }
+                    })
+
+                    await db.wallet.update({
+                        where: {
+                            user_id: req.user.id,
+                        },
+                        data: {
+                            balance: parseInt(req.user.wallet.balance) + getStep.amount
+                        }
+                    })
+
+                    await db.dailyCashBack.create({
+                        data: {
+                            user_id: req.user.id,
+                            amount: getStep.amount
+                        }
+                    })
+                    return false; 
+                } else {
+                    let getStorage = await db.cashBackStorage.findFirst({});
+                    if (req.user.providerCashBack <= 0) {
+                        var getCurrentProviderCashBack = 0
+                    } else {
+                        var getCurrentProviderCashBack = req.user.providerCashBack
+                    }
+
+                    let totalCalcu = parseInt(getStep.amount) - getCurrentProviderCashBack
+
+                    await db.users.update({
+                        where: {
+                            id: req.user.id
+                        },
+                        data: {
+                            providerCashBack: 0
+                        }
+                    })
+
+                    if (requestType == 'call') {
+                        let call = getStorage.callCashBack
+                        if (call <= 0) {
+                            return false;
+                        } else {
+                            if (parseInt(call) - parseInt(getStep.amount) >= 0) {
+                                await db.cashBackStorage.update({
+                                    where: {
+                                        id: 1
+                                    }, data: {
+                                        callCashBack: parseInt(getStorage.callCashBack) - parseInt(totalCalcu)
+                                    }
+                                })
+
+                                await db.wallet.update({
+                                    where: {
+                                        user_id: req.user.id
+                                    },
+                                    data: {
+                                        balance: parseInt(req.user.wallet.balance) + getStep.amount
+                                    }
+                                })
+                                await db.dailyCashBack.create({
+                                    data: {
+                                        user_id: req.user.id,
+                                        amount: getStep.amount
+                                    }
+                                })
+                            } else {
+                                await db.cashBackStorage.update({
+                                    where: {
+                                        id: 1
+                                    }, data: {
+                                        callCashBack: 0
+                                    }
+                                })
+
+                                await db.wallet.update({
+                                    where: {
+                                        user_id: req.user.id
+                                    },
+                                    data: {
+                                        balance: parseInt(req.user.wallet.refundStorage) + getStep.amount
+                                    }
+                                })
+                                await db.dailyCashBack.create({
+                                    data: {
+                                        user_id: req.user.id,
+                                        amount: getStep.amount
+                                    }
+                                })
+                            }
+                        }
+                    }
+                } 
+            } else {
+                let getStorage = await db.cashBackStorage.findFirst({});
+
+                if (requestType == 'call') {
+                    let call = getStorage.callCashBack
+                    if (call <= 0) {
+                        return false;
+                    } else {
+                        if (parseInt(call) - parseInt(getStep.amount) >= 0) {
+                            await db.cashBackStorage.update({
+                                where: {
+                                    id: 1
+                                }, data: {
+                                    callCashBack: parseInt(getStorage.callCashBack) - parseInt(getStep.amount)
+                                }
+                            })
+
+                            await db.wallet.update({
+                                where: {
+                                    user_id: req.user.id
+                                },
+                                data: {
+                                    balance: parseInt(req.user.wallet.balance) + getStep.amount
+                                }
+                            })
+                            await db.dailyCashBack.create({
+                                data: {
+                                    user_id: req.user.id,
+                                    amount: getStep.amount
+                                }
+                            })
+                        } else {
+                            let finalAmount = parseInt(getStep.amount) - parseInt(getStorage.callCashBack)
+                            await db.cashBackStorage.update({
+                                where: {
+                                    id: 1
+                                }, data: {
+                                    callCashBack: 0
+                                }
+                            })
+
+                            await db.wallet.update({
+                                where: {
+                                    user_id: req.user.id
+                                },
+                                data: {
+                                    balance: parseInt(req.user.wallet.balance) + parseInt(finalAmount)
+                                }
+                            })
+                            await db.dailyCashBack.create({
+                                data: {
+                                    user_id: req.user.id,
+                                    amount: getStep.amount
+                                }
+                            })
+                        }
+                    }
+                }
+            }
+        }
+
+    } catch (e) {
+        console.log(e)
+        return false
+    }
+}
+
+let calculation = () => {
+
+}
+
+module.exports = { getSubCategoryPrices, makeSubscriptionPayments, withdrawMoney, chargeBalance, transferTo, userInfo, callRequest }

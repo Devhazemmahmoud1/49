@@ -7,8 +7,8 @@ generator client {
 
 datasource db {
   provider = "mysql"
-  //url      = "mysql://root:root@localhost:3306/fourtynine?schema=public"
-  url      = "mysql://49hub1:Database49hub@64.225.101.68:3306/fourtynine?schema=public"
+  url      = "mysql://root:root@localhost:3306/fourtynine?schema=public"
+  //url      = "mysql://49hub1:Database49hub@64.225.101.68:3306/fourtynine?schema=public"
 }
 
 model Admins {
@@ -22,36 +22,37 @@ model Admins {
 }
 
 model Users {
-  id             Int                  @id @default(autoincrement())
-  firstName      String               @db.VarChar(255)
-  lastName       String               @db.VarChar(255)
-  email          String               @db.VarChar(5000)
-  phone          String               @db.VarChar(255)
-  password       String               @db.VarChar(255)
-  is_locked      Int                  @default(0)
-  ref_number     String               @db.VarChar(255)
-  device_id      String?              @db.VarChar(100)
-  fcm            String?              @db.VarChar(300)
-  countryCode    String?
-  hashCode       String?
-  created_at     DateTime             @default(now())
-  updated_at     DateTime             @updatedAt
-  Wallet         Wallet?
-  profilePicture String?
-  coverPicture   String?
-  Ride           ride[]
-  resturants     resturants[]
-  subscriptions  subscriptions[]
-  agent          ridesRequested[]
-  ads            Advertisment[]
-  userSettings   userSettings[]
-  userPrivacy    userPrivacy[]
-  posts          Posts[]
-  friends        friends[]
-  followers      followers[]
-  friendRequests friendRequests[]
-  blocked        socialBlockedUsers[]
-  notifications  notifications[]
+  id               Int                  @id @default(autoincrement())
+  firstName        String               @db.VarChar(255)
+  lastName         String               @db.VarChar(255)
+  email            String               @db.VarChar(5000)
+  phone            String               @db.VarChar(255)
+  password         String               @db.VarChar(255)
+  is_locked        Int                  @default(0)
+  ref_number       String               @db.VarChar(255)
+  device_id        String?              @db.VarChar(100)
+  fcm              String?              @db.VarChar(300)
+  countryCode      String?
+  hashCode         String?
+  providerCashBack Decimal              @default(0) @db.Decimal(9, 2)
+  created_at       DateTime             @default(now())
+  updated_at       DateTime             @updatedAt
+  Wallet           Wallet?
+  profilePicture   String?
+  coverPicture     String?
+  Ride             ride[]
+  resturants       resturants[]
+  subscriptions    subscriptions[]
+  agent            ridesRequested[]
+  ads              Advertisment[]
+  userSettings     userSettings[]
+  userPrivacy      userPrivacy[]
+  posts            Posts[]
+  friends          friends[]
+  followers        followers[]
+  friendRequests   friendRequests[]
+  blocked          socialBlockedUsers[]
+  notifications    notifications[]
 }
 
 model ref {
@@ -119,24 +120,25 @@ model SubCategoryAttachments {
 }
 
 model Wallet {
-  id               Int              @id @default(autoincrement())
-  user_id          Int              @unique
-  balance          String
-  startBalance     String
-  balanceAfter5    String
-  grossMoney       String
-  generatedBal     String
-  profit           String
-  total            String
-  FiveYears        String
-  TenYears         String
-  providerCashBack String?
-  refundStorage    Decimal?     @db.Decimal(9,2) @default(0)
-  PendingStorage   Decimal?     @db.Decimal(9,2) @default(0)
-  created_at       DateTime         @default(now())
-  updated_at       DateTime         @updatedAt
-  user             Users            @relation(fields: [user_id], references: [id])
-  Activity         WalletActivity[]
+  id                Int              @id @default(autoincrement())
+  user_id           Int              @unique
+  balance           String
+  startBalance      String
+  balanceAfter5     String
+  grossMoney        String
+  generatedBal      String
+  profit            String
+  total             String
+  FiveYears         String
+  TenYears          String
+  providerCashBack  String?
+  refundStorage     Decimal?         @default(0) @db.Decimal(9, 2)
+  PendingStorage    Decimal?         @default(0) @db.Decimal(9, 2)
+  FreeClicksStorage Decimal?          @default(0) @db.Decimal(9, 2)
+  created_at        DateTime         @default(now())
+  updated_at        DateTime         @updatedAt
+  user              Users            @relation(fields: [user_id], references: [id])
+  Activity          WalletActivity[]
 }
 
 model WalletActivity {
@@ -147,6 +149,13 @@ model WalletActivity {
   created_at   DateTime @default(now())
   updated_at   DateTime @updatedAt
   Wallet       Wallet   @relation(fields: [wallet_id], references: [id])
+}
+
+model cashBackStep {
+  id Int @id @default(autoincrement())
+  step Decimal @db.Decimal(9,2)
+  created_at   DateTime @default(now())
+  updated_at   DateTime @updatedAt  
 }
 
 model Payment {
@@ -213,7 +222,7 @@ model cashBackStorage {
   id               Int      @id @default(autoincrement())
   fees             Int      @default(0)
   fourtyNineGain   String
-  providerCashBack String //
+  providerCashBack String?
   requestCashBack  String
   callCashBack     String
   likeCashBack     String
@@ -222,6 +231,14 @@ model cashBackStorage {
   anyCashBack      String
   created_at       DateTime @default(now())
   updated_at       DateTime @updatedAt
+}
+
+model dailyCashBack {
+  id         Int      @id @default(autoincrement())
+  amount     Decimal  @db.Decimal(9, 2)
+  user_id    Int
+  created_at DateTime @default(now())
+  updated_at DateTime @updatedAt
 }
 
 model RunningCost {

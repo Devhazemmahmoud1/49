@@ -392,7 +392,7 @@ let register = async (req, res) => {
         await db.wallet.create({
             data: {
                 user_id: create.id,
-                balance: "0",
+                balance: "250",
                 startBalance: '0',
                 balanceAfter5: '0',
                 grossMoney: "0",

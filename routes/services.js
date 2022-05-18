@@ -13,6 +13,8 @@ router.post('/submit-payment', guard, services.makeSubscriptionPayments);
 
 router.post('/withdraw', guard , services.withdrawMoney)
 
+router.post('/call-request', guard, services.callRequest)
+
 router.get('/info', guard, services.userInfo)
 
 
