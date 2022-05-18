@@ -36,11 +36,11 @@ let register = async (req, res) => {
         })
     }
 
-    if (password.length < 8) {
+    if (password.length < 8 || password.length > 15) {
         return res.status(403).json({
             error: {
-                'error_en': 'Password should contain at least 8 characters',
-                'error_ar': 'كلمه السر يجب ان تحتوي علي ٨ احرف علي الاقل'
+                'error_en': 'Password should contain at least 8 characters and max of 15 characters.',
+                'error_ar': ' كلمه السر يجب ان تحتوي علي ٨ احرف علي الاقل و ١٥ حرف كحد اقصي.'
             }
         })
     }
@@ -200,7 +200,7 @@ let register = async (req, res) => {
                     settingName_ar: ' البلد',
                     settingName_en: 'Country',
                     value: country,
-                    status: 0,
+                    status: 1,
                 },
                 {
                     identifier: 2,
@@ -208,7 +208,7 @@ let register = async (req, res) => {
                     settingName_ar: 'البريد الالكتروني',
                     settingName_en: 'Email address',
                     value: email,
-                    status: 0,
+                    status: 1,
                 },
                 {
                     identifier: 3,
@@ -216,7 +216,7 @@ let register = async (req, res) => {
                     settingName_ar: 'رقم الهاتف',
                     settingName_en: 'Phone number',
                     value: phone,
-                    status: 0,
+                    status: 1,
                 },
                 {
                     identifier: 4,
@@ -224,7 +224,7 @@ let register = async (req, res) => {
                     settingName_ar: 'تاريخ الميلاد',
                     settingName_en: 'Birth Date',
                     value: '',
-                    status: 0,
+                    status: 1,
                 },
                 {
                     identifier: 5,
@@ -232,7 +232,7 @@ let register = async (req, res) => {
                     settingName_ar: 'الحاله الاجتماعيه',
                     settingName_en: 'Social status',
                     value: '',
-                    status: 0,
+                    status: 1,
                 },
                 {
                     identifier: 6,
@@ -240,7 +240,7 @@ let register = async (req, res) => {
                     settingName_ar: 'الوظيفه',
                     settingName_en: 'Job',
                     value: '',
-                    status: 0,
+                    status: 1,
                 },
                 {
                     identifier: 7,
@@ -248,7 +248,7 @@ let register = async (req, res) => {
                     settingName_ar: 'المدينه',
                     settingName_en: 'City',
                     value: '',
-                    status: 0,
+                    status: 1,
                 },
                 // {
                 //     user_id: create.id,
@@ -263,7 +263,7 @@ let register = async (req, res) => {
                     settingName_ar: 'النوع',
                     settingName_en: 'Gender',
                     value: '',
-                    status: 0,
+                    status: 1,
                 },
             ]
         })
@@ -286,7 +286,7 @@ let register = async (req, res) => {
                     settingName_ar: 'اخر ظهور',
                     settingName_en: 'Last seen',
                     type: 0,
-                    status: 0,
+                    status: 1,
                 },
                 {
                     user_id: create.id,
@@ -294,7 +294,7 @@ let register = async (req, res) => {
                     settingName_ar: 'ظهور قرا،ه الرساله',
                     settingName_en: 'Read messages',
                     type: 0,
-                    status: 0,
+                    status: 1,
                 },
                 {   
                     user_id: create.id,
@@ -302,7 +302,7 @@ let register = async (req, res) => {
                     settingName_ar: 'ظهور بيانات شخصيه',
                     settingName_en: 'Personal information',
                     type: 0,
-                    status: 0,
+                    status: 1,
                 },
                 {
                     user_id: create.id,
@@ -310,7 +310,7 @@ let register = async (req, res) => {
                     settingName_ar: 'ظهور الصوره الشخصيه',
                     settingName_en: 'Profile Picture',
                     type: 0,
-                    status: 0,
+                    status: 1,
                 },
                 {
                     user_id: create.id,
@@ -318,7 +318,7 @@ let register = async (req, res) => {
                     settingName_ar: 'الصور الشخصيه',
                     settingName_en: 'Photos',
                     type: 0,
-                    status: 0,
+                    status: 1,
                 },
                 {
                     user_id: create.id,
@@ -326,7 +326,7 @@ let register = async (req, res) => {
                     settingName_ar: 'ظهور منشورات',
                     settingName_en: 'Posts',
                     type: 0,
-                    status: 0,
+                    status: 1,
                 },
                 {
                     user_id: create.id,
@@ -334,7 +334,7 @@ let register = async (req, res) => {
                     settingName_ar: 'ظهور قصص',
                     settingName_en: 'Stories',
                     type: 0,
-                    status: 0,
+                    status: 1,
                 },
                 {
                     user_id: create.id,
@@ -342,7 +342,7 @@ let register = async (req, res) => {
                     settingName_ar: 'ظهور قايمه الاصدقا،',
                     settingName_en: 'Friend list',
                     type: 0,
-                    status: 0,
+                    status: 1,
                 },
                 {
                     user_id: create.id,
@@ -350,7 +350,7 @@ let register = async (req, res) => {
                     settingName_ar: 'ظهور قايمه المتابعيين',
                     settingName_en: 'Followers list',
                     type: 0,
-                    status: 0,
+                    status: 1,
                 },
                 {
                     user_id: create.id,
@@ -358,7 +358,7 @@ let register = async (req, res) => {
                     settingName_ar: 'ظهور نشاطيه',
                     settingName_en: 'Activity',
                     type: 0,
-                    status: 0,
+                    status: 1,
                 },
                 {
                     user_id: create.id,
@@ -366,7 +366,7 @@ let register = async (req, res) => {
                     settingName_ar: 'ظهور عشوايي',
                     settingName_en: 'Random appearance',
                     type: 0,
-                    status: 0,
+                    status: 1,
                 },
                 {
                     user_id: create.id,
@@ -374,7 +374,7 @@ let register = async (req, res) => {
                     settingName_ar: 'طلبات الصداقه',
                     settingName_en: 'Friend requests',
                     type: 1,
-                    status: 0,
+                    status: 1,
                 },
                 {
                     user_id: create.id,
@@ -382,7 +382,7 @@ let register = async (req, res) => {
                     settingName_ar: 'طلبات المتابعه',
                     settingName_en: 'Follow requests',
                     type: 1,
-                    status: 0,
+                    status: 1,
                 },
             ]
         })
@@ -401,6 +401,7 @@ let register = async (req, res) => {
                 total: '0',
                 TenYears: "0",
                 FiveYears: "0",
+                refundStorage: 250,    
             }
         })
 

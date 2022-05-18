@@ -21,6 +21,7 @@ let createResturant = async (req ,res) => {
             name: resturantName,
             lng: lng,
             lat: lat,
+            user_id: req.user.id,
             workFrom_ar: workFrom,
             workFrom_en: workFrom,
             workTo_ar: workTo,
@@ -37,6 +38,7 @@ let createResturant = async (req ,res) => {
         let createAttachment = await db.resturantAttachments.create({
             data: {
                 url: item.filename,
+                type: 1,
                 resturant_id: createRest.id,
             }     
         })
