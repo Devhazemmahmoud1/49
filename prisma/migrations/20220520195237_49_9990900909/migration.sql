@@ -1,0 +1,4 @@
+-- AlterTable
+ALTER TABLE `Users` ADD COLUMN `recentLikes` INTEGER NULL DEFAULT 0,
+    ADD COLUMN `recentShare` INTEGER NULL DEFAULT 0,
+    ADD COLUMN `recentViews` INTEGER NULL DEFAULT 0;

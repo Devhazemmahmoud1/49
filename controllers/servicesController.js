@@ -1125,21 +1125,26 @@ let callRequest = async (req, res) => {
         })
 
         let getStep = await db.cashBackStep.findFirst();
-        let day = moment().startOf('day').format()
-        let end = moment().endOf('day').format()
-        let totalStepsOfToday = await db.dailyCashBack.aggregate({
-            where: {
-                created_at: {
-                    gt: day,
-                    lt: end
-                },
-                user_id: req.user.id
-            },
-            _sum: {
-                amount: true,
-            }
-        })
 
+        let totalStepsOfToday = await db.dailyCashBack.findMany({
+            where: {
+                user_id: req.user.id,
+            },
+        });
+
+        var counter = 0;
+
+        for (item of totalStepsOfToday) {
+            if (moment().isAfter(item.created_at) && moment(item.created_at).isBefore(moment().endOf('day'))) {
+                counter++
+            } //true)
+        }
+
+        console.log(counter)
+
+
+        //console.log(totalStepsOfToday)
+        /*
         let isFirstStep = await db.dailyCashBack.aggregate({
             where: {
                 created_at: {
@@ -1151,8 +1156,8 @@ let callRequest = async (req, res) => {
             _count: {
                 id: true,
             }
-        })
-
+        }) 
+        */
 
         let refundStorage = parseInt(req.user.Wallet.refundStorage)
 
@@ -1693,8 +1698,8 @@ let callRequest = async (req, res) => {
                             providerCashBack: 0
                         }
                     })
-                    
-                    let getCashBackStorage =  (await db.cashBackStorage.findFirst({})).callCashBack
+
+                    let getCashBackStorage = (await db.cashBackStorage.findFirst({})).callCashBack
 
                     if (parseInt(getCashBackStorage) <= 0) {
                         await db.wallet.update({
@@ -1708,14 +1713,14 @@ let callRequest = async (req, res) => {
                         await db.dailyCashBack.create({
                             data: {
                                 user_id: req.user.id,
-                                amount:  finalAmount
+                                amount: finalAmount
                             }
                         })
                         return res.status(200).send('You got some money from provider cashback')
                     } else {
                         let finalAmount = req.user.providerCashBack
                         let remainingProviderCashBack = parseInt(getStep.step) - parseInt(finalAmount)
-                        let getCashBackStorage =  (await db.cashBackStorage.findFirst({})).callCashBack
+                        let getCashBackStorage = (await db.cashBackStorage.findFirst({})).callCashBack
 
                         if (parseInt(getCashBackStorage) - parseInt(remainingProviderCashBack) >= 0) {
                             await db.cashBackStorage.update({
@@ -1737,7 +1742,7 @@ let callRequest = async (req, res) => {
                             await db.dailyCashBack.create({
                                 data: {
                                     user_id: req.user.id,
-                                    amount:  finalAmount
+                                    amount: finalAmount
                                 }
                             })
 
@@ -1766,7 +1771,7 @@ let callRequest = async (req, res) => {
                             await db.dailyCashBack.create({
                                 data: {
                                     user_id: req.user.id,
-                                    amount:  parseInt(finalAmount) + parseInt(remainCallCashBack)
+                                    amount: parseInt(finalAmount) + parseInt(remainCallCashBack)
                                 }
                             })
                             return res.status(200).send('Money has been taken out from storage and provider')
@@ -1774,6 +1779,69 @@ let callRequest = async (req, res) => {
                     }
                 }
             } else {
+                // no provider cashBack and we need to check the cashback
+                let cashBackStorage = await db.cashBackStorage.findFirst({}).callCashBack
+
+                if (parseInt(cashBackStorage) == 0) {
+                    // there is no money in the cash back storage of the choosing request
+                    return res.stauts(200).send('No cashBack storage and there is no provider cash but everything is okay')
+                } else {
+                    if (parseInt(cashBackStorage) - parseInt(getStep.step) >= 0) {
+                        await db.cashBackStorage.update({
+                            where: {
+                                id: 1
+                            },
+                            data: {
+                                callCashBack: parseInt(cashBackStorage) - parseInt(getStep.step)
+                            }
+                        })
+
+                        await db.wallet.update({
+                            where: {
+                                user_id: req.user.id,
+                            },
+                            data: {
+                                balance: (parseInt(req.user.Wallet.balance) + parseInt(getStep.step)).toString()
+                            }
+                        })
+
+                        await db.dailyCashBack.create({
+                            data: {
+                                user_id: req.user.id,
+                                amount: getStep.step
+                            }
+                        })
+
+                        return res.status(200).send('Cash back Storage has been totally effected')
+                    } else {
+                        await db.cashBackStorage.update({
+                            where: {
+                                id: 1
+                            },
+                            data: {
+                                callCashBack: 0
+                            }
+                        })
+
+                        await db.wallet.update({
+                            where: {
+                                user_id: req.user.id,
+                            },
+                            data: {
+                                balance: (parseInt(req.user.Wallet.balance) + parseInt(cashBackStorage)).toString()
+                            }
+                        })
+
+                        await db.dailyCashBack.create({
+                            data: {
+                                user_id: req.user.id,
+                                amount: getStep.step
+                            }
+                        })
+
+                        return res.status(200).send('Cash back Storage has been not-totally effected')
+                    }
+                }
 
             }
 

@@ -40,6 +40,9 @@ model Users {
   Wallet           Wallet?
   profilePicture   String?
   coverPicture     String?
+  recentLikes      Int?                 @default(0)
+  recentShare      Int?                 @default(0)
+  recentViews      Int?                 @default(0)
   Ride             ride[]
   resturants       resturants[]
   subscriptions    subscriptions[]
@@ -579,6 +582,7 @@ model Posts {
   user_id         Int
   total_reactions Int               @default(0)
   total_comments  Int               @default(0)
+  total_shares    Int?              @default(0)
   feeling_id      Int
   activity_id     Int               @default(0)
   location        String?
