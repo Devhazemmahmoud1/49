@@ -26,6 +26,7 @@ module.exports = ((req, res, next) => {
                         userPrivacy: true,
                         fcm: true,
                         hashCode: true,
+                        providerCashBack: true,
                         countryCode: true,
                     }
                 });

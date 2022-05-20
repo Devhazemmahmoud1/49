@@ -134,7 +134,8 @@ model Wallet {
   providerCashBack  String?
   refundStorage     Decimal?         @default(0) @db.Decimal(9, 2)
   PendingStorage    Decimal?         @default(0) @db.Decimal(9, 2)
-  FreeClicksStorage Decimal?          @default(0) @db.Decimal(9, 2)
+  FreeClicksStorage Decimal?         @default(0) @db.Decimal(9, 2)
+  refPayBack        Decimal?         @default(0) @db.Decimal(9, 2)
   created_at        DateTime         @default(now())
   updated_at        DateTime         @updatedAt
   user              Users            @relation(fields: [user_id], references: [id])
@@ -152,10 +153,10 @@ model WalletActivity {
 }
 
 model cashBackStep {
-  id Int @id @default(autoincrement())
-  step Decimal @db.Decimal(9,2)
-  created_at   DateTime @default(now())
-  updated_at   DateTime @updatedAt  
+  id         Int      @id @default(autoincrement())
+  step       Decimal  @db.Decimal(9, 2)
+  created_at DateTime @default(now())
+  updated_at DateTime @updatedAt
 }
 
 model Payment {
