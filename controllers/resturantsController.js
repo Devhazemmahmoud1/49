@@ -65,7 +65,8 @@ let createResturant = async (req ,res) => {
     return res.status(200).json({
         success: {
             success_ar: 'تم اضافه مطعمك بنجاح.',
-            success_en: 'Your resturant has been added successfully.'
+            success_en: 'Your resturant has been added successfully.',
+            id: createRest.id
         }
     })
 
