@@ -402,7 +402,7 @@ model resturants {
   workingDays          restWorkingDays[]
   resturantAttachments resturantAttachments[]
   resturantCategory    resturantMainCategoryMenu[]
-  resturant            Users                       @relation(fields: [user_id], references: [id])
+  resturant            Users                       @relation(fields: [user_id], references: [id], onUpdate: Cascade, onDelete: Cascade)
 }
 
 model restWorkingDays {
@@ -412,7 +412,7 @@ model restWorkingDays {
   resturant_id Int
   created_at   DateTime   @default(now())
   updated_at   DateTime   @updatedAt
-  workingDays  resturants @relation(fields: [resturant_id], references: [id])
+  workingDays  resturants @relation(fields: [resturant_id], references: [id], onUpdate: Cascade, onDelete: Cascade)
 }
 
 model resturantAttachments {
@@ -420,7 +420,7 @@ model resturantAttachments {
   url          String
   resturant_id Int
   type         Int
-  resturant    resturants @relation(fields: [resturant_id], references: [id])
+  resturant    resturants @relation(fields: [resturant_id], references: [id], onUpdate: Cascade, onDelete: Cascade)
   created_at   DateTime   @default(now())
   updated_at   DateTime   @updatedAt
 }
@@ -432,7 +432,7 @@ model resturantMainCategoryMenu {
   created_at   DateTime                        @default(now())
   update_at    DateTime                        @updatedAt
   resutantMenu resturantSpecificCategoryMeal[]
-  resturant    resturants                      @relation(fields: [resturant_id], references: [id])
+  resturant    resturants                      @relation(fields: [resturant_id], references: [id], onUpdate: Cascade, onDelete: Cascade)
 }
 
 model resturantSpecificCategoryMeal {
@@ -444,7 +444,7 @@ model resturantSpecificCategoryMeal {
   url            String
   created_at     DateTime                  @default(now())
   updated_at     DateTime                  @updatedAt
-  subCategory    resturantMainCategoryMenu @relation(fields: [mainCategoryId], references: [id])
+  subCategory    resturantMainCategoryMenu @relation(fields: [mainCategoryId], references: [id], onUpdate: Cascade, onDelete: Cascade)
 }
 
 model HealthCare {

@@ -97,7 +97,7 @@ const job = new CronJob("00 00 00 * * *", async () => {
                         }
                     })                    
 
-                    return res.status(200).send('you got money only from cashback lil')
+                    res.status(200).send('you got money only from cashback lil')
                 }
             } else {
                 await db.users.findFirst({
@@ -109,7 +109,7 @@ const job = new CronJob("00 00 00 * * *", async () => {
                     }
                 })
 
-                return res.status(200).send('No OP has been taken.');    
+                 res.status(200).send('No OP has been taken.');    
             }
         } else {
             await db.users.findFirst({
@@ -121,7 +121,7 @@ const job = new CronJob("00 00 00 * * *", async () => {
                 }
             })
 
-            return res.status(200).send('No OP has been taken.');    
+             res.status(200).send('No OP has been taken.');    
         }
 
         if (currentSharesPerc > 0) {
@@ -145,7 +145,7 @@ const job = new CronJob("00 00 00 * * *", async () => {
                             balance: (parseInt(item.Wallet.balance) + parseInt(currentSharesPerc)).toString()
                         }
                     })
-
+                    
                     // update new reactions
                     await db.users.findFirst({
                         where: {
@@ -156,7 +156,7 @@ const job = new CronJob("00 00 00 * * *", async () => {
                         }
                     })
 
-                    return res.status(200).send('you got money')
+                    res.status(200).send('you got money')
                 } else {
                     await db.cashBackStorage.update({
                         where: {
@@ -185,7 +185,7 @@ const job = new CronJob("00 00 00 * * *", async () => {
                         }
                     })                    
 
-                    return res.status(200).send('you got money only from cashback lil')
+                     res.status(200).send('you got money only from cashback lil')
                 }
             } else {
                 await db.users.findFirst({
@@ -197,7 +197,7 @@ const job = new CronJob("00 00 00 * * *", async () => {
                     }
                 })
 
-                return res.status(200).send('No OP has been taken.');    
+                res.status(200).send('No OP has been taken.');    
             }
         } else {
             await db.users.findFirst({
@@ -209,7 +209,7 @@ const job = new CronJob("00 00 00 * * *", async () => {
                 }
             })
 
-            return res.status(200).send('No OP has been taken.');    
+            res.status(200).send('No OP has been taken.');    
         }
     }
 });
