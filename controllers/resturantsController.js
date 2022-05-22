@@ -98,7 +98,8 @@ let createMainCategories = async (req ,res) => {
     return res.status(200).json({
         success: {
             success_en: 'Category has been added to your list.',
-            success_ar: 'تم اضافه القسم بنجاح'
+            success_ar: 'تم اضافه القسم بنجاح',
+            id: createNewCategory.id
         }
     })
 }
