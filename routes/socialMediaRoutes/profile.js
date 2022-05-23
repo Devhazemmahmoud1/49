@@ -1,9 +1,9 @@
 const router = require('express').Router()
 const guard = require('../../middleware/guard')
-const profile = require('../../controllers/socialMediaControllers/myProfileController')
-const users = require('../../controllers/socialMediaControllers/usersProfileController')
+const profile = require('../../controllers/socialMediaControllers/myProfileController');
+const users = require('../../controllers/socialMediaControllers/usersProfileController');
 const uploadMethod = require('../../controllers/s3Controller/uploadS3Controller');
-const multer = require('multer')
+const multer = require('multer');
 const { PrismaClient } = require('@prisma/client');
 const db = new PrismaClient();
 

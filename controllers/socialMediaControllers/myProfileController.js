@@ -55,9 +55,6 @@ let getMyFriends = async (req, res) => {
         },
         skip: page == 1 ? 0 : (page * maxAds) - maxAds,
         take: maxAds,
-        include: {
-            user: true
-        }
     })
     return res.status(200).json(getFriendsList)
 }
@@ -127,9 +124,6 @@ let getMyFollowers = async (req, res) => {
         },
         skip: page == 1 ? 0 : (page * maxAds) - maxAds,
         take: maxAds,
-        include: {
-            user: true
-        }
     })
 
     return res.status(200).json(getFollowersList)
