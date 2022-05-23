@@ -57,10 +57,12 @@ let getMyFriends = async (req, res) => {
         take: maxAds,
     })
 
+    console.log(getFriendsList)
+
     for (item of getFriendsList) {
         let user = await db.users.findFirst({
             where: {
-                id: item.user_id
+                id: item.friend_id
             }
         })
         item.user = user
