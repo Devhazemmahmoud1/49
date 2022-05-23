@@ -2015,8 +2015,5 @@ let callRequest = async (req, res) => {
     }
 }
 
-let calculation = () => {
-
-}
 
 module.exports = { getSubCategoryPrices, makeSubscriptionPayments, withdrawMoney, chargeBalance, transferTo, userInfo, callRequest }

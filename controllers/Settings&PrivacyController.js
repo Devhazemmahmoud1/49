@@ -12,9 +12,7 @@ let editSettings = async (req, res) => {
     //value => status
 
     try {
-        
         // get userSetting
-
         let getUserSetting = await db.userSettings.findMany({
             where: {
                 user_id: req.user.id
@@ -51,6 +49,13 @@ let editSettings = async (req, res) => {
             })
             x++;
         }
+
+        return res.status(200).json({
+            success: {
+                success_ar: 'تم تعديل اعداداتك.',
+                success_en: 'Settings has been updated.'
+            }
+        })
 
     } catch (e) { console.log(e) }
 }
@@ -93,6 +98,8 @@ let editPrivacy = async (req, res) => {
 }
 
 /* Getting the settings information according to the guard was giving */
-let getSettings = (req, res) => {}
+let getSettings = (req, res) => {
+
+}
 
 module.exports = { editSettings, editPrivacy, getSettings }

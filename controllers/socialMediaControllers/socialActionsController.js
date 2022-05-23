@@ -130,7 +130,13 @@ let sendFriendRequest = async (req, res) => {
 /* remove friend requests from my user side req.user.id => other user */
 let UndoFriendRequest = async (req, res) => {
     const { requestedFriendId } = req.body
-    if (!requestedFriendId) return false;
+    if (!requestedFriendId)  return res.status(200).json({
+        error: {
+            error_ar: 'خطا.',
+            error_en: 'User is not a friend'
+        }
+    });
+
     try {
         let getRequestId = await db.friendRequests.findFirst({ where: { user_id: req.user.id, friendRequestTo: parseInt(requestedFriendId) } });
         await db.friendRequests.delete({
@@ -459,8 +465,8 @@ let acceptFriendRequest = async (req, res) => {
 
         let checkuser = await db.friendRequests.findFirst({
             where: {
-                user_id: req.user.id,
-                friendRequestTo: parseInt(friendId)
+                user_id: parseInt(friendId),
+                friendRequestTo: req.user.id
             }
         })
 
@@ -492,16 +498,16 @@ let acceptFriendRequest = async (req, res) => {
     }
 
     // Notification is required
-    let notify = {
+    /*let notify = {
         notification_ar: '' + req.user.firstName + ' ' + req.user.lastName + ' قام بقبول طلب الصداقه.',
         notification_en: '' + req.user.firstName + ' ' + req.user.lastName + ' has accepted your friend request.',
         sender: req.user.id,
         reciever: parseInt(checkuser.id),
         postId: req.user.id,
         type: 4,
-    }
+    }*/
 
-    sendNotification(notify);
+   // sendNotification(notify);
 
     return res.status(200).json({
         success: {
