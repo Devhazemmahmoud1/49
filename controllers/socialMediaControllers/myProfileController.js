@@ -56,6 +56,17 @@ let getMyFriends = async (req, res) => {
         skip: page == 1 ? 0 : (page * maxAds) - maxAds,
         take: maxAds,
     })
+
+    for (item of getFriendsList) {
+        let user = await db.users.findFirst({
+            where: {
+                id: item.user_id
+            }
+        })
+        item.user = user
+    }
+
+    
     return res.status(200).json(getFriendsList)
 }
 
@@ -126,6 +137,15 @@ let getMyFollowers = async (req, res) => {
         take: maxAds,
     })
 
+    for (item of getFollowersList) {
+        let user = await db.users.findFirst({
+            where: {
+                id: item.user_id
+            }
+        })
+        item.user = user
+    }
+
     return res.status(200).json(getFollowersList)
 }
 
@@ -143,10 +163,16 @@ let getFriendRequests = async (req, res) => {
         },
         skip: page == 1 ? 0 : (page * maxAds) - maxAds,
         take: maxAds,
-        include: {
-            user: true
-        }
     })
+
+    for (item of getFriendsRequests) {
+        let user = await db.users.findFirst({
+            where: {
+                id: item.user_id
+            }
+        })
+        item.user = user
+    }
 
     return res.status(200).json(getFriendsRequests)
 }
