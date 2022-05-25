@@ -7,8 +7,8 @@ generator client {
 
 datasource db {
   provider = "mysql"
-  //url      = "mysql://root:root@localhost:3306/fourtynine?schema=public"
-  url      = "mysql://49hub1:Database49hub@64.225.101.68:3306/fourtynine?schema=public"
+  url      = "mysql://root:root@localhost:3306/fourtynine?schema=public"
+  //url      = "mysql://49hub1:Database49hub@64.225.101.68:3306/fourtynine?schema=public"
 }
 
 model Admins {
@@ -700,26 +700,6 @@ model reactions {
   updated_at DateTime @updatedAt
 }
 
-model stories {
-  id               Int          @id @default(autoincrement())
-  user_id          Int
-  storyType        Int
-  storyContent     String?
-  story_attachment String?
-  created_at       DateTime     @default(now())
-  updated_at       DateTime     @updatedAt
-  views            storyViews[]
-}
-
-model storyViews {
-  id         Int      @id @default(autoincrement())
-  userViewer Int
-  story_id   Int
-  created_at DateTime @default(now())
-  updated_at DateTime @updatedAt
-  story      stories  @relation(fields: [story_id], references: [id])
-}
-
 model friends {
   id         Int      @id @default(autoincrement())
   user_id    Int
@@ -798,6 +778,7 @@ model songs {
 
 model reels {
   id            Int      @id @default(autoincrement())
+  desc          String?
   videoUrl      String
   user_id       Int
   videoThumbUrl String
@@ -806,6 +787,27 @@ model reels {
   totalLikes    Int      @default(0)
   song_id       Int      @unique
   song          songs?   @relation(fields: [song_id], references: [id])
+  type          Int      @default(1)
+  reelLikes     reelLikes[]
+  reelViews     reelViews[]
   created_at    DateTime @default(now())
   updated_at    DateTime @updatedAt
+}
+
+model reelLikes {
+  id Int @id @default(autoincrement())
+  user_id Int
+  reel_id Int
+  created_at    DateTime @default(now())
+  updated_at    DateTime @updatedAt
+  reels reels @relation(fields: [reel_id], references: [id])
+}
+
+model reelViews {
+  id Int @id @default(autoincrement())
+  user_id Int 
+  reel_id Int
+  created_at    DateTime @default(now())
+  updated_at    DateTime @updatedAt
+  reels reels @relation(fields: [reel_id], references: [id])  
 }

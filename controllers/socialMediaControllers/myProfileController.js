@@ -4,8 +4,37 @@ const db = new PrismaClient();
 
 /* Get my own profile */
 let getMyProfile = async (req, res) => {
+
+    let reels = await db.reels.findMany({
+        where: {
+            user_id: req.user.id,
+            type: 2
+        }
+    })
+
+    for (item of reels) {
+        item.isFriend = false
+
+        item.isLiked = (await db.reelLikes.findFirst({
+            where: {
+                reel_id: item.id,
+                user_id: req.user.id
+            }
+        })) != null 
+
+        item.isMine = true
+
+        item.userInfo = await db.users.findFirst({
+            where: {
+                id: item.user_id
+            }
+        })
+    }
+
+
     return res.status(200).json({
         userInfo: req.user,
+        myStories: reels,
         total_friends: await db.friends.aggregate({
             where: {
                 user_id: req.user.id
