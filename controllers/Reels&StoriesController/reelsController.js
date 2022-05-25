@@ -108,8 +108,15 @@ let publicReels = async (req, res) => {
         skip: page == 1 ? 0 : (page * maxReels) - maxReels,
         take: maxReels,
     });
-    
+
     return res.status(200).json(getMyreelList)
 }
 
-module.exports = { deleteReel, getOneReel,getMyReels, publicReels }
+let getSongs = async ( req, res ) => {
+    let songs = await db.songs.findMany({})
+    return res.status(200).json(songs.filter((result) => {
+        return result.id > 0
+    }))
+}
+
+module.exports = { deleteReel, getOneReel,getMyReels, publicReels, getSongs }

@@ -72,6 +72,8 @@ router.get('/get-list-of-my-reels', guard, reels.getMyReels)
 
 router.get('/public-reels-of-people', guard, reels.publicReels)
 
+router.get('/get-all-songs', guard, reels.getSongs)
+
 /* Create a story */
 
 /* Get My stories */
