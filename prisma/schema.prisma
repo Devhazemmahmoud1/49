@@ -7,8 +7,8 @@ generator client {
 
 datasource db {
   provider = "mysql"
-  //url      = "mysql://root:root@localhost:3306/fourtynine?schema=public"
-  url      = "mysql://49hub1:Database49hub@64.225.101.68:3306/fourtynine?schema=public"
+  url      = "mysql://root:root@localhost:3306/fourtynine?schema=public"
+  //url      = "mysql://49hub1:Database49hub@64.225.101.68:3306/fourtynine?schema=public"
 }
 
 model Admins {
@@ -40,6 +40,7 @@ model Users {
   Wallet           Wallet?
   profilePicture   String?
   coverPicture     String?
+  tenderPicture    String?
   recentLikes      Int?                 @default(0)
   recentShare      Int?                 @default(0)
   recentViews      Int?                 @default(0)

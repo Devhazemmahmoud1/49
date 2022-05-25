@@ -55,4 +55,7 @@ router.post('/add-favo', guard, ads.addFavo)
 /* remove a specific ad from favo list */
 router.delete('/remove-favo', guard, ads.removeFavo)
 
+/* Get my favorate list */
+router.get('/get-myfavorate', guard, ads.getMyfavorates)
+
 module.exports = router

@@ -17,6 +17,7 @@ initializeApp({
 }); 
 
 
+
 var cronJob = require('./controllers/cronJob/cronJobController')
 var cashBackCronJob = require('./controllers/cronJob/cashBackCronJobController')
 var socket = require('./controllers/socketController')
@@ -35,6 +36,7 @@ var so = require('./routes/socketHandler')
 var settings = require('./routes/setting')
 var socialProfile = require('./routes/socialMediaRoutes/profile')
 var actions = require('./routes/socialMediaRoutes/usersAction')
+var Reels = require('./routes/Reels&stories')
 
 var app = express();
 
@@ -43,7 +45,8 @@ const server = require('http').createServer(app);
   
 // Create the Socket IO server on 
 // the top of http server
-/*const io = socketio(server, {
+/*
+const io = socketio(server, {
   cors: {
     origin: "http://localhost:8888",
     methods: ["GET", "POST"]
@@ -82,7 +85,7 @@ app.use('/socket', so)
 app.use('/setting', settings);
 app.use('/social/profile', socialProfile)
 app.use('/social/actions', actions)
-
+app.use('/reels', Reels)
 
 // catch 404 and forward to error handler
 app.use(function(req, res, next) {

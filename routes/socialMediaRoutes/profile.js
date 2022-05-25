@@ -48,7 +48,7 @@ router.post('/upload-profile-picture' ,upload.array('attachments', 12), async (r
 
     let createNewAd = await db.posts.create({
         type: 1,
-        user_id: req.user.id
+        user_id: parseInt(req.body.id)
     })
 
     for (item of file) {
@@ -77,7 +77,7 @@ router.post('/upload-cover-picture' ,upload.array('attachments', 12), async (req
     })
     let createNewAd = await db.posts.create({
         type: 1,
-        user_id: req.user.id
+        user_id: parseInt(req.body.id)
     })
 
     for (item of file) {
@@ -90,6 +90,52 @@ router.post('/upload-cover-picture' ,upload.array('attachments', 12), async (req
         })
     }
     return res.status(200).json(result)
+});
+
+
+/* Uploading cover using Multter Package */
+router.post('/user/upload-to-galary' ,upload.array('attachments', 12), async (req, res, next) => {
+    let file = req.files
+    let result = await uploadMethod.getFileStream(file)
+
+    // update to gallary proccess
+
+    await db.gallary.create({
+        data: {
+            user_id: parseInt(req.body.id),
+            post_id: 0,
+            url: result[0].filename
+        }
+    })
+
+    return res.status(200).json({
+        success: {
+            success_en: 'Photo has been uploaded to your albums',
+            success_ar: 'تم رفع الصوره في الالبومات الخاصه بك'
+        }
+    })
+});
+
+
+/* Uploading cover using Multter Package */
+router.post('/upload-a-new-tender-picture' ,upload.array('attachments', 12), async (req, res, next) => {
+    let file = req.files
+    let result = await uploadMethod.getFileStream(file)
+    await db.users.update({
+        where: {
+            id: parseInt(req.body.id)
+        },
+        data: {
+            tenderPicture: result[0].filename
+        }
+    })
+
+    return res.status(200).json({
+        success: {
+            success_en: 'Photo has been uploaded to your Tender profile',
+            success_ar: 'تم رفع الصوره في الالبومات الخاصه بك'
+        }
+    })
 });
 
 /* API for users profile goes over here */
@@ -159,6 +205,20 @@ router.get('/get/comment-reactions/:id', guard, profile.getCommentReactions)
 
 // get a specifc post reactions
 router.get('/get/post-reactions/:id', guard, profile.getPostsReactions)
+
+
+/* Main Page for social */
+router.get('/users/main-page', guard, profile.getMainPage)
+
+router.get('/user/about/:id', guard, profile.getMyAbout)
+
+router.get('/user/find/get-mygallary-list', guard, profile.getMyGalary)
+
+router.post('/make-profile-picture-from-album', guard, profile.changeProfileFromGal)
+
+router.get('/get/tender-list-randomely-males', guard, profile.getTenderMales)
+
+router.get('/get/tender-list-randomely-females', guard, profile.getTenderFemales)
 
 
 module.exports = router

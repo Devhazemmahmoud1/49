@@ -25,7 +25,6 @@ module.exports = ((req, res, next) => {
                         userSettings: true,
                         userPrivacy: true,
                         fcm: true,
-                        hashCode: true,
                         providerCashBack: true,
                         countryCode: true,
                     }

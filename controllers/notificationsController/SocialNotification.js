@@ -19,11 +19,24 @@ let sendNotification = async (notify) => {
             }
         })
 
+        let getUserFCM = await db.users.findFirst({
+            where: {
+                id: notify.reciever
+            }
+        })
+
         admin.messaging().send({
-            token: 'fyw5I0jZSEKfSxe3tfFWJ8:APA91bGYeSQRhu0Y8PT6ISjdATVMG696zb0szfV1t575UYijn_mdqZc7y3ZsPeXRc6E9vKFSNZ75b3onIewcZ24C6YLkrF34S8SQSJHvCy_qK-i2Gs82GZlDcafy3kbSnc75GJwBZY3d',
+            data: {
+                id: notify.postId ?? 0,
+                type: 1
+            },  
+            token: getUserFCM,
             notification: {
-              title: 'Notification title',
-              body: 'hello'
+              title: '49 Notification',
+              body: {
+                ar: notify.notification_en,
+                en: notify.notification_en
+            },
             }
         })
 

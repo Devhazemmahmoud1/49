@@ -70,7 +70,4 @@ router.post('/like-on-comment', guard, action.makeLikeOnComment)
 // make unlike on comment
 router.delete('/unlike-on-comment', guard, action.makeUnlikeOnComment)
 
-// 
-
-
 module.exports = router

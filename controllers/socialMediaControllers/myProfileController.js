@@ -543,5 +543,199 @@ let getPostsReactions = async (req, res) => {
 }
 
 
+let getMainPage = async (req, res) => {
+    let { page } = req.query
 
-module.exports = { getMyProfile, getMyFriends, getMyFollowers, getMyPosts, getMyBlockedUsers, createPost, editPost, deletePost, getActivities, getFeelings, getFriendRequests, getComments, getCommentReactions, getPostsReactions }
+    if (! page) page = 1
+
+    let posts = []
+
+    let getMyFriends = await db.friends.findMany({
+        where: {
+            user_id: req.user.id
+        },
+        include: {
+            user: {
+                include: {
+                    userPrivacy: true,
+                    posts: true,
+                }
+            }
+        },
+        orderBy: {
+            created_at: 'desc'
+        }
+    })
+
+    let filteredFriendsPosts = getMyFriends.filter( (result) => {
+        return result.user.userPrivacy[6].status > 0
+    })
+
+    posts.push(filteredFriendsPosts)
+
+    let getMyFollowers = await db.followers.findMany({
+        where: {
+            user_id: req.user.id
+        },
+        include: {
+            user: {
+                include: {
+                    userPrivacy: true,
+                    posts: true,
+                }
+            }
+        },
+        orderBy: {
+            created_at: 'desc'
+        }
+    })
+
+    let filteredFollowingPosts = getMyFollowers.filter( (result) => {
+        return result.user.userPrivacy[6].status > 0
+    })
+
+    posts.push(filteredFollowingPosts)
+
+    return res.status(200).json(posts)
+}
+
+let getMyGalary = async (req ,res) => {
+    let { page } = req.query
+
+    if (! page) page = 1;
+
+    let maxPhotos = 20
+
+    let mygallary = await db.gallary.findMany({
+        where: {
+            user_id: req.user.id,
+        },
+        skip: page == 1 ? 0 : (page * maxPhotos) - maxPhotos,
+        take: maxPhotos,
+    })
+
+    return res.status(200).json(mygallary)
+}
+
+let getMyAbout = async (req ,res) => {
+    const { id } = req.params
+
+    if (!id ) return res.status(403).json({
+        error: {
+            error_en: 'No id is found',
+            error_ar: 'No id is found.'
+        }
+    })
+
+    let checkUser = await db.users.findFirst({
+        where: {
+            id: parseInt(id)
+        },
+        include: {
+            userSettings: true
+        }
+    })
+
+    if (! checkUser) {
+        return res.status(403).json({
+            error: {
+                error_en: 'No id is found',
+                error_ar: 'No id is found.'
+            }
+        })        
+    }
+
+    return res.status(200).json(checkUser)
+}
+
+let getTenderMales = async (req, res) => {
+    let { page } = req.query
+
+    if (! page) page = 1;
+
+    let maxTender = 10
+
+    let getUsers = await db.users.findMany({
+        include: {
+            userSettings: true,
+            userPrivacy: true,
+        },
+        skip: page == 1 ? 0 : (page * maxTender) - maxTender,
+        take: maxTender,
+    })
+
+    let fillteredUsers = getUsers.filter( (result) => {
+        console.log(result.userSettings[7])
+        return result.userSettings[7].value == "1"
+    })
+
+    return res.status(200).json(fillteredUsers)
+}
+
+let getTenderFemales = async (req, res) => {
+    let { page } = req.query
+
+    if (! page) page = 1;
+
+    let maxTender = 10
+
+    let getUsers = await db.users.findMany({
+        include: {
+            userSettings: true,
+            userPrivacy: true,
+        },
+        skip: page == 1 ? 0 : (page * maxTender) - maxTender,
+        take: maxTender,
+    })
+
+    let fillteredUsers = getUsers.filter( (result) => {
+        console.log(result.userSettings[7])
+        return result.userSettings[7].value == "2"
+    })
+
+    return res.status(200).json(fillteredUsers)
+}
+
+let changeProfileFromGal = async (req , res) => {
+    const { galId } = req.body
+
+    try {
+        let checkUser = await db.users.findFirst({
+            where: {
+                id: req.user.id
+            },
+            select: {
+                profilePicture: true,
+            }
+        })
+
+        if (!checkUser) return res.status(403)
+
+        let getGalUrl = await db.gallary.findFirst({
+            where: {
+                id: parseInt(galId)
+            }
+        });
+
+        await db.users.update({
+            where: {
+                id: req.user.id
+            },
+            data: {
+                profilePicture: getGalUrl.url
+            }
+        })
+
+        return res.status(200).json({
+            success_en: 'Your profile has been changed successfully.',
+            success_ar: 'تم تغيير الصوره الشخصيه الخاصه بكم.'
+        })
+
+    } catch ( e ) {
+        console.log(e)
+        return false;
+    }
+}
+
+
+module.exports = { getMyProfile, getMyFriends, getMyFollowers, getMyPosts, getMyBlockedUsers, createPost, editPost, deletePost, getActivities, getFeelings, getFriendRequests, getComments, getCommentReactions, getPostsReactions, getMainPage, getMyAbout, getMyGalary, changeProfileFromGal, getTenderFemales, getTenderMales }

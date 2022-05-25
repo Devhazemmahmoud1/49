@@ -20,7 +20,7 @@ let getProperties = async (req, res) => {
 }
 
 /* Fetching a single ad from our end */
-let getAd = async (req,res) => {
+let getAd = async (req, res) => {
     const { id } = req.params
 
     if (!id) {
@@ -40,10 +40,10 @@ let getAd = async (req,res) => {
                     Subprops: true,
                 }
             },
-            sub:{
-               select: {
-                   id: true,
-               } 
+            sub: {
+                select: {
+                    id: true,
+                }
             }
         }
     })
@@ -54,7 +54,7 @@ let getAd = async (req,res) => {
 /* Creating a new ad method */
 let createNewAd = async (req, res) => {
     const { title, desc, mainCategory, subCategory, attachments, adProps } = req.body
-    if (!title || !subCategory || !mainCategory ) {
+    if (!title || !subCategory || !mainCategory) {
         return res.status(403).json({
             error: {
                 error_ar: 'عنوان الاعلان مطلوب.',
@@ -118,6 +118,12 @@ let createNewAd = async (req, res) => {
 
 }
 
+/*  Edit an ad  */
+let EditAd = async (req, res) => {
+
+}
+
+
 /* Add a specific ad to favo list according to the giving ad_id  */
 let addFavo = async (req, res) => {
     const { ad_id } = req.body
@@ -129,6 +135,24 @@ let addFavo = async (req, res) => {
     let checkAd = await db.advertisment.findFirst({ where: { id: parseInt(ad_id) } });
 
     if (!checkAd) return;
+
+    // check if this user has already added this item to list 
+
+    let checkFavoList = await db.favorates.findFirst({
+        where: {
+            ad_id: parseInt(ad_id),
+            user_id: req.user.id
+        }
+    })
+
+    if (checkFavoList) {
+        return res.status(403).json({
+            error: {
+                error_en: 'This ad is already in your favrite list.',
+                error_ar: 'هذا الاعلان مسجل بالفعل في المفضله.'
+            }
+        })
+    }
 
     // add ad_id to favorate
     let op = await db.favorates.create({
@@ -156,12 +180,11 @@ let removeFavo = async (req, res) => {
         return res.status(403).send("INVALID AD ID")
     }
 
-    let checkAd = await db.advertisment.findFirst({ where: { id: parseInt(ad_id), user_id: req.user.id } });
+    let checkAd = await db.advertisment.findFirst({ where: { id: parseInt(ad_id) } });
 
     if (!checkAd) return;
 
     // check if this user has already added this item to list 
-
     let checkFavoList = await db.favorates.findFirst({
         where: {
             ad_id: parseInt(ad_id),
@@ -169,7 +192,7 @@ let removeFavo = async (req, res) => {
         }
     })
 
-    if (checkFavoList) {
+    if (! checkFavoList) {
         return res.status(403).json({
             error: {
                 error_en: 'This ad is already in your favrite list.',
@@ -185,12 +208,12 @@ let removeFavo = async (req, res) => {
             user_id: req.user.id
         }
     })
-
+    
     await db.favorates.delete({
         where: {
             id: op.id
         }
-    })    
+    })
 
     if (op) {
         return res.status(200).json({
@@ -203,9 +226,35 @@ let removeFavo = async (req, res) => {
 
 }
 
-/*  Edit an ad  */
-let EditAd = async (req, res) => {
-    
+let getMyfavorates = async (req, res) => {
+    let { page } = req.query
+
+    if (! page) page = 1;
+
+    let maxItems = 15;
+
+    let items = await db.favorates.findMany({
+        where: {
+            user_id: req.user.id,
+        },
+        include: {
+            ads: {
+                include: {
+                    attachments: true,
+                    values: {
+                        include: {
+                            Subprops: true,
+                        }
+                    },
+                }
+            }
+        },
+        skip: page == 1 ? 0 : (page * maxItems) - maxItems,
+        take: maxItems,
+    })
+
+    return res.status(200).json(items)
+
 }
 
-module.exports = { getProperties, getAd, createNewAd, addFavo, removeFavo, EditAd }
+module.exports = { getProperties, getAd, createNewAd, addFavo, removeFavo, EditAd, getMyfavorates }
