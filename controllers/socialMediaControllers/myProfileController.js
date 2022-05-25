@@ -550,6 +550,9 @@ let getMainPage = async (req, res) => {
 
     let posts = []
 
+    let uniquePosts = []
+
+
     let getMyFriends = await db.friends.findMany({
         where: {
             user_id: req.user.id
@@ -564,16 +567,11 @@ let getMainPage = async (req, res) => {
         },
         orderBy: {
             created_at: 'desc'
-        }
+        },
+        
     })
 
-    let filteredFriendsPosts = getMyFriends.filter( (result) => {
-        return result.user.userPrivacy[6].status > 0
-    })
-
-    posts.push(filteredFriendsPosts)
-
-    let getMyFollowers = await db.followers.findMany({
+    let getMyFollowing = await db.followers.findMany({
         where: {
             user_id: req.user.id
         },
@@ -587,14 +585,22 @@ let getMainPage = async (req, res) => {
         },
         orderBy: {
             created_at: 'desc'
-        }
+        },
     })
 
-    let filteredFollowingPosts = getMyFollowers.filter( (result) => {
+    for (item of getMyFriends) {
+        posts.push(item.user.posts)
+    }
+
+    for (item of getMyFollowing) {
+        posts.push(item.user.posts)
+    }
+
+    console.log(posts)
+
+    let filteredFriendsPosts = getMyFriends.filter( (result) => {
         return result.user.userPrivacy[6].status > 0
     })
-
-    posts.push(filteredFollowingPosts)
 
     return res.status(200).json(posts)
 }
@@ -665,11 +671,18 @@ let getTenderMales = async (req, res) => {
     })
 
     let fillteredUsers = getUsers.filter( (result) => {
-        console.log(result.userSettings[7])
         return result.userSettings[7].value == "1"
     })
 
-    return res.status(200).json(fillteredUsers)
+    let latestFilter = fillteredUsers.filter( (result) => {
+        return result.userPrivacy[11].status = 1
+    })
+
+    for (item of latestFilter) {
+        item.recentlyActive = 0
+    }
+
+    return res.status(200).json(latestFilter)
 }
 
 let getTenderFemales = async (req, res) => {
@@ -689,11 +702,17 @@ let getTenderFemales = async (req, res) => {
     })
 
     let fillteredUsers = getUsers.filter( (result) => {
-        console.log(result.userSettings[7])
         return result.userSettings[7].value == "2"
     })
+    let latestFilter = fillteredUsers.filter( (result) => {
+        return result.userPrivacy[11].status == 1
+    })
 
-    return res.status(200).json(fillteredUsers)
+    for (item of latestFilter) {
+        item.recentlyActive = 0
+    }
+
+    return res.status(200).json(latestFilter)
 }
 
 let changeProfileFromGal = async (req , res) => {

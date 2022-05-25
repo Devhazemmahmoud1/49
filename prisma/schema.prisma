@@ -783,3 +783,29 @@ model Gallary {
   created_at DateTime @default(now())
   updated_at DateTime @updatedAt
 }
+
+model songs {
+  id         Int      @id @default(autoincrement())
+  name       String
+  desc       String?
+  playUrl    String
+  duration   Int?
+  thumbUrl   String?
+  created_at DateTime @default(now())
+  updated_at DateTime @updatedAt
+  reel       reels[]
+}
+
+model reels {
+  id            Int      @id @default(autoincrement())
+  videoUrl      String
+  user_id       Int
+  videoThumbUrl String
+  videoDuration Int
+  totalViews    Int      @default(0)
+  totalLikes    Int      @default(0)
+  song_id       Int      @unique
+  song          songs?   @relation(fields: [song_id], references: [id])
+  created_at    DateTime @default(now())
+  updated_at    DateTime @updatedAt
+}
