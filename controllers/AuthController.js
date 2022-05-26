@@ -262,7 +262,7 @@ let register = async (req, res) => {
                     user_id: create.id,
                     settingName_ar: 'النوع',
                     settingName_en: 'Gender',
-                    value: gender,
+                    value: gender.toString(),
                     status: 1,
                 },
             ]
