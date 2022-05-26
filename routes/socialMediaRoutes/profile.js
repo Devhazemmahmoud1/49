@@ -216,9 +216,9 @@ router.get('/user/find/get-mygallary-list', guard, profile.getMyGalary)
 
 router.post('/make-profile-picture-from-album', guard, profile.changeProfileFromGal)
 
-router.get('/get/tender-list-randomely-males', guard, profile.getTenderMales)
+router.get('/get/tender-list/randomely/males', guard, profile.getTenderMales)
 
-router.get('/get/tender-list-randomely-females', guard, profile.getTenderFemales)
+router.get('/get/tender/list/randomely/females', guard, profile.getTenderFemales)
 
 
 module.exports = router
