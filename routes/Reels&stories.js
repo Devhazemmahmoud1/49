@@ -78,6 +78,7 @@ router.get('/get-all-songs', guard, reels.getSongs)
 
 /* Create a story */
 router.post('/create-story', upload.array('reel', 12), async (req, res, next) => {
+    
     let file = req.files
     let { videoDuration, song_id, userId, desc, type } = req.body
     let result = await uploadMethod.getFileStream(file)
@@ -113,7 +114,7 @@ router.post('/like-on-reel', guard, reels.putLikeOnReel)
 router.post('/remove-like-from-reel', guard, reels.removeLikeFromReel)
 
 /* add view to Reel */
-router.post('/reel-views', guard, reels.addViewToReel)
+router.post('/reel-views/add', guard, reels.addViewToReel)
 
 /* Get my stories */
 router.get('/get-my-stories', guard, reels.getMyStories)
