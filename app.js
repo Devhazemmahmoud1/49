@@ -10,17 +10,17 @@ const s3 = require('./controllers/s3Controller/s3Configiration')
 const { initializeApp, applicationDefault } = require('firebase-admin/app');
 const admin  = require('firebase-admin')
 
-
-
 initializeApp({
   credential: applicationDefault(),
 }); 
 
-
-
 var cronJob = require('./controllers/cronJob/cronJobController')
 var cashBackCronJob = require('./controllers/cronJob/cashBackCronJobController')
 var socket = require('./controllers/socketController')
+
+
+
+// Routes // 
 var indexRouter = require('./routes/index');
 var usersRouter = require('./routes/users');
 var categoriesRouter = require('./routes/categories');

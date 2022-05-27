@@ -708,6 +708,14 @@ let getTenderMales = async (req, res) => {
     })
 
     for (item of latestFilter) {
+
+        item.isFriend = (await db.friends.findFirst({
+            where: {
+                friend_id: item.id,
+                user_id: req.user.id
+            }
+        })) != null
+
         item.recentlyActive = 0
     }
 
@@ -738,6 +746,14 @@ let getTenderFemales = async (req, res) => {
     })
 
     for (item of latestFilter) {
+
+        item.isFriend = (await db.friends.findFirst({
+            where: {
+                friend_id: item.id,
+                user_id: req.user.id
+            }
+        })) != null
+        
         item.recentlyActive = 0
     }
 
