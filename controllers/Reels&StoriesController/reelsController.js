@@ -137,6 +137,12 @@ let getMyReels = async (req, res) => {
         item.userInfo = await db.users.findFirst({
             where: {
                 id: item.user_id
+            },
+            select: {
+                profilePicture: true,
+                firstName: true,
+                lastName: true,
+                id: true,
             }
         })
     }
@@ -185,6 +191,12 @@ let publicReels = async (req, res) => {
         item.userInfo = await db.users.findFirst({
             where: {
                 id: item.user_id
+            },
+            select: {
+                profilePicture: true,
+                firstName: true,
+                lastName: true,
+                id: true,
             }
         })
     }
@@ -493,6 +505,12 @@ let getUserStories = async (req, res) => {
         item.userInfo = await db.users.findFirst({
             where: {
                 id: item.user_id
+            },
+            select: {
+                profilePicture: true,
+                firstName: true,
+                lastName: true,
+                id: true,
             }
         })
 
@@ -572,6 +590,12 @@ let getLikedPeople = async (req, res) => {
         item.userInfo = await db.users.findFirst({
             where: {
                 id: item.user_id
+            },
+            select: {
+                profilePicture: true,
+                firstName: true,
+                lastName: true,
+                id: true,
             }
         })     
     }
@@ -582,6 +606,7 @@ let getLikedPeople = async (req, res) => {
 
 /* Who liked my own reel */
 let getViewedPeople = async (req, res) => {
+    
     const { id } = req.params
 
     let { page } = req.query
@@ -647,6 +672,12 @@ let getViewedPeople = async (req, res) => {
         item.userInfo = await db.users.findFirst({
             where: {
                 id: item.user_id
+            },
+            select: {
+                profilePicture: true,
+                firstName: true,
+                lastName: true,
+                id: true,
             }
         })      
     }
