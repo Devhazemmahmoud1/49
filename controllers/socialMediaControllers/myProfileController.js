@@ -719,7 +719,7 @@ let getTenderMales = async (req, res) => {
         item.isFriendRequest = (await db.friendRequests.findFirst({
             where: {
                 friendRequestTo: item.id,
-                user_id: user.req.id
+                user_id: req.user.id
             }
         })) != null
 
