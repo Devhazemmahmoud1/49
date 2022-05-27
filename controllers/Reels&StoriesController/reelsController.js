@@ -545,8 +545,6 @@ let getLikedPeople = async (req, res) => {
         }
     })
 
-    console.log(checkReel)
-
     if (! checkReel) {
         return res.status(403).json({
             error: {
@@ -564,6 +562,8 @@ let getLikedPeople = async (req, res) => {
         take: maxReels,
     })
 
+    let users = []
+    
     for (item of listOfUsers) {
         if (item.user_id == req.user.id) continue; 
         item.isFriend = (await db.friends.findFirst({
@@ -598,9 +598,11 @@ let getLikedPeople = async (req, res) => {
                 id: true,
             }
         })     
+
+        users.push(item)
     }
 
-    return res.status(200).json(listOfUsers)
+    return res.status(200).json(users)
 
 }
 
@@ -646,6 +648,8 @@ let getViewedPeople = async (req, res) => {
         take: maxReels,
     }))
 
+    let users = []
+
     for (item of listOfUsers) {
         if (item.user_id == req.user.id) continue; 
         item.isFriend = (await db.friends.findFirst({
@@ -679,10 +683,12 @@ let getViewedPeople = async (req, res) => {
                 lastName: true,
                 id: true,
             }
-        })      
+        })    
+        
+        users.push(item)
     }
 
-    return res.status(200).json(listOfUsers)
+    return res.status(200).json(users)
 
 }
 

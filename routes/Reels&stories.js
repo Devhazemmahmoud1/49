@@ -125,6 +125,7 @@ router.get('/get-user-stories/:id', guard, reels.getUserStories)
 /* Get Likes and view of my reels */
 router.get('/people/who/liked/myReel/:id', guard, reels.getLikedPeople)
 
+/*  */
 router.get('/get/views/of/myReel/:id', guard, reels.getViewedPeople)
 
 module.exports = router
