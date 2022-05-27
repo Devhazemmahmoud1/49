@@ -708,7 +708,7 @@ let getTenderMales = async (req, res) => {
     })
 
     for (item of latestFilter) {
-
+        if (item.id == req.user.id) continue;
         item.isFriend = (await db.friends.findFirst({
             where: {
                 friend_id: item.id,
@@ -718,8 +718,8 @@ let getTenderMales = async (req, res) => {
 
         item.isFriendRequest = (await db.friendRequests.findFirst({
             where: {
-                friendRequestTo: req.user.id,
-                user_id: item.id
+                friendRequestTo: item.id,
+                user_id: user.req.id
             }
         })) != null
 
@@ -753,7 +753,7 @@ let getTenderFemales = async (req, res) => {
     })
 
     for (item of latestFilter) {
-
+        if (item.id == req.user.id) continue;
         item.isFriend = (await db.friends.findFirst({
             where: {
                 friend_id: item.id,
