@@ -707,6 +707,8 @@ let getTenderMales = async (req, res) => {
         return result.userPrivacy[11].status = 1
     })
 
+    let users = []
+
     for (item of latestFilter) {
         if (item.id == req.user.id) continue;
         item.isFriend = (await db.friends.findFirst({
@@ -724,9 +726,11 @@ let getTenderMales = async (req, res) => {
         })) != null
 
         item.recentlyActive = 0
+
+        users.push(item)
     }
 
-    return res.status(200).json(latestFilter)
+    return res.status(200).json(users)
 }
 
 let getTenderFemales = async (req, res) => {
@@ -752,6 +756,8 @@ let getTenderFemales = async (req, res) => {
         return result.userPrivacy[11].status == 1
     })
 
+    let users = []
+
     for (item of latestFilter) {
         if (item.id == req.user.id) continue;
         item.isFriend = (await db.friends.findFirst({
@@ -769,9 +775,10 @@ let getTenderFemales = async (req, res) => {
         })) != null
 
         item.recentlyActive = 0
+        users.push(item)
     }
 
-    return res.status(200).json(latestFilter)
+    return res.status(200).json(users)
 }
 
 let changeProfileFromGal = async (req , res) => {
