@@ -30,7 +30,6 @@ module.exports = ((req, res, next) => {
                         countryCode: true,
                     }
                 });
-                delete user.password
                 req.user = user;
                 next()
             });
