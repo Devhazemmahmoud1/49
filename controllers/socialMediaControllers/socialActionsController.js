@@ -93,6 +93,41 @@ let sendFriendRequest = async (req, res) => {
         })
     }
 
+    let checkIfTheOtherUserSentFriendReq = await db.friendRequests.findFirst({
+        where: {
+            user_id: parseInt(friendId),
+            friendRequestTo: req.user.id
+        }
+    })
+
+    if (checkIfTheOtherUserSentFriendReq) {
+        await db.friends.create({
+            data: {
+                user_id: req.user.id,
+                friend_id: parseInt(friendId)
+            }
+        })
+        await db.friends.create({
+            data: {
+                user_id: parseInt(friendId),
+                friend_id: req.user.id
+            }
+        })
+
+        await db.friendRequests.delete({
+            where: {
+                id: parseInt(checkIfTheOtherUserSentFriendReq.id)
+            }
+        })        
+
+        return res.status(200).json({
+            success: {
+                success_en: 'You are now friends',
+                success_en: 'انتم الان اصدقا'
+            }
+        })
+    }
+
     try {
         await db.friendRequests.create({
             data: {

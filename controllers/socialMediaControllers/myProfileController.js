@@ -716,6 +716,13 @@ let getTenderMales = async (req, res) => {
             }
         })) != null
 
+        item.isFriendRequest = (await db.friendRequests.findFirst({
+            where: {
+                friendRequestTo: req.user.id,
+                user_id: item.id
+            }
+        })) != null
+
         item.recentlyActive = 0
     }
 
@@ -753,7 +760,14 @@ let getTenderFemales = async (req, res) => {
                 user_id: req.user.id
             }
         })) != null
-        
+
+        item.isFriendRequest = (await db.friendRequests.findFirst({
+            where: {
+                friendRequestTo: req.user.id,
+                user_id: item.id
+            }
+        })) != null
+
         item.recentlyActive = 0
     }
 
