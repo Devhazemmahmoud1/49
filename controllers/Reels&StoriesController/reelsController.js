@@ -401,7 +401,7 @@ let removeLikeFromReel = async (req, res) => {
             id: parseInt(id)
         },
         data: {
-            totalLikes: parseInt(checkReelIfTrue.totalLikes) - 1
+            totalLikes: (parseInt(getReel.totalLikes) - 1)
         }
     })
 

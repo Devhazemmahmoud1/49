@@ -111,7 +111,7 @@ router.post('/create-story', upload.array('reel', 12), async (req, res, next) =>
 router.post('/like-on-reel', guard, reels.putLikeOnReel)
 
 /* make a like on a reel */
-router.post('/remove-like-from-reel', guard, reels.removeLikeFromReel)
+router.post('/remove-like/from/reel', guard, reels.removeLikeFromReel)
 
 /* add view to Reel */
 router.post('/reel-views/add', guard, reels.addViewToReel)
