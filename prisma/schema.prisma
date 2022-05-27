@@ -495,8 +495,8 @@ model Advertisment {
   is_pending      Int              @default(0)
   created_at      DateTime         @default(now())
   updated_at      DateTime         @updatedAt
-  user            Users            @relation(fields: [user_id], references: [id])
-  sub             SubCategories    @relation(fields: [subCategory_id], references: [id])
+  user            Users            @relation(fields: [user_id], references: [id], onUpdate: Cascade, onDelete: Cascade)
+  sub             SubCategories    @relation(fields: [subCategory_id], references: [id],onUpdate: Cascade, onDelete: Cascade)
   attachments     AdsAttachments[]
   values          userPropValues[]
   favo            favorates[]
@@ -512,14 +512,17 @@ model AdsAttachments {
 }
 
 model subCategoryProperties {
-  id          Int             @id @default(autoincrement())
-  prop_en     String
-  prop_ar     String
-  category_id Int
-  created_at  DateTime        @default(now())
-  updated_at  DateTime        @updatedAt
-  subCategory SubCategories   @relation(fields: [category_id], references: [id])
-  propValues  userPropValues?
+  id             Int             @id @default(autoincrement())
+  prop_en        String
+  prop_ar        String
+  dataType       Int
+  type           Int
+  identifier     Int
+  subCategory_id Int
+  created_at     DateTime        @default(now())
+  updated_at     DateTime        @updatedAt
+  subCategory    SubCategories   @relation(fields: [subCategory_id], references: [id])
+  propValues     userPropValues?
 }
 
 model userPropValues {
@@ -777,37 +780,37 @@ model songs {
 }
 
 model reels {
-  id            Int      @id @default(autoincrement())
+  id            Int         @id @default(autoincrement())
   desc          String?
   videoUrl      String
   user_id       Int
   videoThumbUrl String
   videoDuration Int
-  totalViews    Int      @default(0)
-  totalLikes    Int      @default(0)
-  song_id       Int      @unique
-  song          songs?   @relation(fields: [song_id], references: [id])
-  type          Int      @default(1)
+  totalViews    Int         @default(0)
+  totalLikes    Int         @default(0)
+  song_id       Int         @unique
+  song          songs?      @relation(fields: [song_id], references: [id])
+  type          Int         @default(1)
   reelLikes     reelLikes[]
   reelViews     reelViews[]
-  created_at    DateTime @default(now())
-  updated_at    DateTime @updatedAt
+  created_at    DateTime    @default(now())
+  updated_at    DateTime    @updatedAt
 }
 
 model reelLikes {
-  id Int @id @default(autoincrement())
-  user_id Int
-  reel_id Int
-  created_at    DateTime @default(now())
-  updated_at    DateTime @updatedAt
-  reels reels @relation(fields: [reel_id], references: [id])
+  id         Int      @id @default(autoincrement())
+  user_id    Int
+  reel_id    Int
+  created_at DateTime @default(now())
+  updated_at DateTime @updatedAt
+  reels      reels    @relation(fields: [reel_id], references: [id])
 }
 
 model reelViews {
-  id Int @id @default(autoincrement())
-  user_id Int 
-  reel_id Int
-  created_at    DateTime @default(now())
-  updated_at    DateTime @updatedAt
-  reels reels @relation(fields: [reel_id], references: [id])  
+  id         Int      @id @default(autoincrement())
+  user_id    Int
+  reel_id    Int
+  created_at DateTime @default(now())
+  updated_at DateTime @updatedAt
+  reels      reels    @relation(fields: [reel_id], references: [id])
 }

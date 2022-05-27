@@ -16,7 +16,7 @@ initializeApp({
 
 var cronJob = require('./controllers/cronJob/cronJobController')
 var cashBackCronJob = require('./controllers/cronJob/cashBackCronJobController')
-var socket = require('./controllers/socketController')
+var socket = require('./controllers/socketController/socketController')
 
 
 
