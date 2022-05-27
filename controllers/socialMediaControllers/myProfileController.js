@@ -703,10 +703,13 @@ let getTenderMales = async (req, res) => {
         return result.userSettings[7].value == "1"
     })
 
+    console.log('this is 1', fillteredUsers)
+
     let latestFilter = fillteredUsers.filter( (result) => {
         return result.userPrivacy[11].status = 1
     })
 
+    console.log('this is 2', latestFilter)
     let users = []
 
     for (item of latestFilter) {
@@ -729,6 +732,8 @@ let getTenderMales = async (req, res) => {
 
         users.push(item)
     }
+
+    console.log('333', users)
 
     return res.status(200).json(users)
 }
