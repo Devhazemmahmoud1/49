@@ -1,8 +1,9 @@
 const router = require('express').Router()
 const guard = require('../middleware/guard')
 const ads = require('../controllers/AdsController')
-var multer = require('multer')
-var { getFileStream, run } = require('../controllers/s3Controller/uploadS3Controller')
+const multer = require('multer');
+const {getFileStream, run} = require('../controllers/s3Controller/uploadS3Controller');
+const {autoCatch} = require("../utils/auto_catch");
 
 /* Add a multter API FOR UPLLOADING IMAGES  */
 var store = multer.diskStorage({
@@ -38,24 +39,24 @@ router.post('/upload-ads-attahcments' ,upload.array('attachments', 12), async (r
 /* Ads API goes here */
 
 /* Get a specific Sub category props according to the giving information */
-router.get('/props/:id', ads.getProperties);
+router.get('/props/:id',autoCatch( ads.getProperties));
 
 /* Get single ad according to the giving ID */
-router.get('/single/:id', ads.getAd)
+router.get('/single/:id',autoCatch( ads.getAd))
 
 /* Create a new ad */
-router.post('/create-ad', guard, ads.createNewAd)
+router.post('/create-ad', guard,autoCatch( ads.createNewAd))
 
 /* Edit a specific ad */
-router.post('/edit-ad', guard, ads.EditAd)
+router.post('/edit-ad', guard, autoCatch(ads.EditAd))
 
 /* add a specific ad to favo list */
-router.post('/add-favo', guard, ads.addFavo)
+router.post('/add-favo', guard,autoCatch( ads.addFavo))
 
 /* remove a specific ad from favo list */
-router.delete('/remove-favo', guard, ads.removeFavo)
+router.delete('/remove-favo', guard,autoCatch( ads.removeFavo))
 
 /* Get my favorate list */
-router.get('/get-myfavorate', guard, ads.getMyfavorates)
+router.get('/get-myfavorate', guard,autoCatch( ads.getMyfavorates))
 
 module.exports = router

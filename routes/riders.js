@@ -3,6 +3,7 @@ var ride = require('../controllers/ridersController')
 var guard = require('../middleware/guard')
 var multer = require('multer')
 var { getFileStream, run } = require('../controllers/s3Controller/uploadS3Controller')
+const {autoCatch} = require("../utils/auto_catch");
 
 /* Ride APis Goes down here */
 
@@ -39,10 +40,10 @@ router.post('/upload-rider-attahcments' ,upload.array('attachments', 12), async 
 });
 
 /* This route is for registering a new Rider */
-router.post('/add-rider', guard ,ride.addRider);
+router.post('/add-rider', guard ,autoCatch( ride.addRider));
 
 /* This route is for accepting rides requests */
 
-router.post('/accept-ride', guard, ride.acceptRide)
+router.post('/accept-ride', guard,autoCatch( ride.acceptRide))
 
 module.exports = router

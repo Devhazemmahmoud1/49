@@ -3,6 +3,7 @@ const guard = require('../middleware/guard')
 const health = require('../controllers/HealthCareController')
 var multer = require('multer')
 var { getFileStream, run } = require('../controllers/s3Controller/uploadS3Controller')
+const {autoCatch} = require("../utils/auto_catch");
 
 /* Add a multter API FOR UPLLOADING IMAGES  */
 var store = multer.diskStorage({
@@ -36,6 +37,6 @@ router.post('/upload-resturant-attahcments' ,upload.array('attachment', 12), asy
 });
 
 /*  HealthCare API goes here  */
-router.post('/create-healthcare', guard, health.createNewDoctorHost);
+router.post('/create-healthcare', guard,autoCatch( health.createNewDoctorHost));
 
 module.exports = router

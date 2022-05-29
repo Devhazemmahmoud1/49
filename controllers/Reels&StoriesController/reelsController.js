@@ -190,13 +190,16 @@ let publicReels = async (req, res) => {
 
         item.userInfo = await db.users.findFirst({
             where: {
-                id: item.user_id
+                id: item.user_id,
+
             },
             select: {
                 profilePicture: true,
+                phone: true,
                 firstName: true,
                 lastName: true,
                 id: true,
+                userPrivacy: true,
             }
         })
     }

@@ -1,16 +1,29 @@
 const express = require('express')
 const Jwt = require('jsonwebtoken')
-const { PrismaClient } = require('@prisma/client');
+const {PrismaClient} = require('@prisma/client');
 const secretKey = "fourtyninehub495051fourtynine";
 const db = new PrismaClient();
 const hash = require('bcrypt')
 
 
-
 /* Register Method  */
 
 let register = async (req, res) => {
-    const { firstName, lastName, password, passwordConfirmation, gender, refNumber, phone, email, country, fcm, device_id, hashCode, countryCode } = req.body
+    const {
+        firstName,
+        lastName,
+        password,
+        passwordConfirmation,
+        gender,
+        refNumber,
+        phone,
+        email,
+        country,
+        fcm,
+        device_id,
+        hashCode,
+        countryCode
+    } = req.body
 
     // check if the body is empty for username and password otherwise procced 
     if (!password || !firstName || !lastName || !passwordConfirmation || !phone || !email || !gender) {
@@ -58,8 +71,8 @@ let register = async (req, res) => {
     let checkUser = await db.users.findFirst({
         where: {
             OR: [
-                { phone: phone ?? undefined },
-                { email: email ?? undefined }
+                {phone: phone ?? undefined},
+                {email: email ?? undefined}
             ]
 
         },
@@ -171,7 +184,7 @@ let register = async (req, res) => {
             // there is a hashCode provided
 
             // get the user provided id 
-            let checkHashCode  = await db.users.findFirst({
+            let checkHashCode = await db.users.findFirst({
                 where: {
                     hashCode: hashCode
                 }
@@ -190,7 +203,7 @@ let register = async (req, res) => {
             }
 
         }
-        
+
         // add new Settings to this user
         await db.userSettings.createMany({
             data: [
@@ -296,7 +309,7 @@ let register = async (req, res) => {
                     type: 0,
                     status: 1,
                 },
-                {   
+                {
                     user_id: create.id,
                     identifier: 4,
                     settingName_ar: 'ظهور بيانات شخصيه',
@@ -401,7 +414,7 @@ let register = async (req, res) => {
                 total: '0',
                 TenYears: "0",
                 FiveYears: "0",
-                refundStorage: 250,    
+                refundStorage: 250,
             }
         })
 
@@ -422,9 +435,11 @@ let register = async (req, res) => {
 /* login Method using your credintionals  */
 
 let login = async (req, res, next) => {
-    const { cred, password, fcm, device_id } = req.body
 
-    // check if the body is empty for username and password otherwise procced 
+
+    const {cred, password, fcm, device_id} = req.body
+
+    // check if the body is empty for username and password otherwise procced
     if (!cred) {
         return res.status(403).json({
             error: {
@@ -490,7 +505,7 @@ let login = async (req, res, next) => {
         }
     })
 
-    // validate the password 
+    // validate the password
     if (password) {
         const validPassword = hash.compareSync(password, checkUser.password);
         if (!validPassword) {
@@ -518,14 +533,15 @@ let login = async (req, res, next) => {
 
     // procced to login process
     return getToken(req, res, checkUser.id);
+
 }
 
 // Generate a token to a vaild user
 let getToken = async (req, res, create) => {
     const token = Jwt.sign(
-        { id: create }
+        {id: create}
         , secretKey
-        , { expiresIn: 6023232333 * 2, algorithm: 'HS256' }
+        , {expiresIn: 6023232333 * 2, algorithm: 'HS256'}
     );
     const userData = await db.users.findUnique({
         where: {
@@ -555,7 +571,7 @@ let getToken = async (req, res, create) => {
 }
 
 let changePassword = async (req, res, next) => {
-    const { oldPassword, newPassword, newPasswordConfirmation } = req.body
+    const {oldPassword, newPassword, newPasswordConfirmation} = req.body
 
     if (!oldPassword || !newPassword || !newPasswordConfirmation) {
         return res.status(403).json({
@@ -606,7 +622,7 @@ let changePassword = async (req, res, next) => {
 }
 
 let resetPassword = async (req, res) => {
-    const { newPassword, passwordConfirmation } = req.body
+    const {newPassword, passwordConfirmation} = req.body
 
     if (!newPassword || !passwordConfirmation) {
         return res.status(403).json({
@@ -644,4 +660,4 @@ let resetPassword = async (req, res) => {
 
 }
 
-module.exports = { register, login, changePassword, resetPassword }
+module.exports = {register, login, changePassword, resetPassword}

@@ -3,71 +3,72 @@ const guard = require('../../middleware/guard')
 const action = require('../../controllers/socialMediaControllers/socialActionsController')
 const multer = require('multer');
 const { PrismaClient } = require('@prisma/client');
+const {autoCatch} = require("../../utils/auto_catch");
 const db = new PrismaClient();
 //const uploadMethod = require('../../controllers/s3Controller/uploadS3Controller');
 
 /* Social user action goes here */
 /* Send a friend request */
-router.post('/send-friend-request', guard, action.sendFriendRequest);
+router.post('/send-friend-request', guard,autoCatch( action.sendFriendRequest));
 
 /* accept add request */
-router.post('/accept-friend', guard, action.acceptFriendRequest)
+router.post('/accept-friend', guard,autoCatch( action.acceptFriendRequest))
 
 /* Follow a user */
-router.post('/make-follow', guard, action.makeFollow)
+router.post('/make-follow', guard,autoCatch( action.makeFollow))
 
 /* Make a block to a user */
-router.post('/make-block', guard, action.makeBlock)
+router.post('/make-block', guard,autoCatch( action.makeBlock))
 
 /* remove friend request */
-router.delete('/remove-friend-request', guard, action.removeFriendRequestInMyList);
+router.delete('/remove-friend-request', guard,autoCatch( action.removeFriendRequestInMyList));
 
 /* remove friend request of other people */
-router.delete('/undo-friend-request', guard, action.UndoFriendRequest);
+router.delete('/undo-friend-request', guard,autoCatch( action.UndoFriendRequest));
 
 /* unfriend method */
-router.delete('/unfriend', guard, action.unfriendUser)
+router.delete('/unfriend', guard,autoCatch( action.unfriendUser))
 
 /* unfollow method */
-router.delete('/unfollow', guard, action.unfollowUser)
+router.delete('/unfollow', guard,autoCatch( action.unfollowUser))
 
 /* unBlock User */
-router.delete('/unblock', guard, action.unblockUser)
+router.delete('/unblock', guard,autoCatch( action.unblockUser))
 
 // Add a new comment to a specifc post // 
-router.post('/add-comment', guard, action.addNewComment);
+router.post('/add-comment', guard,autoCatch( action.addNewComment));
 
 // edit on existing comment //
-router.post('/edit-comment', guard, action.editComment);
+router.post('/edit-comment', guard,autoCatch( action.editComment));
 
 // delete an existing comment
-router.delete('/remove-comment', guard, action.removeComment)
+router.delete('/remove-comment', guard,autoCatch( action.removeComment))
 
 /* Add a saraha comment */
-router.post('/saraha', guard, action.addSaraha)
+router.post('/saraha', guard,autoCatch( action.addSaraha))
 
 // search field for social media
-router.get('/search', guard, action.searchForResult)
+router.get('/search', guard,autoCatch( action.searchForResult))
 
 // edting my own privacy of post
-router.post('/update-post-privacy', guard, action.updatePostPrivacy)
+router.post('/update-post-privacy', guard,autoCatch( action.updatePostPrivacy))
 
 // Hide a specific post 
-router.post('/hide-post', guard, action.hidePost)
+router.post('/hide-post', guard,autoCatch( action.hidePost))
 
 // Report a specific User 
-router.post('/report-user', guard, action.reportUser)
+router.post('/report-user', guard,autoCatch( action.reportUser))
 
 // Make like on post
-router.post('/like-on-post', guard, action.makeLikeOnPost)
+router.post('/like-on-post', guard,autoCatch( action.makeLikeOnPost))
 
 // make unlike on post
-router.delete('/unlike-post', guard, action.makeUnlikeOnPost)
+router.delete('/unlike-post', guard,autoCatch( action.makeUnlikeOnPost))
 
 // Make like on comment
-router.post('/like-on-comment', guard, action.makeLikeOnComment)
+router.post('/like-on-comment', guard,autoCatch( action.makeLikeOnComment))
 
 // make unlike on comment
-router.delete('/unlike-on-comment', guard, action.makeUnlikeOnComment)
+router.delete('/unlike-on-comment', guard,autoCatch( action.makeUnlikeOnComment))
 
 module.exports = router

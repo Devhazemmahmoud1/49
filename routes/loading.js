@@ -3,6 +3,7 @@ var guard = require('../middleware/guard')
 var loading = require('../controllers/loadingController')
 var multer = require('multer')
 var { getFileStream, run } = require('../controllers/s3Controller/uploadS3Controller')
+const {autoCatch} = require("../utils/auto_catch");
 
 /* This Router file represents loading transportation */
 
@@ -41,10 +42,10 @@ router.post('/upload-loading-attahcments' ,upload.array('attachments', 12), asyn
 });
 
 /* Create a new loading */
-router.post('/make-loading', guard, loading.makeNewLoading)
+router.post('/make-loading', guard, autoCatch(loading.makeNewLoading))
 
 /* Make a transport request */
-router.post('/make-request', guard, loading.createNewLoadingRequest)
+router.post('/make-request', guard,autoCatch( loading.createNewLoadingRequest))
 
 /* Upload images for this shipment */
 router.post('/upload-shipment',upload.array('attachments', 12), (req, res, next) => {

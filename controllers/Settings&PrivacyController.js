@@ -5,7 +5,7 @@ const moment = require('moment');
 
 /* Edit settings according to the giving information */
 let editSettings = async (req, res) => {
-    const { gender, birthDate, socialStatus, job, city } = req.body
+    const { firstName,lastName,gender, birthDate, socialStatus, job, city } = req.body
 
     // update user settings 
 
@@ -30,10 +30,12 @@ let editSettings = async (req, res) => {
 
         let values = [
             { value: birthDate.value, status: birthDate.status},
+            { value: firstName.value, status: firstName.status},
+            { value: lastName.value, status: lastName.status},
             { value: socialStatus.value, status: socialStatus.status},
             { value: job.value, status: job.status},
             { value: city.value, status: city.status},
-            { value: gender.value, status: gender.status},
+         //   { value: gender.value, status: gender.status},
         ]
 
         let x = 0;

@@ -3,6 +3,7 @@ const guard = require('../middleware/guard')
 const rest = require('../controllers/resturantsController')
 var multer = require('multer')
 var { getFileStream, run } = require('../controllers/s3Controller/uploadS3Controller')
+const {autoCatch} = require("../utils/auto_catch");
 
 /* Add a multter API FOR UPLLOADING IMAGES  */
 var store = multer.diskStorage({
@@ -43,42 +44,42 @@ router.post('/upload-resturant-meal-attachments' ,upload.array('attachments', 12
 });
  
 /* Here goes resturants APIS */
-router.post('/create-rest', guard, rest.createResturant)
+router.post('/create-rest', guard,autoCatch( rest.createResturant))
 
 /* get list of my own resturants */
-router.get('/get-resturants', guard, rest.getResturants)
+router.get('/get-resturants', guard,autoCatch( rest.getResturants))
 
 /* Get resturant information */
-router.get('/get-resturant/:id', guard, rest.getResturant)
+router.get('/get-resturant/:id', guard,autoCatch( rest.getResturant))
 
 /* Edit a resturant of yours */
-router.post('/edit-rest', guard, rest.updateResturant)
+router.post('/edit-rest', guard,autoCatch( rest.updateResturant))
 
 /* Delete a resturant of yours */
-router.delete('/delete-rest', guard, rest.deleteResturant)
+router.delete('/delete-rest', guard,autoCatch( rest.deleteResturant))
 
 /* Create MainCategories for a specific resturant */
-router.post('/create-maincategory', guard, rest.createMainCategories)
+router.post('/create-maincategory', guard,autoCatch( rest.createMainCategories))
 
 /* Get resturant information */
-router.get('/get-resturant-categories/:id', guard, rest.getResturantCategories)
+router.get('/get-resturant-categories/:id', guard,autoCatch( rest.getResturantCategories))
 
 /* Edit a resturant category of yours */
-router.post('/edit-maincategory', guard, rest.updateMainCategories)
+router.post('/edit-maincategory', guard,autoCatch( rest.updateMainCategories))
 
 /* Delete a resturant cateogru of yours */
-router.delete('/delete-maincategory', guard, rest.deleteMainCategories)
+router.delete('/delete-maincategory', guard,autoCatch( rest.deleteMainCategories))
 
 /* Create a new Meal for a specific category of  resturant */
-router.post('/create-meal', guard, rest.createMealForResturant)
+router.post('/create-meal', guard,autoCatch( rest.createMealForResturant))
 
 /* Get resturant meals information */
-router.get('/get-resturant-meals/:id', guard, rest.getReturantMeals)
+router.get('/get-resturant-meals/:id', guard,autoCatch( rest.getReturantMeals))
 
 /* Edit a resturant category of yours */
-router.post('/edit-meal', guard, rest.updateMealForResturant)
+router.post('/edit-meal', guard,autoCatch( rest.updateMealForResturant))
 
 /* Delete a resturant cateogru of yours */
-router.delete('/delete-meal', guard, rest.deleteMealForResturant)
+router.delete('/delete-meal', guard,autoCatch( rest.deleteMealForResturant))
 
 module.exports = router
