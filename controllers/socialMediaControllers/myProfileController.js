@@ -694,7 +694,6 @@ let getTenderMales = async (req, res) => {
         include: {
             userPrivacy: true,
             userSettings: true,
-            phone:true
         },
         skip: page == 1 ? 0 : (page * maxTender) - maxTender,
         take: maxTender,
@@ -704,13 +703,10 @@ let getTenderMales = async (req, res) => {
         return result.userSettings[7].value == "1"
     })
 
-    console.log('this is 1', fillteredUsers)
-
     let latestFilter = fillteredUsers.filter( (result) => {
         return result.userPrivacy[11].status = 1
     })
 
-    console.log('this is 2', latestFilter)
     let users = []
 
     for (item of latestFilter) {
@@ -756,7 +752,6 @@ let getTenderFemales = async (req, res) => {
 
     let getUsers = await db.users.findMany({
         include: {
-            phone:true,
             userSettings: true,
             userPrivacy: true,
         },
