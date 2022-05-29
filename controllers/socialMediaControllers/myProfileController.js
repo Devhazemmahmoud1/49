@@ -693,6 +693,7 @@ let getTenderMales = async (req, res) => {
     let getUsers = await db.users.findMany({
         include: {
             userPrivacy: true,
+            userSettings: true,
             phone:true
         },
         skip: page == 1 ? 0 : (page * maxTender) - maxTender,
@@ -756,6 +757,7 @@ let getTenderFemales = async (req, res) => {
     let getUsers = await db.users.findMany({
         include: {
             phone:true,
+            userSettings: true,
             userPrivacy: true,
         },
         skip: page == 1 ? 0 : (page * maxTender) - maxTender,
