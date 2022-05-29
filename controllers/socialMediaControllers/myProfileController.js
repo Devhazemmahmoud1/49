@@ -735,6 +735,7 @@ let getTenderMales = async (req, res) => {
         }else{
             item.isFriendRequest = false
             item.isFriend = false
+            item.recentlyActive = 0
             users.push(item)
         }
 
@@ -792,6 +793,7 @@ let getTenderFemales = async (req, res) => {
         }else{
             item.isFriend = false;
             item.isFriendRequest = false;
+            item.recentlyActive = 0
             users.push(item)
         }
 
