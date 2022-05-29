@@ -713,24 +713,31 @@ let getTenderMales = async (req, res) => {
     let users = []
 
     for (item of latestFilter) {
-        if (item.id == req.user.id) continue;
-        item.isFriend = (await db.friends.findFirst({
-            where: {
-                friend_id: item.id,
-                user_id: req.user.id
-            }
-        })) != null
+        if(req.user){
+            if (item.id == req.user.id) continue;
+            item.isFriend = (await db.friends.findFirst({
+                where: {
+                    friend_id: item.id,
+                    user_id: req.user.id
+                }
+            })) != null
 
-        item.isFriendRequest = (await db.friendRequests.findFirst({
-            where: {
-                friendRequestTo: item.id,
-                user_id: req.user.id
-            }
-        })) != null
+            item.isFriendRequest = (await db.friendRequests.findFirst({
+                where: {
+                    friendRequestTo: item.id,
+                    user_id: req.user.id
+                }
+            })) != null
 
-        item.recentlyActive = 0
+            item.recentlyActive = 0
 
-        users.push(item)
+            users.push(item)
+        }else{
+            item.isFriendRequest = false
+            item.isFriend = false
+            users.push(item)
+        }
+
     }
 
     console.log('333', users)
@@ -764,23 +771,30 @@ let getTenderFemales = async (req, res) => {
     let users = []
 
     for (item of latestFilter) {
-        if (item.id == req.user.id) continue;
-        item.isFriend = (await db.friends.findFirst({
-            where: {
-                friend_id: item.id,
-                user_id: req.user.id
-            }
-        })) != null
+        if(req.user){
+            if (item.id == req.user.id) continue;
+            item.isFriend = (await db.friends.findFirst({
+                where: {
+                    friend_id: item.id,
+                    user_id: req.user.id
+                }
+            })) != null
 
-        item.isFriendRequest = (await db.friendRequests.findFirst({
-            where: {
-                friendRequestTo: req.user.id,
-                user_id: item.id
-            }
-        })) != null
+            item.isFriendRequest = (await db.friendRequests.findFirst({
+                where: {
+                    friendRequestTo: req.user.id,
+                    user_id: item.id
+                }
+            })) != null
 
-        item.recentlyActive = 0
-        users.push(item)
+            item.recentlyActive = 0
+            users.push(item)
+        }else{
+            item.isFriend = false;
+            item.isFriendRequest = false;
+            users.push(item)
+        }
+
     }
 
     return res.status(200).json(users)

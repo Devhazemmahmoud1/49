@@ -289,7 +289,7 @@ let register = async (req, res) => {
                     user_id: create.id,
                     identifier: 1,
                     settingName_ar: 'استقبال رسايل',
-                    settingName_en: 'Recieve messages',
+                    settingName_en: 'Receive messages',
                     type: 0,
                     status: 0,
                 },

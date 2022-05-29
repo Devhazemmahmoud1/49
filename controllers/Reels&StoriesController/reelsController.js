@@ -1,10 +1,10 @@
-const { PrismaClient } = require('@prisma/client');
-const { sendNotification } = require('../notificationsController/SocialNotification.js');
+const {PrismaClient} = require('@prisma/client');
+const {sendNotification} = require('../notificationsController/SocialNotification.js');
 const db = new PrismaClient();
 
 /* delete a  reel */
 let deleteReel = async (req, res) => {
-    const { id } = req.body
+    const {id} = req.body
 
     if (!id) return res.status(403).json({
         error: {
@@ -46,7 +46,7 @@ let deleteReel = async (req, res) => {
 
 /* get One reel */
 let getOneReel = async (req, res) => {
-    const { id } = req.params
+    const {id} = req.params
 
     if (!id) {
         return res.status(403).json({
@@ -78,14 +78,14 @@ let getOneReel = async (req, res) => {
             user_id: req.user.id,
             friend_id: checkReel.user_id
         }
-    }))  != null 
+    })) != null
 
     checkReel.isLiked = (await db.reelLikes.findFirst({
         where: {
             reel_id: checkReel.id,
             user_id: req.user.id
         }
-    }))  != null 
+    })) != null
 
 
     checkReel.isMine = (await db.reels.findFirst({
@@ -93,7 +93,7 @@ let getOneReel = async (req, res) => {
             id: checkReel.id,
             user_id: req.user.id
         }
-    })) != null 
+    })) != null
 
     checkReel.userInfo = await db.users.findFirst({
         where: {
@@ -106,7 +106,7 @@ let getOneReel = async (req, res) => {
 }
 
 let getMyReels = async (req, res) => {
-    let { page } = req.query
+    let {page} = req.query
     if (!page) page = 1;
     let maxReels = 20;
     console.log(1)
@@ -130,7 +130,7 @@ let getMyReels = async (req, res) => {
                 reel_id: item.id,
                 user_id: req.user.id
             }
-        })) != null 
+        })) != null
 
         item.isMine = true
 
@@ -151,7 +151,7 @@ let getMyReels = async (req, res) => {
 }
 
 let publicReels = async (req, res) => {
-    let { page } = req.query
+    let {page} = req.query
     if (!page) page = 1;
     let maxReels = 20;
 
@@ -167,26 +167,37 @@ let publicReels = async (req, res) => {
     });
 
     for (item of getMyreelList) {
-        item.isFriend = (await db.friends.findFirst({
-            where: {
-                user_id: req.user.id,
-                friend_id: item.user_id
-            }
-        })) != null 
+        if (req.user) {
+            item.isFriend = (await db.friends.findFirst({
+                where: {
+                    user_id: req.user.id,
+                    friend_id: item.user_id
+                }
+            })) != null
+        } else {
+            item.isFriend = false
+        }
+        if (req.user) {
+            item.isLiked = (await db.reelLikes.findFirst({
+                where: {
+                    reel_id: item.id,
+                    user_id: req.user.id
+                }
+            })) != null
+        } else {
+            item.isLiked = false
+        }
+        if (req.user) {
+            item.isMine = (await db.reels.findFirst({
+                where: {
+                    id: item.id,
+                    user_id: req.user.id
+                }
+            })) != null
+        } else {
+            item.isMine = false
+        }
 
-        item.isLiked = (await db.reelLikes.findFirst({
-            where: {
-                reel_id: item.id,
-                user_id: req.user.id
-            }
-        }))  != null
-
-        item.isMine = (await db.reels.findFirst({
-            where: {
-                id: item.id,
-                user_id: req.user.id
-            }
-        }))  != null
 
         item.userInfo = await db.users.findFirst({
             where: {
@@ -215,7 +226,7 @@ let getSongs = async (req, res) => {
 }
 
 let putLikeOnReel = async (req, res) => {
-    const { id } = req.body
+    const {id} = req.body
 
     if (!id) {
         return res.status(403).json({
@@ -283,7 +294,7 @@ let putLikeOnReel = async (req, res) => {
 
 /* Increase the view of the reel*/
 let addViewToReel = async (req, res) => {
-    const { id } = req.body
+    const {id} = req.body
 
     if (!id) {
         return res.status(403).json({
@@ -351,7 +362,7 @@ let addViewToReel = async (req, res) => {
 
 /* DeCrease the view of the reel */
 let removeLikeFromReel = async (req, res) => {
-    const { id } = req.body
+    const {id} = req.body
 
     if (!id) {
         return res.status(403).json({
@@ -384,7 +395,7 @@ let removeLikeFromReel = async (req, res) => {
         }
     })
 
-    if (! checkReelIfTrue) {
+    if (!checkReelIfTrue) {
         return res.status(403).json({
             error: {
                 error_ar: 'View was send before',
@@ -450,7 +461,7 @@ let getMyStories = async (req, res) => {
 
 /* Get users Stories */
 let getUserStories = async (req, res) => {
-    const { id } = req.params
+    const {id} = req.params
 
     if (!id) {
         return res.status(403).json({
@@ -467,13 +478,13 @@ let getUserStories = async (req, res) => {
         }
     })
 
-    if (! checkUser) {
+    if (!checkUser) {
         return res.status(403).json({
             error: {
                 error_en: 'No',
                 error_ar: 'No'
             }
-        })        
+        })
     }
 
     let stories = await db.reels.findMany({
@@ -526,9 +537,9 @@ let getUserStories = async (req, res) => {
 
 /* Who liked my own reel */
 let getLikedPeople = async (req, res) => {
-    const { id } = req.params
+    const {id} = req.params
 
-    let { page } = req.query
+    let {page} = req.query
     if (!page) page = 1;
     let maxReels = 20;
 
@@ -548,27 +559,27 @@ let getLikedPeople = async (req, res) => {
         }
     })
 
-    if (! checkReel) {
+    if (!checkReel) {
         return res.status(403).json({
             error: {
                 error_en: 'No',
                 error_ar: 'No'
             }
-        })        
+        })
     }
 
     let listOfUsers = await db.reelLikes.findMany({
         where: {
-            reel_id: parseInt(id) 
+            reel_id: parseInt(id)
         },
         skip: page == 1 ? 0 : (page * maxReels) - maxReels,
         take: maxReels,
     })
 
     let users = []
-    
+
     for (item of listOfUsers) {
-        if (item.user_id == req.user.id) continue; 
+        if (item.user_id == req.user.id) continue;
         item.isFriend = (await db.friends.findFirst({
             where: {
                 user_id: req.user.id,
@@ -600,7 +611,7 @@ let getLikedPeople = async (req, res) => {
                 lastName: true,
                 id: true,
             }
-        })     
+        })
 
         users.push(item)
     }
@@ -611,10 +622,10 @@ let getLikedPeople = async (req, res) => {
 
 /* Who liked my own reel */
 let getViewedPeople = async (req, res) => {
-    
-    const { id } = req.params
 
-    let { page } = req.query
+    const {id} = req.params
+
+    let {page} = req.query
     if (!page) page = 1;
     let maxReels = 20;
 
@@ -634,18 +645,18 @@ let getViewedPeople = async (req, res) => {
         }
     })
 
-    if (! checkReel) {
+    if (!checkReel) {
         return res.status(403).json({
             error: {
                 error_en: 'No',
                 error_ar: 'No'
             }
-        })        
+        })
     }
 
     let listOfUsers = (await db.reelViews.findMany({
         where: {
-            reel_id: parseInt(id) 
+            reel_id: parseInt(id)
         },
         skip: page == 1 ? 0 : (page * maxReels) - maxReels,
         take: maxReels,
@@ -654,7 +665,7 @@ let getViewedPeople = async (req, res) => {
     let users = []
 
     for (item of listOfUsers) {
-        if (item.user_id == req.user.id) continue; 
+        if (item.user_id == req.user.id) continue;
         item.isFriend = (await db.friends.findFirst({
             where: {
                 user_id: req.user.id,
@@ -686,8 +697,8 @@ let getViewedPeople = async (req, res) => {
                 lastName: true,
                 id: true,
             }
-        })    
-        
+        })
+
         users.push(item)
     }
 
@@ -695,4 +706,17 @@ let getViewedPeople = async (req, res) => {
 
 }
 
-module.exports = { deleteReel, getOneReel, getMyReels, publicReels, getSongs, putLikeOnReel, addViewToReel, removeLikeFromReel, getMyStories, getUserStories, getLikedPeople, getViewedPeople }
+module.exports = {
+    deleteReel,
+    getOneReel,
+    getMyReels,
+    publicReels,
+    getSongs,
+    putLikeOnReel,
+    addViewToReel,
+    removeLikeFromReel,
+    getMyStories,
+    getUserStories,
+    getLikedPeople,
+    getViewedPeople
+}
