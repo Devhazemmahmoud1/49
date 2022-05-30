@@ -496,7 +496,7 @@ model Advertisment {
   created_at      DateTime         @default(now())
   updated_at      DateTime         @updatedAt
   user            Users            @relation(fields: [user_id], references: [id], onUpdate: Cascade, onDelete: Cascade)
-  sub             SubCategories    @relation(fields: [subCategory_id], references: [id],onUpdate: Cascade, onDelete: Cascade)
+  sub             SubCategories    @relation(fields: [subCategory_id], references: [id], onUpdate: Cascade, onDelete: Cascade)
   attachments     AdsAttachments[]
   values          userPropValues[]
   favo            favorates[]
@@ -518,11 +518,12 @@ model subCategoryProperties {
   dataType       Int
   type           Int
   identifier     Int
+  position       Int
   subCategory_id Int
   created_at     DateTime        @default(now())
   updated_at     DateTime        @updatedAt
   subCategory    SubCategories   @relation(fields: [subCategory_id], references: [id])
-  propValues     userPropValues?
+  propValues     userPropValues[]
 }
 
 model userPropValues {
@@ -789,7 +790,7 @@ model reels {
   totalViews    Int         @default(0)
   totalLikes    Int         @default(0)
   song_id       Int         @unique
-  song          songs?      @relation(fields: [song_id], references: [id])
+  song          songs      @relation(fields: [song_id], references: [id])
   type          Int         @default(1)
   reelLikes     reelLikes[]
   reelViews     reelViews[]

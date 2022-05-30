@@ -1,2 +1,0 @@
--- AlterTable
-ALTER TABLE `Wallet` ADD COLUMN `refPayBack` DECIMAL(9, 2) NULL DEFAULT 0;

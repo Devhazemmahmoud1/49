@@ -576,9 +576,7 @@ let getMainPage = async (req, res) => {
     let { page } = req.query
 
     if (! page) page = 1
-
     let posts = []
-
     let uniquePosts = []
 
 
@@ -618,10 +616,20 @@ let getMainPage = async (req, res) => {
     })
 
     for (item of getMyFriends) {
+        item.user.posts.userInfo = await db.users.findFirst({
+            where: {
+                id: item.user.posts.user_id
+            }
+        }) 
         posts.push(...item.user.posts)
     }
 
     for (item of getMyFollowing) {
+        item.user.posts.userInfo = await db.users.findFirst({
+            where: {
+                id: item.user.posts.user_id
+            }
+        })         
         posts.push(...item.user.posts)
     }
 
