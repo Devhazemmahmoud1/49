@@ -616,7 +616,7 @@ let getMainPage = async (req, res) => {
     })
 
     for (item of getMyFriends) {
-        console.log(item)
+        console.log(item.user.posts)
         item.user.posts.userInfo = await db.users.findFirst({
             where: {
                 id: item.user.posts.user_id
@@ -626,7 +626,7 @@ let getMainPage = async (req, res) => {
     }
 
     for (item of getMyFollowing) {
-        console.log(item)
+        console.log(item.user.posts)
         item.user.posts.userInfo = await db.users.findFirst({
             where: {
                 id: item.user.posts.user_id
