@@ -635,11 +635,11 @@ let getMainPage = async (req, res) => {
 
 
 
-    let filteredFriendsPosts = getMyFriends.filter( (result) => {
+    let filteredFriendsPosts = posts.filter( (result) => {
         return result.user.userPrivacy[6].status > 0
     })
 
-    return res.status(200).json(posts)
+    return res.status(200).json(filteredFriendsPosts)
 }
 
 let getMyGalary = async (req ,res) => {
