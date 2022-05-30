@@ -920,7 +920,7 @@ let makeLikeOnPost = async (req, res) => {
             }
         })
 
-        if (! createReation) return res.status(403).send('something went wrong')
+        if (! createReation) return res.status(403).send('something went wrong '+createReation)
 
         var getReactionsForPost = await db.posts.findFirst({
             where: {
@@ -940,6 +940,7 @@ let makeLikeOnPost = async (req, res) => {
                 totalAngry: reaction == 5 ? (getReactionsForPost.totalAngry + 1) : undefined,
             }
         })
+
 
     } catch (e) {
         console.log(e)
