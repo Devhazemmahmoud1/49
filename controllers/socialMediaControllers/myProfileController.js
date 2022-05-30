@@ -634,6 +634,8 @@ let getMainPage = async (req, res) => {
     }
 
 
+    console.log(posts)
+
 
     let filteredFriendsPosts = posts.filter( (result) => {
         return result.user.userPrivacy[6].status > 0
