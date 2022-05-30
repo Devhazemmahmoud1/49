@@ -618,14 +618,14 @@ let getMainPage = async (req, res) => {
     })
 
     for (item of getMyFriends) {
-        posts.push(item.user.posts)
+        posts.push(...item.user.posts)
     }
 
     for (item of getMyFollowing) {
-        posts.push(item.user.posts)
+        posts.push(...item.user.posts)
     }
 
-    console.log(posts)
+
 
     let filteredFriendsPosts = getMyFriends.filter( (result) => {
         return result.user.userPrivacy[6].status > 0
