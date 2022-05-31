@@ -616,7 +616,6 @@ let getMainPage = async (req, res) => {
     })
 
     for (item of getMyFriends) {
-        console.log(item.user.posts)
         item.user.posts.userInfo = await db.users.findFirst({
             where: {
                 id: item.user.posts.user_id
@@ -626,7 +625,6 @@ let getMainPage = async (req, res) => {
     }
 
     for (item of getMyFollowing) {
-        console.log(item.user.posts)
         item.user.posts.userInfo = await db.users.findFirst({
             where: {
                 id: item.user.posts.user_id
@@ -636,14 +634,15 @@ let getMainPage = async (req, res) => {
     }
 
 
-    console.log(posts)
 
 
-    let filteredFriendsPosts = posts.filter( (result) => {
-        return result.user.userPrivacy[6].status > 0
-    })
 
-    return res.status(200).json(filteredFriendsPosts)
+    // let filteredFriendsPosts = posts.filter( (result) => {
+    //     console.log(result.user)
+    //     return result.user.userPrivacy[6].status > 0
+    // })
+
+    return res.status(200).json(posts)
 }
 
 let getMyGalary = async (req ,res) => {
