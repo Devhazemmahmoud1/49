@@ -12,7 +12,7 @@ let getProperties = async (req, res) => {
 
     let props = await db.subCategoryProperties.findMany({
         where: {
-            category_id: parseInt(id)
+            subCategory_id: parseInt(id)
         }
     })
 

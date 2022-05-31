@@ -128,6 +128,18 @@ let getMyPosts = async (req, res) => {
             }
         })
 
+        item.userInfo = await db.users.findFirst({
+            where: {
+                id: item.user_id
+            },
+            select: {
+                id: true,
+                firstName: true,
+                lastName: true,
+                profilePicture: true,
+            }
+        })
+
         item.activity = await db.postActivity.findFirst({
             where: {
                 id: item.activity_id

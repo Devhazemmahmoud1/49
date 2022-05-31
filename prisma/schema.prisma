@@ -520,6 +520,7 @@ model subCategoryProperties {
   identifier     Int
   position       Int
   subCategory_id Int
+  dropDownValues String?
   created_at     DateTime        @default(now())
   updated_at     DateTime        @updatedAt
   subCategory    SubCategories   @relation(fields: [subCategory_id], references: [id])
