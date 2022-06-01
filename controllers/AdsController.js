@@ -78,6 +78,10 @@ let createNewAd = async (req, res) => {
         }
     })
 
+    console.log(createNewAd)
+
+    return;
+
     // creating props for this ad
     for (item of adProps) {
 
