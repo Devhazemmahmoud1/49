@@ -53,52 +53,91 @@ let getAd = async (req, res) => {
 
 /* Creating a new ad method */
 let createNewAd = async (req, res) => {
-    const { title, desc, mainCategory, subCategory, attachments, adProps } = req.body
-    if (!title || !subCategory || !mainCategory) {
+    const { mainCategory, subCategory, attachments, adProps } = req.body
+    if (!subCategory || !mainCategory) {
         return res.status(403).json({
             error: {
-                error_ar: 'عنوان الاعلان مطلوب.',
-                error_en: 'Ad title is required.'
+                error_ar: 'Ad category id for sub and main are required.',
+                error_en: 'Ad category id for sub and main are required.'
             }
         })
     }
 
+    // fetch all the props 
+
+
+
     // Create a new Ad
     let creatingAd = await db.advertisment.create({
         data: {
-            title: title,
-            desc: desc,
+            title: '',
+            desc: '',
             user_id: req.user.id,
             mainCategory_id: parseInt(mainCategory),
             subCategory_id: parseInt(subCategory)
         }
     })
 
-    // let attachment = [
-    //     {
-    //         filename: 'Static data'
-    //     },
-    //     {
-    //         filename: 'Dynamic data'
-    //     }
-    // ];
-
-    // creating attachments for this ad
-    for (item of attachments) {
-        let createAttachments = await db.adsAttachments.create({
-            data: {
-                ad_id: creatingAd.id,
-                url: item.filename,
-            }
-        })
-    }
-
-    /*let props = [
-        { subCategory_id: 1, ad_id: creatingAd.id, subCategoryProperty_id: 1, value: 200 },
-    ]*/
-
     // creating props for this ad
-    for (item of props) {
+    for (item of adProps) {
+
+        if (item.identifier == 7700 || item.identifier == 700 || item.identifier == 33
+            || item.identifier == 44 || item.identifier == 55) {
+            // attachment images     
+            await db.userPropValues.create({
+                data: {
+                    subCategoryProperty_id: item.subCategoryProperty_id,
+                    subCategory_id: item.subCategory_id,
+                    ad_id: creatingAd.id,
+                    value: JSON.stringify(item.value)
+                }
+            })
+
+            continue;
+        }
+
+        if (item.identifier == 900) {
+            // Video attachment
+            await db.userPropValues.create({
+                data: {
+                    subCategoryProperty_id: item.subCategoryProperty_id,
+                    subCategory_id: item.subCategory_id,
+                    ad_id: creatingAd.id,
+                    value: JSON.stringify(item.value)
+                }
+            })
+
+            continue;
+        }
+
+        if (item.identifier == 20000) {
+            // PDF attachment
+            await db.userPropValues.create({
+                data: {
+                    subCategoryProperty_id: item.subCategoryProperty_id,
+                    subCategory_id: item.subCategory_id,
+                    ad_id: creatingAd.id,
+                    value: JSON.stringify(item.value)
+                }
+            })
+
+            continue;
+        }
+
+        if (item.identifier == 10000) {
+            // Page Title
+            await db.userPropValues.create({
+                data: {
+                    subCategoryProperty_id: item.subCategoryProperty_id,
+                    subCategory_id: item.subCategory_id,
+                    ad_id: creatingAd.id,
+                    value: JSON.stringify(item.value)
+                }
+            })
+
+            continue;
+        }
+
         await db.userPropValues.create({
             data: {
                 subCategoryProperty_id: item.subCategoryProperty_id,
@@ -107,6 +146,8 @@ let createNewAd = async (req, res) => {
                 value: item.value.toString()
             }
         })
+
+        continue;
     }
 
     return res.status(200).json({
@@ -192,7 +233,7 @@ let removeFavo = async (req, res) => {
         }
     })
 
-    if (! checkFavoList) {
+    if (!checkFavoList) {
         return res.status(403).json({
             error: {
                 error_en: 'This ad is already in your favrite list.',
@@ -208,7 +249,7 @@ let removeFavo = async (req, res) => {
             user_id: req.user.id
         }
     })
-    
+
     await db.favorates.delete({
         where: {
             id: op.id
@@ -229,7 +270,7 @@ let removeFavo = async (req, res) => {
 let getMyfavorates = async (req, res) => {
     let { page } = req.query
 
-    if (! page) page = 1;
+    if (!page) page = 1;
 
     let maxItems = 15;
 

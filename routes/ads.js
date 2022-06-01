@@ -39,24 +39,24 @@ router.post('/upload-ads-attahcments' ,upload.array('attachments', 12), async (r
 /* Ads API goes here */
 
 /* Get a specific Sub category props according to the giving information */
-router.get('/props/:id',autoCatch( ads.getProperties));
+router.get('/props/:id', autoCatch( ads.getProperties));
 
 /* Get single ad according to the giving ID */
-router.get('/single/:id',autoCatch( ads.getAd))
+router.get('/single/:id', autoCatch( ads.getAd))
 
 /* Create a new ad */
-router.post('/create-ad', guard,autoCatch( ads.createNewAd))
+router.post('/create-ad', guard, autoCatch( ads.createNewAd))
 
 /* Edit a specific ad */
 router.post('/edit-ad', guard, autoCatch(ads.EditAd))
 
 /* add a specific ad to favo list */
-router.post('/add-favo', guard,autoCatch( ads.addFavo))
+router.post('/add-favo', guard, autoCatch( ads.addFavo))
 
 /* remove a specific ad from favo list */
-router.delete('/remove-favo', guard,autoCatch( ads.removeFavo))
+router.delete('/remove-favo', guard, autoCatch( ads.removeFavo))
 
 /* Get my favorate list */
-router.get('/get-myfavorate', guard,autoCatch( ads.getMyfavorates))
+router.get('/get-myfavorate', guard, autoCatch( ads.getMyfavorates))
 
 module.exports = router
