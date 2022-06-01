@@ -53,7 +53,7 @@ let getAd = async (req, res) => {
 
 /* Creating a new ad method */
 let createNewAd = async (req, res) => {
-    const { mainCategory, subCategory, attachments, adProps } = req.body
+    const { mainCategory, subCategory, adProps } = req.body
     if (!subCategory || !mainCategory) {
         return res.status(403).json({
             error: {
