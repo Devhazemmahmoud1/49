@@ -506,6 +506,7 @@ model AdsAttachments {
   id          Int          @id @default(autoincrement())
   url         String
   ad_id       Int
+  type        Int          @default(1)
   created_at  DateTime     @default(now())
   updated_at  DateTime     @updatedAt
   attachments Advertisment @relation(fields: [ad_id], references: [id])
@@ -521,6 +522,8 @@ model subCategoryProperties {
   position       Int
   subCategory_id Int
   dropDownValues String?
+  DateFrom       String?
+  DateTo         String?
   created_at     DateTime        @default(now())
   updated_at     DateTime        @updatedAt
   subCategory    SubCategories   @relation(fields: [subCategory_id], references: [id])
