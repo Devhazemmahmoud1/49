@@ -22,11 +22,12 @@ let register = async (req, res) => {
         fcm,
         device_id,
         hashCode,
-        countryCode
+        countryCode,
+        lang
     } = req.body
 
     // check if the body is empty for username and password otherwise procced 
-    if (!password || !firstName || !lastName || !passwordConfirmation || !phone || !email || !gender) {
+    if (!password || !firstName || !lastName || !passwordConfirmation || !phone || !email || !gender || !lang) {
         return res.status(403).json({
             error: {
                 error_ar: 'من فضلك قم بادخال جميع البيانات المطلوبه',
@@ -278,6 +279,14 @@ let register = async (req, res) => {
                     value: gender.toString(),
                     status: 1,
                 },
+                {
+                    identifier: 9,
+                    user_id: create.id,
+                    settingName_ar: 'اللغه',
+                    settingName_en: 'Language',
+                    value: lang.toString(),
+                    status: 1,
+                },                
             ]
         })
 

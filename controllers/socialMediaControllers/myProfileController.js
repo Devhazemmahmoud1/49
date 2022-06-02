@@ -1,5 +1,6 @@
 const express = require('express')
 const { PrismaClient } = require('@prisma/client');
+const { sendNotification, sendBulkNotification } = require('../notificationsController/SocialNotification.js');
 const db = new PrismaClient();
 
 /* Get my own profile */
@@ -20,7 +21,7 @@ let getMyProfile = async (req, res) => {
                 reel_id: item.id,
                 user_id: req.user.id
             }
-        })) != null 
+        })) != null
 
         item.isMine = true
 
@@ -66,6 +67,15 @@ let getMyProfile = async (req, res) => {
             _count: {
                 id: true,
             }
+        }),
+        unReadNotifications: await db.notifications.aggregate({
+            where: {
+                reciever_id: req.user.id,
+                is_read: 0,
+            },
+            _count: {
+                is_read: true,
+            }
         })
     })
 }
@@ -97,7 +107,7 @@ let getMyFriends = async (req, res) => {
         item.user = user
     }
 
-    
+
     return res.status(200).json(getFriendsList)
 }
 
@@ -286,6 +296,18 @@ let createPost = async (req, res) => {
             }
         }
 
+        // needs an update
+        let notify = {
+            notification_ar: '' + req.user.firstName + ' ' + req.user.lastName + ' قام بنشر منشور جديد.',
+            notification_en: '' + req.user.firstName + ' ' + req.user.lastName + ' has posted and new post.',
+            sender: req.user.id,
+            reciever: 0,
+            postId: createPost.id,
+            type: 1,
+        }
+
+        await sendBulkNotification(notify, req.user);
+
         return res.status(200).json({
             success: {
                 succes_en: 'Your post has been submitted.',
@@ -363,13 +385,19 @@ let deletePost = async (req, res) => {
             }
         })
 
-        if (!deletingPostAttachments) return res.status(403).send('Something went wrong.');
+        //if (!deletingPostAttachments) return res.status(403).send('Something went wrong.');
 
         //let getPostPrivacyId = await db.post
 
         let deletingPrivacy = await db.postsPrivacy.deleteMany({
             where: {
                 post_id: parseInt(id),
+            }
+        })
+
+        let deleteManyNotifications = await db.notifications.deleteMany({
+            where: {
+                direction: parseInt(id)
             }
         })
 
@@ -403,7 +431,7 @@ let getActivities = async (req, res) => {
 }
 
 // get Main categories 
-let getComments = async (req, res) => { 
+let getComments = async (req, res) => {
     const { id } = req.params
     let { page } = req.query
 
@@ -432,7 +460,7 @@ let getComments = async (req, res) => {
     })
 
     let postsWithUser = [];
- 
+
     for (item of getPostComments) {
         item.userInfo = await db.users.findFirst({
             where: {
@@ -444,7 +472,7 @@ let getComments = async (req, res) => {
             where: {
                 user_id: req.user.id,
                 comment_id: item.id
-            }, 
+            },
             select: {
                 type: true,
             }
@@ -587,7 +615,7 @@ let getPostsReactions = async (req, res) => {
 let getMainPage = async (req, res) => {
     let { page } = req.query
 
-    if (! page) page = 1
+    if (!page) page = 1
     let posts = []
     let uniquePosts = []
 
@@ -607,7 +635,7 @@ let getMainPage = async (req, res) => {
         orderBy: {
             created_at: 'desc'
         },
-        
+
     })
 
     let getMyFollowing = await db.followers.findMany({
@@ -632,7 +660,7 @@ let getMainPage = async (req, res) => {
             where: {
                 id: item.user.posts.user_id
             }
-        }) 
+        })
         posts.push(...item.user.posts)
     }
 
@@ -641,7 +669,7 @@ let getMainPage = async (req, res) => {
             where: {
                 id: item.user.posts.user_id
             }
-        })         
+        })
         posts.push(...item.user.posts)
     }
 
@@ -657,10 +685,10 @@ let getMainPage = async (req, res) => {
     return res.status(200).json(posts)
 }
 
-let getMyGalary = async (req ,res) => {
+let getMyGalary = async (req, res) => {
     let { page } = req.query
 
-    if (! page) page = 1;
+    if (!page) page = 1;
 
     let maxPhotos = 20
 
@@ -675,10 +703,10 @@ let getMyGalary = async (req ,res) => {
     return res.status(200).json(mygallary)
 }
 
-let getMyAbout = async (req ,res) => {
+let getMyAbout = async (req, res) => {
     const { id } = req.params
 
-    if (!id ) return res.status(403).json({
+    if (!id) return res.status(403).json({
         error: {
             error_en: 'No id is found',
             error_ar: 'No id is found.'
@@ -694,13 +722,13 @@ let getMyAbout = async (req ,res) => {
         }
     })
 
-    if (! checkUser) {
+    if (!checkUser) {
         return res.status(403).json({
             error: {
                 error_en: 'No id is found',
                 error_ar: 'No id is found.'
             }
-        })        
+        })
     }
 
     return res.status(200).json(checkUser)
@@ -709,7 +737,7 @@ let getMyAbout = async (req ,res) => {
 let getTenderMales = async (req, res) => {
     let { page } = req.query
 
-    if (! page) page = 1;
+    if (!page) page = 1;
 
     let maxTender = 10
 
@@ -722,18 +750,18 @@ let getTenderMales = async (req, res) => {
         take: maxTender,
     })
 
-    let fillteredUsers = getUsers.filter( (result) => {
+    let fillteredUsers = getUsers.filter((result) => {
         return result.userSettings[7].value == "1"
     })
 
-    let latestFilter = fillteredUsers.filter( (result) => {
+    let latestFilter = fillteredUsers.filter((result) => {
         return result.userPrivacy[11].status = 1
     })
 
     let users = []
 
     for (item of latestFilter) {
-        if(req.user){
+        if (req.user) {
             if (item.id == req.user.id) continue;
             item.isFriend = (await db.friends.findFirst({
                 where: {
@@ -752,7 +780,7 @@ let getTenderMales = async (req, res) => {
             item.recentlyActive = 0
 
             users.push(item)
-        }else{
+        } else {
             item.isFriendRequest = false
             item.isFriend = false
             item.recentlyActive = 0
@@ -769,7 +797,7 @@ let getTenderMales = async (req, res) => {
 let getTenderFemales = async (req, res) => {
     let { page } = req.query
 
-    if (! page) page = 1;
+    if (!page) page = 1;
 
     let maxTender = 10
 
@@ -782,17 +810,17 @@ let getTenderFemales = async (req, res) => {
         take: maxTender,
     })
 
-    let fillteredUsers = getUsers.filter( (result) => {
+    let fillteredUsers = getUsers.filter((result) => {
         return result.userSettings[7].value == "2"
     })
-    let latestFilter = fillteredUsers.filter( (result) => {
+    let latestFilter = fillteredUsers.filter((result) => {
         return result.userPrivacy[11].status == 1
     })
 
     let users = []
 
     for (item of latestFilter) {
-        if(req.user){
+        if (req.user) {
             if (item.id == req.user.id) continue;
             item.isFriend = (await db.friends.findFirst({
                 where: {
@@ -810,7 +838,7 @@ let getTenderFemales = async (req, res) => {
 
             item.recentlyActive = 0
             users.push(item)
-        }else{
+        } else {
             item.isFriend = false;
             item.isFriendRequest = false;
             item.recentlyActive = 0
@@ -822,7 +850,7 @@ let getTenderFemales = async (req, res) => {
     return res.status(200).json(users)
 }
 
-let changeProfileFromGal = async (req , res) => {
+let changeProfileFromGal = async (req, res) => {
     const { galId } = req.body
 
     try {
@@ -857,7 +885,7 @@ let changeProfileFromGal = async (req , res) => {
             success_ar: 'تم تغيير الصوره الشخصيه الخاصه بكم.'
         })
 
-    } catch ( e ) {
+    } catch (e) {
         console.log(e)
         return false;
     }

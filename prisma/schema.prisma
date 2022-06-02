@@ -534,7 +534,7 @@ model userPropValues {
   id                     Int                   @id @default(autoincrement())
   subCategory_id         Int
   subCategoryProperty_id Int                   @unique
-  value                  String
+  value                  String                @db.VarChar(5000)
   ad_id                  Int
   created_at             DateTime              @default(now())
   updated_at             DateTime              @updatedAt

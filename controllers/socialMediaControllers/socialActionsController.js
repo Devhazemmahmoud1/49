@@ -39,7 +39,7 @@ let addNewComment = async (req, res) => {
             type: 1,
         }
 
-        sendNotification(notify);
+        sendNotification(notify, req.user);
     }
 
     return res.status(200).send('ok')
@@ -151,7 +151,7 @@ let sendFriendRequest = async (req, res) => {
             type: 2,
         }
 
-        sendNotification(notify);
+        sendNotification(notify, req.user);
     }
 
     return res.status(200).json({
@@ -339,11 +339,11 @@ let makeFollow = async (req, res) => {
         notification_en: '' + req.user.firstName + ' ' + req.user.lastName + ' has followed you',
         sender: req.user.id,
         reciever: parseInt(userId),
-        postId: parseInt(userId),
+        postId: null,
         type: 3,
     }
 
-    sendNotification(notify);
+    sendNotification(notify, req.user);
 
     return res.status(200).json({
         success: {
@@ -533,16 +533,16 @@ let acceptFriendRequest = async (req, res) => {
     }
 
     // Notification is required
-    /*let notify = {
+    let notify = {
         notification_ar: '' + req.user.firstName + ' ' + req.user.lastName + ' قام بقبول طلب الصداقه.',
         notification_en: '' + req.user.firstName + ' ' + req.user.lastName + ' has accepted your friend request.',
         sender: req.user.id,
         reciever: parseInt(checkuser.id),
         postId: req.user.id,
         type: 4,
-    }*/
+    }
 
-   // sendNotification(notify);
+   sendNotification(notify, req.user);
 
     return res.status(200).json({
         success: {
@@ -703,7 +703,7 @@ let addSaraha = async (req, res) => {
         type: 5,
     }
 
-    sendNotification(notify);
+    sendNotification(notify, req.user);
 
     return res.status(200).json({
         success: {
@@ -956,7 +956,7 @@ let makeLikeOnPost = async (req, res) => {
         type: 1,
     }
 
-    sendNotification(notify);
+    sendNotification(notify, req.user);
 
     return res.status(200).json({
         success: {
@@ -1125,7 +1125,7 @@ let makeLikeOnComment = async (req, res) => {
         type: 1,
     }
 
-    sendNotification(notify);
+    sendNotification(notify, req.user);
 
     return res.status(200).json({
         success: {

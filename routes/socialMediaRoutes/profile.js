@@ -7,6 +7,7 @@ const multer = require('multer');
 const {PrismaClient} = require('@prisma/client');
 const {autoCatch} = require("../../utils/auto_catch");
 const db = new PrismaClient();
+const { sendBulkNotification } = require('../../controllers/notificationsController/SocialNotification')
 
 
 /* Add a multter API FOR UPLLOADING IMAGES  */
@@ -63,6 +64,24 @@ router.post('/upload-profile-picture', upload.array('attachments', 12), async (r
                 }
             })
         }
+
+        let getUser = await db.users.findFirst({
+            where: {
+                id: parseInt(req.body.id)
+            }
+        })
+
+        let notify = {
+            notification_ar: '' + getUser.firstName + ' ' + getUser.lastName + ' قام بتغيير صوره الملف الشخصي.',
+            notification_en: '' + getUser.firstName + ' ' + getUser.lastName + ' has changed their profile picture.',
+            sender: parseInt(req.body.id),
+            reciever: 0,
+            postId: createNewAd.id,
+            type: 1,
+        }
+
+        await sendBulkNotification(notify, getUser);
+
         return res.status(200).json(result)
     } catch (e) {
         next(e)
@@ -97,6 +116,24 @@ router.post('/upload-cover-picture', upload.array('attachments', 12), async (req
                 }
             })
         }
+
+        let getUser = await db.users.findFirst({
+            where: {
+                id: parseInt(req.body.id)
+            }
+        })
+
+        let notify = {
+            notification_ar: '' + getUser.firstName + ' ' + getUser.lastName + ' قام بتغيير صوره الغلاف الشخصي.',
+            notification_en: '' + getUser.firstName + ' ' + getUser.lastName + ' has changed their cover picture.',
+            sender: parseInt(req.body.id),
+            reciever: 0,
+            postId: createNewAd.id,
+            type: 1,
+        }
+
+        await sendBulkNotification(notify, getUser);
+
         return res.status(200).json(result)
     } catch (e) {
         next(e)

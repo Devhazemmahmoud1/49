@@ -34,7 +34,6 @@ let getAd = async (req, res) => {
             id: parseInt(id)
         },
         include: {
-            attachments: true,
             values: {
                 include: {
                     Subprops: true,

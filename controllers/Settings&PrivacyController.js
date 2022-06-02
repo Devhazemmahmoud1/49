@@ -5,7 +5,7 @@ const moment = require('moment');
 
 /* Edit settings according to the giving information */
 let editSettings = async (req, res) => {
-    const { firstName,lastName,gender, birthDate, socialStatus, job, city } = req.body
+    const { firstName,lastName, birthDate, socialStatus, job, city, lang } = req.body
 
     // update user settings 
 
@@ -30,16 +30,18 @@ let editSettings = async (req, res) => {
 
         let values = [
             { value: birthDate.value, status: birthDate.status},
-            { value: firstName.value, status: firstName.status},
-            { value: lastName.value, status: lastName.status},
             { value: socialStatus.value, status: socialStatus.status},
             { value: job.value, status: job.status},
             { value: city.value, status: city.status},
-         //   { value: gender.value, status: gender.status},
+            { value: lang.value, status: lang.status},
         ]
 
         let x = 0;
         for (item of getUserSetting) {
+            if (item.identifier == 8) {
+                continue
+            }
+
             await db.userSettings.update({
                 where: {
                     id: item.id

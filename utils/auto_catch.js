@@ -1,6 +1,6 @@
-const autoCatch=  fn => {
+const autoCatch =  fn => {
     return (req, res, next) => {
         fn(req, res, next).catch(next)
     }
 }
-module.exports = {autoCatch}
+module.exports = { autoCatch }

@@ -37,6 +37,7 @@ var settings = require('./routes/setting')
 var socialProfile = require('./routes/socialMediaRoutes/profile')
 var actions = require('./routes/socialMediaRoutes/usersAction')
 var Reels = require('./routes/Reels&stories')
+var notification = require('./routes/notifications')
 
 var app = express();
 
@@ -45,19 +46,15 @@ const server = require('http').createServer(app);
   
 // Create the Socket IO server on 
 // the top of http server
-/*
-const io = socketio(server, {
-  cors: {
-    origin: "http://localhost:8888",
-    methods: ["GET", "POST"]
-  }
-});
+
+
+const io = socketio(server);
 
 app.use((req, res, next) => {
   req.io = io;
   return next();
 }); 
-*/
+
 
 // view engine setup
 app.set('views', path.join(__dirname, 'views'));
@@ -86,6 +83,7 @@ app.use('/setting', settings);
 app.use('/social/profile', socialProfile)
 app.use('/social/actions', actions)
 app.use('/reels', Reels)
+app.use('/notify', notification)
 
 // catch 404 and forward to error handler
 app.use(function(req, res, next) {
@@ -105,7 +103,7 @@ app.use(function(err, req, res, next) {
     console.log(err)
 });
 
-/*
+
 var sockets = []
 
 io.on('connection', (socket) => {
@@ -119,6 +117,6 @@ io.on('connection', (socket) => {
     console.log(socket.id + ' is out from here')
   })
 })
-*/
+
 
 module.exports = { app, server }
