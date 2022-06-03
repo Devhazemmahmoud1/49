@@ -8,11 +8,6 @@ const router = require('express').Router()
 router.post('/transaction', guard, async (req, res, next) => {
     var { paymentInfo } = req.body
 
-    let paymentInfo = {
-        subCategory_id: 10,
-        amount: 20
-    }
-
     let amount = (paymentInfo.amount * 100)
     var token = await getPaymobToken()
     //console.log(token)
