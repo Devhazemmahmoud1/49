@@ -2,9 +2,10 @@ var express = require('express');
 var router = express.Router();
 
 /* GET home page. */
-router.get('/', function(req, res) {
+router.get('/paymentstatus', function(req, res) {
   //res.render('index', { title: 'Express' });
   console.log(req.io)
+  return res.send('Everything is working good thanks kofta')
 });
 
 module.exports = router;
