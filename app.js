@@ -38,6 +38,7 @@ var socialProfile = require('./routes/socialMediaRoutes/profile')
 var actions = require('./routes/socialMediaRoutes/usersAction')
 var Reels = require('./routes/Reels&stories')
 var notification = require('./routes/notifications')
+var paymob = require('./routes/payments/PayMob')
 
 var app = express();
 
@@ -84,6 +85,7 @@ app.use('/social/profile', socialProfile)
 app.use('/social/actions', actions)
 app.use('/reels', Reels)
 app.use('/notify', notification)
+app.use('/payment', paymob)
 
 // catch 404 and forward to error handler
 app.use(function(req, res, next) {

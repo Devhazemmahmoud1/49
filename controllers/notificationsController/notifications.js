@@ -111,8 +111,6 @@ let deleteNotification = async (req, res) => {
         })
     }
 
-    console.log(req.user.id, id)
-
     let checkIfMyNotification = await db.notifications.findFirst({
         where: {
             id: parseInt(id),
