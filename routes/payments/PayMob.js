@@ -6,14 +6,10 @@ const router = require('express').Router()
 
 /* Get the token */
 router.post('/transaction', guard, async (req, res, next) => {
-    //var { paymentInfo } = req.body
+    var { paymentInfo } = req.body
 
     let paymentInfo = {
-        firstName: req.user.firstName,
-        lastName: req.user.lastName,
-        userId: req.user.id,
         subCategory_id: 10,
-        email: req.user.email,
         amount: 20
     }
 
