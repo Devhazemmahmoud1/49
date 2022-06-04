@@ -36,7 +36,7 @@ router.post('/callback', async (req, res) => {
     const paymentToken = await getPaymobToken()
 
     if (success == true && (await getHMACByOrderId(paymentToken, id)) == hmac) {
-        res.redirect('http://64.225.101.68:3000/paymentstatus' + `?status=${stat}&data=${payment}`)
+        
     } else {
         res.send()
     }
@@ -58,6 +58,8 @@ router.get('/callback', async (req, res) => {
     const realHmac = await getHMACByOrderId(paymentToken, id)
 
     const isValid = realHmac == hmac
+
+    res.redirect('http://64.225.101.68:3000/paymentstatus' + `?status=${isValid}&data=${payment}`)
 })
 
 module.exports = router
