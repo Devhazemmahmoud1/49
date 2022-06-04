@@ -6,6 +6,8 @@ const router = require('express').Router()
 
 var payment;
 
+var success;
+
 /* Get the token */
 router.post('/transaction', guard, async (req, res, next) => {
     var { paymentInfo } = req.body
@@ -28,11 +30,13 @@ router.post('/callback', async (req, res) => {
 
     payment = payment_key_claims 
 
+    stat = success
+
     //return res.json(payment_key_claims)
     const paymentToken = await getPaymobToken()
 
     if (success == true && (await getHMACByOrderId(paymentToken, id)) == hmac) {
-        res.redirect('http://64.225.101.68:3000/paymentstatus' + `?status=${isValid}&data=${payment}`)
+        res.redirect('http://64.225.101.68:3000/paymentstatus' + `?status=${stat}&data=${payment}`)
     } else {
         res.send()
     }
