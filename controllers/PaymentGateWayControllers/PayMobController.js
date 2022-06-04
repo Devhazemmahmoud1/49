@@ -126,7 +126,7 @@ let completeOP =  async (paymentInfo) => {
 
     await db.paymentGateWayFees.update({
         where: {
-            id: 2,
+            id: 1,
         },
         data: {
             totalFees: parseInt(perviousFees.totalFees) + fees
