@@ -81,7 +81,7 @@ let completeOP =  async (paymentInfo) => {
     console.log(paymentInfo)
     let checkUser = await db.users.findFirst({
         where: {
-            id: parseInt(paymentInfo.state)
+            id: parseInt(paymentInfo.billing_data.state)
         }
     })
 
@@ -97,12 +97,14 @@ let completeOP =  async (paymentInfo) => {
         }
     });
 
+    let amount = parseInt(paymentInfo.amount_cents / 100)
+
     let methods = await db.paymentMethods.findMany({});
     let tax = await db.govFees.findFirst({});
     let cashBackRules = await db.cashBackRules.findFirst({})
 
-    let newAmount = parseInt(paymentInfo.amount) - (parseInt(paymentInfo.amount) * (methods[0].gatewayPercentage / 100)) - methods[0].gatewayConstant
-    let TaxAndVat = parseInt(newAmount) - (parseInt(paymentInfo.amount) * (tax.VAT / 100)) - (parseInt(amount) * (tax.Tax / 100))
+    let newAmount = parseInt(amount) - (parseInt(amount) * (methods[0].gatewayPercentage / 100)) - methods[0].gatewayConstant
+    let TaxAndVat = parseInt(newAmount) - (parseInt(amount) * (tax.VAT / 100)) - (parseInt(amount) * (tax.Tax / 100))
     let totalGovCuts = parseInt(newAmount) - parseInt(TaxAndVat)
     let newtotalGovCuts = parseInt(cashBackRules.totalGovCut) + parseInt(totalGovCuts)
     await db.cashBackRules.update({
@@ -114,7 +116,7 @@ let completeOP =  async (paymentInfo) => {
         }
     })
     // total fees for paymob
-    let fees = (parseInt(paymentInfo.amount) * (methods[0].gatewayPercentage / 100)) + parseInt(methods[0].gatewayConstant)
+    let fees = (parseInt(amount) * (methods[0].gatewayPercentage / 100)) + parseInt(methods[0].gatewayConstant)
 
     let perviousFees = await db.paymentGateWayFees.findFirst({
         where: {
@@ -134,7 +136,7 @@ let completeOP =  async (paymentInfo) => {
     // gross Money
     let getSubCatGross = await db.subCategories.findFirst({
         where: {
-            id: parseInt(paymentInfo.subcategory_id)
+            id: parseInt(paymentInfo.billing_data.floor)
         }
     })
 
@@ -142,7 +144,7 @@ let completeOP =  async (paymentInfo) => {
 
     await db.subCategories.update({
         where: {
-            id: parseInt(paymentInfo.subcategory_id)
+            id: parseInt(paymentInfo.billing_data.floor)
         },
         data: {
             grossMoney: "" + gross + ""
@@ -186,7 +188,7 @@ let completeOP =  async (paymentInfo) => {
     // update gross money for this category
     let subCategories = await db.subCategories.findFirst({
         where: {
-            id: parseInt(paymentInfo.subcategory_id)
+            id: parseInt(paymentInfo.billing_data.floor)
         }
     })
 
