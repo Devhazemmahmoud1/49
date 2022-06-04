@@ -193,9 +193,9 @@ let completeOP =  async (paymentInfo) => {
     })
 
     let NetAfterOverHead = parseInt(paymentInfo.amount) - parseInt(overHeadConstant)
-    let xFactor = parseInt(NetAfterOverHead) / parseInt(paymentFactor)
-    let fourtyNineGain = parseInt(xFactor) * parseInt(portion)
-    let ProviderCashBack = parseInt(xFactor) * parseInt(providerPortion)
+    let xFactor = parseInt(NetAfterOverHead) / parseInt(subCategories.paymentFactor)
+    let fourtyNineGain = parseInt(xFactor) * parseInt(subCategories.portion)
+    let ProviderCashBack = parseInt(xFactor) * parseInt(subCategories.providerPortion)
     let NetAfterAllPortion = NetAfterOverHead - fourtyNineGain - `ProviderCashBack`
     let requestPortion = NetAfterAllPortion * (fetchCashBackRules.requestPortion / 100)
     let requestCall = NetAfterAllPortion * (fetchCashBackRules.callPortion / 100)
