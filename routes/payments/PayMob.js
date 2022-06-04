@@ -59,7 +59,7 @@ router.get('/callback', async (req, res) => {
 
     const isValid = realHmac == hmac
 
-    res.redirect('http://64.225.101.68:3000/paymentstatus' + `?status=${isValid}&data=${payment}`)
+    res.redirect('http://64.225.101.68:3000/paymentstatus' + `?status=${isValid}&data=${JSON.stringify(payment)}`)
 })
 
 module.exports = router
