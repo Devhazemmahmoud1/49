@@ -120,7 +120,7 @@ let completeOP =  async (paymentInfo) => {
 
     let perviousFees = await db.paymentGateWayFees.findFirst({
         where: {
-            id: 2
+            id: 1
         }
     })
 
