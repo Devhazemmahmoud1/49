@@ -4,6 +4,8 @@ const { getPaymobToken, makeOrder, paymentKeys, getHMACByOrderId } = require('..
 
 const router = require('express').Router()
 
+var payment;
+
 /* Get the token */
 router.post('/transaction', guard, async (req, res, next) => {
     var { paymentInfo } = req.body
@@ -17,8 +19,6 @@ router.post('/transaction', guard, async (req, res, next) => {
     //console.log(paymentKey)
     return res.status(200).json({
         url: `https://accept.paymob.com/api/acceptance/iframes/354120?payment_token=${paymentKey}`
-
-        
     })
 })
 
@@ -26,14 +26,16 @@ router.post('/callback', async (req, res) => {
     const { hmac } = req.query
     const { id, success, payment_key_claims } = req.body.obj
 
+    payment = payment_key_claims 
+
+    //return res.json(payment_key_claims)
     const paymentToken = await getPaymobToken()
 
     if (success == true && (await getHMACByOrderId(paymentToken, id)) == hmac) {
-        return res.json(payment_key_claims)
+        res.redirect('http://64.225.101.68:3000/paymentstatus' + `?status=${isValid}&data=${payment}`)
+    } else {
+        res.send()
     }
-
-    res.send()
-
 })
 
 /* CallBack Route */
@@ -52,8 +54,6 @@ router.get('/callback', async (req, res) => {
     const realHmac = await getHMACByOrderId(paymentToken, id)
 
     const isValid = realHmac == hmac
-
-    res.redirect('http://64.225.101.68:3000/paymentstatus' + `?status=${isValid}`)
 })
 
 module.exports = router
