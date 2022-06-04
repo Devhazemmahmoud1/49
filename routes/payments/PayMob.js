@@ -1,12 +1,10 @@
 const guard = require("../../middleware/guard");
 const { autoCatch } = require("../../utils/auto_catch");
-const { getPaymobToken, makeOrder, paymentKeys, getHMACByOrderId } = require('../../controllers/PaymentGateWayControllers/PayMobController')
+const { getPaymobToken, makeOrder, paymentKeys, getHMACByOrderId, completeOP } = require('../../controllers/PaymentGateWayControllers/PayMobController')
 
 const router = require('express').Router()
 
 var payment;
-
-var success;
 
 /* Get the token */
 router.post('/transaction', guard, async (req, res, next) => {
@@ -30,13 +28,15 @@ router.post('/callback', async (req, res) => {
 
     payment = payment_key_claims 
 
-    stat = success
-
     //return res.json(payment_key_claims)
     const paymentToken = await getPaymobToken()
 
     if (success == true && (await getHMACByOrderId(paymentToken, id)) == hmac) {
-        
+        try {
+            await completeOP(payment)
+        } catch (e) {
+            console.log(e)
+        }
     } else {
         res.send()
     }
@@ -59,7 +59,8 @@ router.get('/callback', async (req, res) => {
 
     const isValid = realHmac == hmac
 
-    res.redirect('http://64.225.101.68:3000/paymentstatus' + `?status=${isValid}&data=${JSON.stringify(payment)}`)
+    res.redirect('http://64.225.101.68:3000/paymentstatus' + `?status=${isValid}`)
+    //res.redirect('http://64.225.101.68:3000/paymentstatus' + `?status=${isValid}&data=${JSON.stringify(payment)}`)
 })
 
 module.exports = router
