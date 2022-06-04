@@ -92,7 +92,7 @@ let completeOP =  async (paymentInfo) => {
     await db.subscriptions.create({
         data: {
             user_id: checkUser.id,
-            period: 1,
+            period: "1",
             isPermium: 1,
         }
     });
