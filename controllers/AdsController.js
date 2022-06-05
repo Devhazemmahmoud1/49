@@ -16,6 +16,10 @@ let getProperties = async (req, res) => {
         }
     })
 
+    check = JSON.parse(props)
+
+    console.log(check)
+
     return res.status(200).json(props)
 }
 

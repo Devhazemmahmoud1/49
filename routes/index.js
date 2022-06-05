@@ -8,4 +8,8 @@ router.get('/paymentstatus', function(req, res) {
   return res.send('Everything is working good thanks kofta')
 });
 
+router.get('/socket', function (req, res) {
+  return res.send('hello socket')
+})
+
 module.exports = router;

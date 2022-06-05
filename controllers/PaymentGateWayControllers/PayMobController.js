@@ -102,7 +102,6 @@ let completeOP =  async (paymentInfo) => {
     let methods = await db.paymentMethods.findMany({});
     let tax = await db.govFees.findFirst({});
     let cashBackRules = await db.cashBackRules.findFirst({})
-
     let newAmount = parseInt(amount) - (parseInt(amount) * (methods[0].gatewayPercentage / 100)) - methods[0].gatewayConstant
     let TaxAndVat = parseInt(newAmount) - (parseInt(amount) * (tax.VAT / 100)) - (parseInt(amount) * (tax.Tax / 100))
     let totalGovCuts = parseInt(newAmount) - parseInt(TaxAndVat)
@@ -177,8 +176,8 @@ let completeOP =  async (paymentInfo) => {
     }
 
     let overHeadFactor = parseInt(grossMoney)
-
     let runningCost = await db.runningCost.findMany({})
+    
     for (item of runningCost) {
         cost += parseInt(item.amount)
     }

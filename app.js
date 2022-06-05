@@ -8,17 +8,17 @@ const db = new PrismaClient();
 var socketio = require("socket.io");
 const s3 = require('./controllers/s3Controller/s3Configiration')
 const { initializeApp, applicationDefault } = require('firebase-admin/app');
-const admin  = require('firebase-admin')
+const admin = require('firebase-admin')
+const secretKey = "fourtyninehub495051fourtynine";
+const socketUserHandler = require('./middleware/socketHandler')
+const Jwt = require('jsonwebtoken');
 
 initializeApp({
   credential: applicationDefault(),
-}); 
+});
 
 var cronJob = require('./controllers/cronJob/cronJobController')
 var cashBackCronJob = require('./controllers/cronJob/cashBackCronJobController')
-var socket = require('./controllers/socketController/socketController')
-
-
 
 // Routes // 
 var indexRouter = require('./routes/index');
@@ -44,18 +44,41 @@ var app = express();
 
 // Create the http server
 const server = require('http').createServer(app);
-  
+
 // Create the Socket IO server on 
 // the top of http server
 
+global.io = socketio(server, {
+  maxHttpBufferSize: 100000000,
+  connectTimeout: 5000,
+  transports: ['websocket', 'polling'],
+  pingInterval: 5 * 1000,
+  pingTimeout: 5000,
+  allowEIO3: true,
+  allowRequest: (req, callback) => {
+    callback(null, true);
+  },
+  cors: {
+    origin: "http://localhost:8888",
+    methods: ["GET", "POST"],
+  }
+});
 
-const io = socketio(server);
 
 app.use((req, res, next) => {
   req.io = io;
   return next();
-}); 
+});
 
+// Add Access Control Allow Origin headers
+app.use((req, res, next) => {
+  res.setHeader("Access-Control-Allow-Origin", "*");
+  res.header(
+    "Access-Control-Allow-Headers",
+    "Origin, X-Requested-With, Content-Type, Accept"
+  );
+  next();
+});
 
 // view engine setup
 app.set('views', path.join(__dirname, 'views'));
@@ -88,37 +111,80 @@ app.use('/notify', notification)
 app.use('/payment', paymob)
 
 // catch 404 and forward to error handler
-app.use(function(req, res, next) {
+app.use(function (req, res, next) {
   next(createError(404));
 });
 // error handler
-app.use(function(err, req, res, next) {
+app.use(function (err, req, res, next) {
   // set locals, only providing error in development
-    res.status(err.status || 500);
-    res.send({
-      // status: err.status || 500,
-      error: {
-        error_en: err.message ?? err,
-        error_ar: err.message ?? err,
-      }
-    });
-    console.log(err)
+  res.status(err.status || 500);
+  res.send({
+    // status: err.status || 500,
+    error: {
+      error_en: err.message ?? err,
+      error_ar: err.message ?? err,
+    }
+  });
+  console.log(err)
 });
-
 
 var sockets = []
 
-io.on('connection', (socket) => {
-  sockets.push({
-    socket_id: socket.id,
-    user_id: 10,
-  })
-  console.log(socket.id + ' Has connected to the channel')
+global.io.on('connection', async (socket) => {
+  if (socket.handshake.headers.authorization) {
+    sockets.push({
+      socket_id: socket.id,
+      user_id: socket.user.id,
+    })
+
+    console.log(sockets)
+  }
 
   socket.on('disconnect', () => {
     console.log(socket.id + ' is out from here')
+    sockets.filter( (removedElem) => {
+      return removedElem.socket_id != socket.id
+    })
+    console.log(sockets)
   })
 })
 
+global.io.use(async (socket, next) => {
+  try {
 
-module.exports = { app, server }
+    let token = socket.handshake.headers.authorization
+    if (!token) {
+      console.log("socket auth be provided !")
+      throw new Error("auth must be provided !")
+    }
+
+    let authorization = token.split('Bearer ')[1]
+    Jwt.verify(authorization, secretKey, async (err, data) => {
+      if (err) throw err;
+      let user = await db.users.findFirst({
+        where: {
+          id: parseInt(data.id)
+        },
+        select: {
+          firstName: true,
+          lastName: true,
+          email: true,
+          id: true,
+        }
+      });
+      if (!user) {
+        return res.status(401).send('user not found in data base');
+      }
+      socket.user = user;
+      next();
+    });
+
+  } catch (e) {
+    console.log("socket cant connect because => " + e.toString())
+    next(Error(e.toString()))
+  }
+});
+
+//var socket = require('./controllers/socketController/socketController')
+
+module.exports = { app, server, io, sockets }

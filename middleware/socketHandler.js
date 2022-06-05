@@ -1,19 +1,44 @@
+const Jwt = require('jsonwebtoken');
+const {PrismaClient} = require('@prisma/client');
+const db = new PrismaClient();
+const secretKey = "fourtyninehub495051fourtynine";
 
-const { createServer } = require("http"); // you can use https as well
-const express = require("express");
-const socketIo = require("socket.io");
 
-const app = express();
-const server = createServer(app);
-const io = socketIo(server, { cors: { origin: "*" } }); // you can change the cors to your own domain
+async function checkAuthToken (req, token, next) {
+  try {
+      if (token == null || !token) {
+          req.user = null;
+          console.log("this access done with No Token ! provided !")
+          next()
+      } else {
+          authorization = token.split('Bearer ')[1]
+          let checkToken = Jwt.verify(authorization, secretKey, async (err, data) => {
+              if (err) throw err;
+              console.log(data)
+              let user = await db.users.findFirst({
+                  where: {
+                      id: parseInt(data.id)
+                  },
+                  select: {
+                      firstName: true,
+                      lastName: true,
+                      email: true,
+                      id:  true,
+                  }
+              });
+              if (!user) {
+                  return res.status(401).send('user not found in data base');
+              }
+              req.user = user;
+              next();
+          });
+          if (!checkToken) {
+              return res.status(401).send('unauthorized');
+          }
+      }
+  } catch (e) {
+      return res.status(401).send('unauthorized');
+  }
+}
 
-app.use((req, res, next) => {
-  req.io = io;
-  return next();
-});
-
-// Now all routes & middleware will have access to req.io
-
-app.use("/api", require("./routes/api")); // this file's express.Router() will have the req.io too.
-
-server.listen(3000, () => console.log(`Server started!`));
+module.exports = { checkAuthToken }

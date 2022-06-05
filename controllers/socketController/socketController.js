@@ -1,7 +1,5 @@
 const express = require('express')
+var socketio = require("socket.io");
 
-let register = async (socket, user_id) => {
-    console.log(socket, user_id)
-}
 
-module.exports = { register }
+module.exports = {  }
