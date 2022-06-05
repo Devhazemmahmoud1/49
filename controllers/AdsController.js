@@ -16,11 +16,7 @@ let getProperties = async (req, res) => {
         }
     })
 
-    [{"ar": "مستعمل","en": "Used"},{"ar": "جديد", "en": "New"}]
-
-    check = JSON.parse(props)
-
-    console.log(check)
+    console.log(props)
 
     return res.status(200).json(props)
 }
