@@ -163,7 +163,7 @@ global.io.use(async (socket, next) => {
       if (err) throw err;
       let user = await db.users.findFirst({
         where: {
-          id: parseInt(data.id)
+          id: parseInt(data.id) ?? undefined
         },
         select: {
           firstName: true,
@@ -175,7 +175,7 @@ global.io.use(async (socket, next) => {
       // if (!user) {
       //   return res.status(401).send('user not found in data base');
       // }
-      socket.user = user;
+      socket.user = user ?? null;
       next();
     });
 
