@@ -172,9 +172,9 @@ global.io.use(async (socket, next) => {
           id: true,
         }
       });
-      if (!user) {
-        return res.status(401).send('user not found in data base');
-      }
+      // if (!user) {
+      //   return res.status(401).send('user not found in data base');
+      // }
       socket.user = user;
       next();
     });
