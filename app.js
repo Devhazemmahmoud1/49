@@ -136,8 +136,6 @@ global.io.on('connection', async (socket) => {
       socket_id: socket.id,
       user_id: socket.user.id,
     })
-
-    console.log(sockets)
   }
 
   socket.on('disconnect', () => {
@@ -161,6 +159,7 @@ global.io.use(async (socket, next) => {
     let authorization = token.split('Bearer ')[1]
     Jwt.verify(authorization, secretKey, async (err, data) => {
       if (err) throw err;
+
       let user = await db.users.findFirst({
         where: {
           id: parseInt(data.id) ?? undefined

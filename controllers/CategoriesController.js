@@ -7,11 +7,6 @@ const db = new PrismaClient();
 let getAllCategories = async (req, res, next) => {
     let categories = await db.mainCategories.findMany({
         include: {
-            subCategories: {
-                include: {
-                    photo: true
-                }
-            },
             photo: true
         }
     })
