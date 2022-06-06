@@ -25,12 +25,11 @@ router.post('/transaction', guard, async (req, res, next) => {
 router.post('/callback', async (req, res) => {
     const { hmac } = req.query
     const { id, success, payment_key_claims } = req.body.obj
-
+    
     payment = payment_key_claims 
-
     //return res.json(payment_key_claims)
     const paymentToken = await getPaymobToken()
-    
+
     if (success == true && (await getHMACByOrderId(paymentToken, id)) == hmac) {
         try {
             await completeOP(payment)

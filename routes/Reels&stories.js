@@ -31,10 +31,9 @@ var upload = multer({
         callback(null, true)
     },
     limits: {
-        fileSize: 100000000
+        fileSize: 1000000000
     }
 });
-
 
 /* Create a reel */
 router.post('/create-reel', upload.array('reel', 12), async (req, res, next) => {

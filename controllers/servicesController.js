@@ -243,8 +243,6 @@ let makeSubscriptionPayments = async (req, res, next) => {
 
         // Profit
 
-
-
         let grossMoney = 0;
         let cost = 0;
 
@@ -324,8 +322,6 @@ let makeSubscriptionPayments = async (req, res, next) => {
             }
         })
 
-
-
         // total fees for Paypal
 
         let fees = (parseInt(amount) * (methods[2].gatewayPercentage / 100)) + parseInt(methods[2].gatewayConstant)
@@ -379,11 +375,7 @@ let makeSubscriptionPayments = async (req, res, next) => {
 
         // Start Balance , Total
 
-
-
         // Profit
-
-
 
         let grossMoney = 0;
         let cost = 0;
@@ -605,11 +597,9 @@ let makeSubscriptionPayments = async (req, res, next) => {
                 })
             }
         }
-
+        
         return res.status(200).json('OK')
     }
-
-
 }
 
 /* This method is for charging balance for a specific user */
