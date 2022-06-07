@@ -219,13 +219,13 @@ let getPost = async (req, res) => {
 
     // get reacted or not.
     if (req.user.id) {
-        checkPostInfo.isReacted = await db.reactions.findFirst({
+        checkPostInfo.isReacted = (await db.reactions.findFirst({
             where: {
                 post_id: parseInt(id),
                 comment_id: 0,
                 user_id: req.user.id
             }
-        })
+        }) != null)
         checkPostInfo.userInfo = await db.users.findFirst({
             where: {
                 id: checkPostInfo.user_id
