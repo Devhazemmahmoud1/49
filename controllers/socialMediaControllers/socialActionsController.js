@@ -1090,7 +1090,7 @@ let makeLikeOnPost = async (req, res) => {
 
 // Make unlike a specific post
 let makeUnlikeOnPost = async (req, res) => {
-    const { postId, reaction } = req.body
+    const { postId } = req.body
 
     if (!postId) {
         return res.status(403).json({
@@ -1109,6 +1109,8 @@ let makeUnlikeOnPost = async (req, res) => {
                 post_id: parseInt(postId),
             }
         })
+
+        let previousReaction = getPostReaction.type;
 
         if (!getPostReaction) return res.status(403).send('something went wrong')
 
@@ -1131,11 +1133,11 @@ let makeUnlikeOnPost = async (req, res) => {
                 id: parseInt(postId)
             },
             data: {
-                totalLikes: reaction == 1 && parseInt(getReactionsForPost.totalLikes) >= 0 ? (getReactionsForPost.totalLikes - 1) : undefined,
-                totalLove: reaction == 2 && parseInt(getReactionsForPost.totalLove) >= 0 ? (getReactionsForPost.totalLove - 1) : undefined,
-                totalWoW: reaction == 3 && parseInt(getReactionsForPost.totalWoW) >= 0 ? (getReactionsForPost.totalWoW - 1) : undefined,
-                totalSad: reaction == 4 && parseInt(getReactionsForPost.totalSad) >= 0 ? (getReactionsForPost.totalSad - 1) : undefined,
-                totalAngry: reaction == 5 && parseInt(getReactionsForPost.totalAngry) >= 0 ? (getReactionsForPost.totalAngry - 1) : undefined,
+                totalLikes: previousReaction == 1 && parseInt(getReactionsForPost.totalLikes) >= 0 ? (getReactionsForPost.totalLikes - 1) : undefined,
+                totalLove: previousReaction == 2 && parseInt(getReactionsForPost.totalLove) >= 0 ? (getReactionsForPost.totalLove - 1) : undefined,
+                totalWoW: previousReaction == 3 && parseInt(getReactionsForPost.totalWoW) >= 0 ? (getReactionsForPost.totalWoW - 1) : undefined,
+                totalSad: previousReaction == 4 && parseInt(getReactionsForPost.totalSad) >= 0 ? (getReactionsForPost.totalSad - 1) : undefined,
+                totalAngry: previousReaction == 5 && parseInt(getReactionsForPost.totalAngry) >= 0 ? (getReactionsForPost.totalAngry - 1) : undefined,
                 total_reactions: getReactionsForPost.total_reactions >= 0 ? getReactionsForPost.total_reactions - 1 : 0
             }
         })
