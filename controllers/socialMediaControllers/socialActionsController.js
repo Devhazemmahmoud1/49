@@ -962,18 +962,60 @@ let makeLikeOnPost = async (req, res) => {
                 }
             })
 
-            await db.posts.update({
-                where: {
-                    id: parseInt(postId)
-                },
-                data: {
-                    totalLikes: reaction == previousReaction && getReactionsForPost.totalLikes > 0? (getReactionsForPost.totalLikes - 1) : undefined,
-                    totalLove: reaction == previousReaction && getReactionsForPost.totalLove > 0 ? (getReactionsForPost.totalLove - 1) : undefined,
-                    totalWoW: reaction == previousReaction && getReactionsForPost.totalWoW > 0 ? (getReactionsForPost.totalWoW - 1) : undefined,
-                    totalSad: reaction == previousReaction && getReactionsForPost.totalSad > 0 ? (getReactionsForPost.totalSad - 1) : undefined,
-                    totalAngry: reaction == previousReaction && getReactionsForPost.totalAngry > 0 ? (getReactionsForPost.totalAngry - 1) : undefined,
-                }
-            })
+            if (previousReaction == 1) {
+                await db.posts.update({
+                    where: {
+                        id: parseInt(postId)
+                    },
+                    data: {
+                        totalLikes: (getReactionsForPost.totalLikes - 1) 
+                    }
+                })
+            } 
+
+            if (previousReaction == 2) {
+                await db.posts.update({
+                    where: {
+                        id: parseInt(postId)
+                    },
+                    data: {
+                        totalLove: (getReactionsForPost.totalLove - 1) 
+                    }
+                })
+            }
+
+            if (previousReaction == 3) {
+                await db.posts.update({
+                    where: {
+                        id: parseInt(postId)
+                    },
+                    data: {
+                        totalWoW: (getReactionsForPost.totalWoW - 1) 
+                    }
+                })
+            }
+
+            if (previousReaction == 4) {
+                await db.posts.update({
+                    where: {
+                        id: parseInt(postId)
+                    },
+                    data: {
+                        totalSad: (getReactionsForPost.totalSad - 1) 
+                    }
+                })
+            }
+
+            if (previousReaction == 5) {
+                await db.posts.update({
+                    where: {
+                        id: parseInt(postId)
+                    },
+                    data: {
+                        totalAngry: (getReactionsForPost.totalAngry - 1) 
+                    }
+                })
+            }
 
             await db.posts.update({
                 where: {
