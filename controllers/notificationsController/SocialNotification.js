@@ -108,7 +108,7 @@ let sendBulkNotification = async (notify, user) => {
             */
         }
 
-        duplicatedUsers.push(...item.friend_id)
+        duplicatedUsers.push(item.friend_id)
     }
 
     let getFollowers = await db.followers.findMany({
@@ -160,7 +160,7 @@ let sendBulkNotification = async (notify, user) => {
             }
         })*/
 
-        duplicatedUsers.push(...item.user_id)        
+        duplicatedUsers.push(item.user_id)        
     }
 
     return true
