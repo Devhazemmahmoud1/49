@@ -198,7 +198,12 @@ let getUserFollowers = async (req, res) => {
 let getPost = async (req, res) => {
     const { id } = req.params
 
-    if (!id) return false;
+    if (!id) return res.stauts(403).json({
+        error: {
+            error_en: 'Post id is not found',
+            error_ar: 'Post id is not found'
+        }
+    });
 
     // check post id
     let checkPostInfo = await db.posts.findFirst({
@@ -221,12 +226,15 @@ let getPost = async (req, res) => {
                 user_id: req.user.id
             }
         })
-    }
-    checkPostInfo.userInfo = await db.users.findFirst({
-        where: {
-            id: checkPostInfo.user_id
-        }
-    })
+        checkPostInfo.userInfo = await db.users.findFirst({
+            where: {
+                id: checkPostInfo.user_id
+            }
+        })
+    } else {
+        checkPostInfo.isReacted = false
+        checkPostInfo.userInfo = null
+    } 
 
     return res.status(200).json(checkPostInfo)
 
