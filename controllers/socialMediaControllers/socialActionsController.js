@@ -939,17 +939,46 @@ let makeLikeOnPost = async (req, res) => {
             where: {
                 user_id: req.user.id,
                 post_id: parseInt(postId),
-                type: parseInt(reaction)
             }
         })
 
         if (checkIfLiked) {
+
+            let previousReaction = checkIfLiked.type
+
+            // get the actual previous reaction 
             await db.reactions.update({
                 where: {
                     id: checkIfLiked.id
                 },
                 data: {
                     type: parseInt(reaction)
+                }
+            })
+
+            await db.posts.update({
+                where: {
+                    id: parseInt(postId)
+                },
+                data: {
+                    totalLikes: reaction == previousReaction ? (getReactionsForPost.totalLikes - 1) : undefined,
+                    totalLove: reaction == previousReaction ? (getReactionsForPost.totalLove - 1) : undefined,
+                    totalWoW: reaction == previousReaction ? (getReactionsForPost.totalWoW - 1) : undefined,
+                    totalSad: reaction == previousReaction ? (getReactionsForPost.totalSad - 1) : undefined,
+                    totalAngry: reaction == previousReaction ? (getReactionsForPost.totalAngry - 1) : undefined,
+                }
+            })
+
+            await db.posts.update({
+                where: {
+                    id: parseInt(postId)
+                },
+                data: {
+                    totalLikes: reaction == 1 && previousReaction != reaction ? (getReactionsForPost.totalLikes + 1) : undefined,
+                    totalLove: reaction == 2 && previousReaction != reaction ? (getReactionsForPost.totalLove + 1) : undefined,
+                    totalWoW: reaction == 3 && previousReaction != reaction ? (getReactionsForPost.totalWoW + 1) : undefined,
+                    totalSad: reaction == 4 && previousReaction != reaction ? (getReactionsForPost.totalSad + 1) : undefined,
+                    totalAngry: reaction == 5 && previousReaction != reaction ? (getReactionsForPost.totalAngry + 1) : undefined,
                 }
             })
 
@@ -986,7 +1015,6 @@ let makeLikeOnPost = async (req, res) => {
                 total_reactions: (parseInt(getReactionsForPost.total_reactions) + 1)
             }
         })
-
 
     } catch (e) {
         console.log(e)
@@ -1060,7 +1088,7 @@ let makeUnlikeOnPost = async (req, res) => {
                 totalWoW: reaction == 3 && parseInt(getReactionsForPost.totalWoW) >= 0 ? (getReactionsForPost.totalWoW - 1) : undefined,
                 totalSad: reaction == 4 && parseInt(getReactionsForPost.totalSad) >= 0 ? (getReactionsForPost.totalSad - 1) : undefined,
                 totalAngry: reaction == 5 && parseInt(getReactionsForPost.totalAngry) >= 0 ? (getReactionsForPost.totalAngry - 1) : undefined,
-                total_reactions: getReactionsForPost.total_reactions >= 0 ? getReactionsForPost.total_reactions  - 1 : 0
+                total_reactions: getReactionsForPost.total_reactions >= 0 ? getReactionsForPost.total_reactions - 1 : 0
             }
         })
 
