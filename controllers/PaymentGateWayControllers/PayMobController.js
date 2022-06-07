@@ -103,7 +103,7 @@ let completeOP =  async (paymentInfo) => {
     let tax = await db.govFees.findFirst({});
     let cashBackRules = await db.cashBackRules.findFirst({})
     let newAmount = parseInt(amount) - (parseInt(amount) * (methods[0].gatewayPercentage / 100)) - methods[0].gatewayConstant
-    let TaxAndVat = parseInt(newAmount) - (parseInt(amount) * (tax.VAT / 100)) - (parseInt(amount) * (tax.Tax / 100))
+    let TaxAndVat = parseInt(newAmount) - (parseInt(amount) * (parseInt(tax.VAT) / 100)) - (parseInt(amount) * (parseInt(tax.Tax) / 100))
     let totalGovCuts = parseInt(newAmount) - parseInt(TaxAndVat)
     let newtotalGovCuts = parseInt(cashBackRules.totalGovCut) + parseInt(totalGovCuts)
     await db.cashBackRules.update({
@@ -114,6 +114,7 @@ let completeOP =  async (paymentInfo) => {
             totalGovCut: '' + newtotalGovCuts + ''
         }
     })
+
     // total fees for paymob
     let fees = (parseInt(amount) * (methods[0].gatewayPercentage / 100)) + parseInt(methods[0].gatewayConstant)
 

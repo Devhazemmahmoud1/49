@@ -559,6 +559,7 @@ CREATE TABLE `AdsAttachments` (
     `id` INTEGER NOT NULL AUTO_INCREMENT,
     `url` VARCHAR(191) NOT NULL,
     `ad_id` INTEGER NOT NULL,
+    `type` INTEGER NOT NULL DEFAULT 1,
     `created_at` DATETIME(3) NOT NULL DEFAULT CURRENT_TIMESTAMP(3),
     `updated_at` DATETIME(3) NOT NULL,
 
@@ -575,6 +576,9 @@ CREATE TABLE `subCategoryProperties` (
     `identifier` INTEGER NOT NULL,
     `position` INTEGER NOT NULL,
     `subCategory_id` INTEGER NOT NULL,
+    `dropDownValues` JSON NULL,
+    `DateFrom` VARCHAR(191) NULL,
+    `DateTo` VARCHAR(191) NULL,
     `created_at` DATETIME(3) NOT NULL DEFAULT CURRENT_TIMESTAMP(3),
     `updated_at` DATETIME(3) NOT NULL,
 
@@ -586,7 +590,7 @@ CREATE TABLE `userPropValues` (
     `id` INTEGER NOT NULL AUTO_INCREMENT,
     `subCategory_id` INTEGER NOT NULL,
     `subCategoryProperty_id` INTEGER NOT NULL,
-    `value` VARCHAR(191) NOT NULL,
+    `value` VARCHAR(5000) NOT NULL,
     `ad_id` INTEGER NOT NULL,
     `created_at` DATETIME(3) NOT NULL DEFAULT CURRENT_TIMESTAMP(3),
     `updated_at` DATETIME(3) NOT NULL,

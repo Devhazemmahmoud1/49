@@ -934,5 +934,29 @@ let changeProfileFromGal = async (req, res) => {
     }
 }
 
+let deleteFromMygalary = async (req, res) => {
+    const {galId} = req.body
 
-module.exports = { getMyProfile, getMyFriends, getMyFollowers, getMyPosts, getMyBlockedUsers, createPost, editPost, deletePost, getActivities, getFeelings, getFriendRequests, getComments, getCommentReactions, getPostsReactions, getMainPage, getMyAbout, getMyGalary, changeProfileFromGal, getTenderFemales, getTenderMales }
+    if (! galId) {
+        return res.send('No gallary ID was provided')
+    }
+
+    let checkIfMine = await db.gallary.findFirst({
+        where: {
+            id: parseInt(galId),
+            user_id: req.user.id
+        }
+    })
+
+    if (checkIfMine) {
+        await db.gallary.delete({
+            where: {
+                id: parseInt(galId)
+            }
+        })
+        return res.send('Gal has been deleted')
+    }
+}
+
+
+module.exports = { getMyProfile, getMyFriends, getMyFollowers, getMyPosts, getMyBlockedUsers, createPost, editPost, deletePost, getActivities, getFeelings, getFriendRequests, getComments, getCommentReactions, getPostsReactions, getMainPage, getMyAbout, getMyGalary, changeProfileFromGal, getTenderFemales, getTenderMales, deleteFromMygalary }

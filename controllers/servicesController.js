@@ -71,17 +71,32 @@ let makeSubscriptionPayments = async (req, res, next) => {
         if (parseInt(req.user.Wallet.balance) >= parseInt(amount)) {
             let newBalance = parseInt(req.user.Wallet.balance) - parseInt(amount)
             let total = parseInt(req.user.Wallet.total) - parseInt(amount)
-            await db.wallet.update({
-                where: {
-                    user_id: req.user.id
-                },
-                data: {
-                    balance: "" + newBalance + "",
-                    total: "" + total + "",
-                    startBalance: "" + parseInt(req.user.Wallet.startBalance) - parseInt(amount) + ""
-                    //generatedBal: "" + total + "",
-                }
-            })
+
+            if (req.user.Wallet.refundStorage > 0) {
+                await db.wallet.update({
+                    where: {
+                        user_id: req.user.id
+                    },
+                    data: {
+                        balance: "" + newBalance + "",
+                        //total: "" + total + "",
+                        //startBalance: "" + parseInt(req.user.Wallet.startBalance) - parseInt(amount) + ""
+                        //generatedBal: "" + total + "",
+                    }
+                })
+            } else {
+                await db.wallet.update({
+                    where: {
+                        user_id: req.user.id
+                    },
+                    data: {
+                        balance: "" + newBalance + "",
+                        total: "" + total + "",
+                        startBalance: "" + parseInt(req.user.Wallet.startBalance) - parseInt(amount) + ""
+                        //generatedBal: "" + total + "",
+                    }
+                })
+            }
 
             let grossMoney = 0;
             let cost = 0;
@@ -95,10 +110,6 @@ let makeSubscriptionPayments = async (req, res, next) => {
                 grossMoney += parseInt(newGross)
             }
 
-            /*let counter = await db.wallet.findMany({})
-            for (item of counter) {
-                grossMoney = parseInt(grossMoney) + parseInt(item.grossMoney)
-            }*/
             let overHeadFactor = parseInt(grossMoney)
 
             let runningCost = await db.runningCost.findMany({})

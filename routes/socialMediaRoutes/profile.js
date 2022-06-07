@@ -298,9 +298,13 @@ router.get('/user/find/get-mygallary-list', guard, autoCatch(profile.getMyGalary
 
 router.post('/make-profile-picture-from-album', guard, autoCatch(profile.changeProfileFromGal))
 
+router.delete('/delete/from/gal-album', guard, autoCatch(profile.deleteFromMygalary))
+
 router.get('/get/tender-list/randomely/males', guard, autoCatch(profile.getTenderMales))
 
 router.get('/get/tender/list/randomely/females', guard, autoCatch(profile.getTenderFemales))
+
+
 
 
 module.exports = router

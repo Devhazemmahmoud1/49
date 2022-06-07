@@ -36,6 +36,16 @@ let editSettings = async (req, res) => {
             { value: lang.value, status: lang.status},
         ]
 
+        let updateUser = await db.users.update({
+            where: {
+                id: req.user.id
+            }, 
+            data: {
+                lastName: lastName.value,
+                firstName: firstName.value
+            }
+        })
+
         let x = 0;
         for (item of getUserSetting) {
             if (item.identifier == 8) {
