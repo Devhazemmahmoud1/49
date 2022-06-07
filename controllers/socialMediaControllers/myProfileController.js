@@ -658,7 +658,7 @@ let getMainPage = async (req, res) => {
         //console.log(item.user.posts)
         item.user.posts.userInfo = await db.users.findFirst({
             where: {
-                id: parseInt(item.user.posts.user_id)
+                id: item.user.posts.user_id
             }
         })
 
