@@ -118,7 +118,7 @@ let sendFriendRequest = async (req, res) => {
             where: {
                 id: parseInt(checkIfTheOtherUserSentFriendReq.id)
             }
-        })        
+        })
 
         return res.status(200).json({
             success: {
@@ -165,7 +165,7 @@ let sendFriendRequest = async (req, res) => {
 /* remove friend requests from my user side req.user.id => other user */
 let UndoFriendRequest = async (req, res) => {
     const { requestedFriendId } = req.body
-    if (!requestedFriendId)  return res.status(200).json({
+    if (!requestedFriendId) return res.status(200).json({
         error: {
             error_ar: 'خطا.',
             error_en: 'User is not a friend'
@@ -542,7 +542,7 @@ let acceptFriendRequest = async (req, res) => {
         type: 4,
     }
 
-   sendNotification(notify, req.user);
+    sendNotification(notify, req.user);
 
     return res.status(200).json({
         success: {
@@ -759,6 +759,38 @@ let searchForResult = async (req, res) => {
         }
     })
 
+    for (item of getPosts) {
+        item.activity = await db.postActivity.findFirst({
+            where: {
+                id: item.activity_id
+            }
+        })
+
+        item.feeling = await db.postFeelings.findFirst({
+            where: {
+                id: item.feeling_id
+            }
+        })
+
+        item.userInfo = await db.users.findFirst({
+            where: {
+                id: item.user_id
+            }
+        })
+
+        // get reacted or not.
+        item.isReacted = (await db.reactions.findFirst({
+            where: {
+                post_id: parseInt(item.id),
+                comment_id: 0,
+                user_id: req.user.id
+            },
+            select: {
+                type: true,
+            }
+        })) != null
+    }
+
     return res.status(200).json({
         people: getPeople,
         posts: getPosts
@@ -905,7 +937,7 @@ let makeLikeOnPost = async (req, res) => {
             where: {
                 user_id: req.user.id,
                 post_id: parseInt(postId),
-                type: parseInt(reaction)            
+                type: parseInt(reaction)
             }
         })
 
@@ -920,7 +952,7 @@ let makeLikeOnPost = async (req, res) => {
             }
         })
 
-        if (! createReation) return res.status(403).send('something went wrong '+createReation)
+        if (!createReation) return res.status(403).send('something went wrong ' + createReation)
 
         var getReactionsForPost = await db.posts.findFirst({
             where: {
@@ -970,7 +1002,7 @@ let makeLikeOnPost = async (req, res) => {
 let makeUnlikeOnPost = async (req, res) => {
     const { postId, reaction } = req.body
 
-    if (!postId || ! reaction) {
+    if (!postId || !reaction) {
         return res.status(403).json({
             error: {
                 error_ar: 'رقم المنشور و نوع ال',
@@ -989,7 +1021,7 @@ let makeUnlikeOnPost = async (req, res) => {
             }
         })
 
-        if (! getPostReaction) return res.status(403).send('something went wrong')
+        if (!getPostReaction) return res.status(403).send('something went wrong')
 
         let deleteReaction = await db.reactions.delete({
             where: {
@@ -997,7 +1029,7 @@ let makeUnlikeOnPost = async (req, res) => {
             }
         })
 
-        if (! deleteReaction) return res.status(403).send('something went wrong')
+        if (!deleteReaction) return res.status(403).send('something went wrong')
 
         let getReactionsForPost = await db.posts.findFirst({
             where: {
@@ -1050,7 +1082,7 @@ let makeUnlikeOnPost = async (req, res) => {
 
 // like on comments
 let makeLikeOnComment = async (req, res) => {
-    const { postId,  commentId, reaction } = req.body
+    const { postId, commentId, reaction } = req.body
 
     if (!postId || !reaction || !commentId) {
         return res.status(403).json({
@@ -1068,7 +1100,7 @@ let makeLikeOnComment = async (req, res) => {
                 user_id: req.user.id,
                 post_id: parseInt(postId),
                 comment_id: parseInt(commentId),
-                type: parseInt(reaction),            
+                type: parseInt(reaction),
             }
         })
 
@@ -1083,7 +1115,7 @@ let makeLikeOnComment = async (req, res) => {
             }
         })
 
-        if (! createReation) return res.status(403).send('something went wrong')
+        if (!createReation) return res.status(403).send('something went wrong')
 
         var getReactionsForPost = await db.comments.findFirst({
             where: {
@@ -1137,7 +1169,7 @@ let makeLikeOnComment = async (req, res) => {
 
 // unlike on comment
 let makeUnlikeOnComment = async (req, res) => {
-    const { postId,  commentId, reaction } = req.body
+    const { postId, commentId, reaction } = req.body
 
     if (!postId || !reaction || !commentId) {
         return res.status(403).json({
@@ -1155,11 +1187,11 @@ let makeUnlikeOnComment = async (req, res) => {
                 user_id: req.user.id,
                 post_id: parseInt(postId),
                 comment_id: parseInt(commentId),
-                type: parseInt(reaction),            
+                type: parseInt(reaction),
             }
         })
 
-        if (! checkIfLiked) return res.status(403).send('Something went wrong');
+        if (!checkIfLiked) return res.status(403).send('Something went wrong');
 
         let createReation = await db.reactions.delete({
             where: {
@@ -1167,7 +1199,7 @@ let makeUnlikeOnComment = async (req, res) => {
             }
         })
 
-        if (! createReation) return res.status(403).send('something went wrong')
+        if (!createReation) return res.status(403).send('something went wrong')
 
         let getRecentReactions = await db.comments.findFirst({
             where: {
