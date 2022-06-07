@@ -966,12 +966,12 @@ let makeLikeOnPost = async (req, res) => {
                         id: parseInt(postId)
                     },
                     data: {
-                        totalLikes: previousReaction == 1 && parseInt(getReactionsForPost.totalLikes) >= 0 ? (getReactionsForPost.totalLikes - 1) : undefined,
-                        totalLove: previousReaction == 2 && parseInt(getReactionsForPost.totalLove) >= 0 ? (getReactionsForPost.totalLove - 1) : undefined,
-                        totalWoW: previousReaction == 3 && parseInt(getReactionsForPost.totalWoW) >= 0 ? (getReactionsForPost.totalWoW - 1) : undefined,
-                        totalSad: previousReaction == 4 && parseInt(getReactionsForPost.totalSad) >= 0 ? (getReactionsForPost.totalSad - 1) : undefined,
-                        totalAngry: previousReaction == 5 && parseInt(getReactionsForPost.totalAngry) >= 0 ? (getReactionsForPost.totalAngry - 1) : undefined,
-                        total_reactions: getReactionsForPost.total_reactions >= 0 ? getReactionsForPost.total_reactions - 1 : 0
+                        totalLikes: previousReaction == 1 && parseInt(getReactionsForPost.totalLikes) > 0 ? (getReactionsForPost.totalLikes - 1) : undefined,
+                        totalLove: previousReaction == 2 && parseInt(getReactionsForPost.totalLove) > 0 ? (getReactionsForPost.totalLove - 1) : undefined,
+                        totalWoW: previousReaction == 3 && parseInt(getReactionsForPost.totalWoW) > 0 ? (getReactionsForPost.totalWoW - 1) : undefined,
+                        totalSad: previousReaction == 4 && parseInt(getReactionsForPost.totalSad) > 0 ? (getReactionsForPost.totalSad - 1) : undefined,
+                        totalAngry: previousReaction == 5 && parseInt(getReactionsForPost.totalAngry) > 0 ? (getReactionsForPost.totalAngry - 1) : undefined,
+                        total_reactions: getReactionsForPost.total_reactions > 0 ? getReactionsForPost.total_reactions - 1 : 0
                     }
                 })
         
