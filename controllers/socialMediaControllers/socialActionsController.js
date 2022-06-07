@@ -1090,7 +1090,7 @@ let makeLikeOnPost = async (req, res) => {
 
 // Make unlike a specific post
 let makeUnlikeOnPost = async (req, res) => {
-    const { postId } = req.body
+    const { postId, reaction } = req.body
 
     if (!postId) {
         return res.status(403).json({
