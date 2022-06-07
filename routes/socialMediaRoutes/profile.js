@@ -1,6 +1,6 @@
 const router = require('express').Router()
 const guard = require('../../middleware/guard')
-const profile = require('../../controllers/socialMediaControllers/myProfileController');
+const profile = require('../../controllers/socialMediaControllers/myProfileController.js');
 const users = require('../../controllers/socialMediaControllers/usersProfileController');
 const uploadMethod = require('../../controllers/s3Controller/uploadS3Controller');
 const multer = require('multer');

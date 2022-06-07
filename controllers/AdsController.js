@@ -75,8 +75,12 @@ let createNewAd = async (req, res) => {
             desc: '',
             user_id: req.user.id,
             mainCategory_id: parseInt(mainCategory),
-            subCategory_id: parseInt(subCategory)
-        }
+            sub: {
+                connect: {
+                    id: parseInt(subCategory)
+                }
+            }
+        },
     })
 
     // creating props for this ad

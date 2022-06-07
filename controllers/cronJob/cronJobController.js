@@ -47,4 +47,4 @@ const job = new CronJob("59 * * * * *", async () => {
 
 });
 
-job.start();
+//job.start();

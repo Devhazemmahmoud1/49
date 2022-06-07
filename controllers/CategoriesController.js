@@ -3,7 +3,6 @@ const { PrismaClient } = require('@prisma/client');
 const db = new PrismaClient();
 
 /* Fetch all categories from the Database */
-
 let getAllCategories = async (req, res, next) => {
     let categories = await db.mainCategories.findMany({
         include: {
@@ -56,7 +55,5 @@ let getSubCats = async (req, res, next) => {
     
     return res.status(200).json(categories)    
 }
-
-
 
 module.exports = { getAllCategories, getSubCats }

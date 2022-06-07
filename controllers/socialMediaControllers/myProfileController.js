@@ -1,4 +1,3 @@
-const express = require('express')
 const { PrismaClient } = require('@prisma/client');
 const { sendNotification, sendBulkNotification } = require('../notificationsController/SocialNotification.js');
 const db = new PrismaClient();
@@ -777,19 +776,44 @@ let getTenderMales = async (req, res) => {
                 }
             })) != null
 
-            item.recentlyActive = 0
+            if (Object.keys(sockets).length !== 0) {
+                console.log('passed 5')
+                for (socket in sockets) {
+                    if (sockets[socket].user_id == item.id) {
+                        console.log('passed 3')
+                        item.recentlyActive = 1
+                    } else {
+                        console.log('passed 4')
+                        item.recentlyActive = 0
+                    }
+                }
+            } else {
+                console.log('passed')
+                item.recentlyActive = 0
+            }
 
             users.push(item)
+            
         } else {
-            item.isFriendRequest = false
-            item.isFriend = false
-            item.recentlyActive = 0
+            console.log('passed')
+            item.isFriend = false;
+            item.isFriendRequest = false;
+            if (Object.keys(sockets).length !== 0) {
+                for (socket in sockets) {
+                    if (sockets[socket].user_id == item.id) {
+                        item.recentlyActive = 1
+                    } else {
+                        item.recentlyActive = 0
+                    }
+                }
+            } else {
+                console.log('passed 1')
+                item.recentlyActive = 0
+            }
+
             users.push(item)
         }
-
     }
-
-    console.log('333', users)
 
     return res.status(200).json(users)
 }
@@ -811,7 +835,7 @@ let getTenderFemales = async (req, res) => {
     })
 
     let fillteredUsers = getUsers.filter((result) => {
-        return result.userSettings[7].value == "2"
+        return result.userSettings[7].value == 2
     })
     let latestFilter = fillteredUsers.filter((result) => {
         return result.userPrivacy[11].status == 1
@@ -836,12 +860,40 @@ let getTenderFemales = async (req, res) => {
                 }
             })) != null
 
-            item.recentlyActive = 0
+            if (Object.keys(sockets).length !== 0) {
+                console.log('passed 5')
+                for (socket in sockets) {
+                    if (sockets[socket].user_id == item.id) {
+                        console.log('passed 3')
+                        item.recentlyActive = 1
+                    } else {
+                        console.log('passed 4')
+                        item.recentlyActive = 0
+                    }
+                }
+            } else {
+                console.log('passed')
+                item.recentlyActive = 0
+            }
+
             users.push(item)
         } else {
+            console.log('passed')
             item.isFriend = false;
             item.isFriendRequest = false;
-            item.recentlyActive = 0
+            if (Object.keys(sockets).length !== 0) {
+                for (socket in sockets) {
+                    if (sockets[socket].user_id == item.id) {
+                        item.recentlyActive = 1
+                    } else {
+                        item.recentlyActive = 0
+                    }
+                }
+            } else {
+                console.log('passed 1')
+                item.recentlyActive = 0
+            }
+
             users.push(item)
         }
 

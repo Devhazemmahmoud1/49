@@ -128,26 +128,28 @@ app.use(function (err, req, res, next) {
   console.log(err)
 });
 
-var sockets = []
+//var socket = require('./controllers/socketController/socketController')
 
-global.io.on('connection', async (socket) => {
-  if (socket.handshake.headers.authorization) {
-    sockets.push({
-      socket_id: socket.id,
-      user_id: socket.user.id,
-    })
+global.sockets = {}
+
+io.on('connection', async (socket) => {
+  if (socket.handshake.headers.authorization.includes('Bearer ')) {
+    if (socket.user.id != null) {
+      let userInfo = {
+        socket_id: socket.id,
+        user_id: socket.user.id,
+      }
+      sockets[socket.id] = userInfo
+    }
   }
 
   socket.on('disconnect', () => {
     console.log(socket.id + ' is out from here')
-    sockets.filter( (removedElem) => {
-      return removedElem.socket_id != socket.id
-    })
-    console.log(sockets)
+    delete sockets[socket.id]
   })
 })
 
-global.io.use(async (socket, next) => {
+io.use(async (socket, next) => {
   try {
 
     let token = socket.handshake.headers.authorization
@@ -185,6 +187,5 @@ global.io.use(async (socket, next) => {
   }
 });
 
-//var socket = require('./controllers/socketController/socketController')
-
 module.exports = { app, server, io, sockets }
+
