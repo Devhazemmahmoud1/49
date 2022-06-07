@@ -75,11 +75,7 @@ let createNewAd = async (req, res) => {
             desc: '',
             user_id: req.user.id,
             mainCategory_id: parseInt(mainCategory),
-            sub: {
-                connect: {
-                    id: parseInt(subCategory)
-                }
-            }
+            subCategory_id: parseInt(subCategory)
         },
     })
 
