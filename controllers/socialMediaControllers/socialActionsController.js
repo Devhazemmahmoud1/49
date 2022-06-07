@@ -933,6 +933,8 @@ let makeLikeOnPost = async (req, res) => {
 
     try {
 
+        // check if reacted before
+
         let checkIfLiked = await db.reactions.findFirst({
             where: {
                 user_id: req.user.id,
@@ -941,7 +943,18 @@ let makeLikeOnPost = async (req, res) => {
             }
         })
 
-        if (checkIfLiked) return res.status(403).send('Something went wrong');
+        if (checkIfLiked) {
+            await db.reactions.update({
+                where: {
+                    id: checkIfLiked.id
+                },
+                data: {
+                    type: parseInt(reaction)
+                }
+            })
+
+            return res.stauts(200).send('ok')
+        }
 
         let createReation = await db.reactions.create({
             data: {
@@ -1000,9 +1013,9 @@ let makeLikeOnPost = async (req, res) => {
 
 // Make unlike a specific post
 let makeUnlikeOnPost = async (req, res) => {
-    const { postId, reaction } = req.body
+    const { postId } = req.body
 
-    if (!postId || !reaction) {
+    if (!postId) {
         return res.status(403).json({
             error: {
                 error_ar: 'رقم المنشور و نوع ال',
@@ -1017,7 +1030,6 @@ let makeUnlikeOnPost = async (req, res) => {
             where: {
                 user_id: req.user.id,
                 post_id: parseInt(postId),
-                type: parseInt(reaction)
             }
         })
 
@@ -1042,12 +1054,12 @@ let makeUnlikeOnPost = async (req, res) => {
                 id: parseInt(postId)
             },
             data: {
-                totalLikes: reaction == 1 ? (getReactionsForPost.totalLikes - 1) : undefined,
-                totalLove: reaction == 2 ? (getReactionsForPost.totalLove - 1) : undefined,
-                totalWoW: reaction == 3 ? (getReactionsForPost.totalWoW - 1) : undefined,
-                totalSad: reaction == 4 ? (getReactionsForPost.totalSad - 1) : undefined,
-                totalAngry: reaction == 5 ? (getReactionsForPost.totalAngry - 1) : undefined,
-                total_reactions: getReactionsForPost.total_reactions - 1
+                totalLikes: reaction == 1 && parseInt(getReactionsForPost.totalLikes) >= 0 ? (getReactionsForPost.totalLikes - 1) : undefined,
+                totalLove: reaction == 2 && parseInt(getReactionsForPost.totalLove) >= 0 ? (getReactionsForPost.totalLove - 1) : undefined,
+                totalWoW: reaction == 3 && parseInt(getReactionsForPost.totalWoW) >= 0 ? (getReactionsForPost.totalWoW - 1) : undefined,
+                totalSad: reaction == 4 && parseInt(getReactionsForPost.totalSad) >= 0 ? (getReactionsForPost.totalSad - 1) : undefined,
+                totalAngry: reaction == 5 && parseInt(getReactionsForPost.totalAngry) >= 0 ? (getReactionsForPost.totalAngry - 1) : undefined,
+                total_reactions: getReactionsForPost.total_reactions >= 0 ? getReactionsForPost.total_reactions  - 1 : 0
             }
         })
 
