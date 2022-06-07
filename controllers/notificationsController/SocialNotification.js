@@ -93,7 +93,7 @@ let sendBulkNotification = async (notify, user) => {
                 }
             })
     
-            /*admin.messaging().send({
+            admin.messaging().send({
                 data: {
                     senderInfo: user.toString(),
                     postId: (notify.postId).toString() ?? "0",
@@ -105,7 +105,7 @@ let sendBulkNotification = async (notify, user) => {
                   body: getTheLanguage.value == 'en_US' ? notify.notification_en.toString() : notify.notification_ar.toString(),
                 }
             })
-            */
+            
         }
 
         duplicatedUsers.push(item.friend_id)
@@ -147,7 +147,7 @@ let sendBulkNotification = async (notify, user) => {
             }
         })
 
-        /*admin.messaging().send({
+        admin.messaging().send({
             data: {
                 senderInfo: user.toString(),
                 postId: (notify.postId).toString() ?? "0",
@@ -158,7 +158,7 @@ let sendBulkNotification = async (notify, user) => {
               title: getTheLanguage.value == 'en_US' ? 'New notification': 'اشعار جديد',
               body: getTheLanguage.value == 'en_US' ? notify.notification_en.toString() : notify.notification_ar.toString(),
             }
-        })*/
+        })
 
         duplicatedUsers.push(item.user_id)        
     }
