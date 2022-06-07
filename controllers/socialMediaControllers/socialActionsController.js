@@ -983,6 +983,7 @@ let makeLikeOnPost = async (req, res) => {
                 totalWoW: reaction == 3 ? (getReactionsForPost.totalWoW + 1) : undefined,
                 totalSad: reaction == 4 ? (getReactionsForPost.totalSad + 1) : undefined,
                 totalAngry: reaction == 5 ? (getReactionsForPost.totalAngry + 1) : undefined,
+                total_reactions: (getReactionsForPost.total_reactions + 1)
             }
         })
 
