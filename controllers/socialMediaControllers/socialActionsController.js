@@ -944,6 +944,12 @@ let makeLikeOnPost = async (req, res) => {
 
         if (checkIfLiked) {
 
+            var getReactionsForPost = await db.posts.findFirst({
+                where: {
+                    id: parseInt(postId)
+                }
+            })
+
             let previousReaction = checkIfLiked.type
 
             // get the actual previous reaction 
