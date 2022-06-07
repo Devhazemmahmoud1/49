@@ -153,7 +153,7 @@ let getUserPosts = async (req, res) => {
         })
 
         // get reacted or not.
-        item.isReacted = await db.reactions.findFirst({
+        item.isReacted = (await db.reactions.findFirst({
             where: {
                 post_id: parseInt(item.id),
                 comment_id: 0,
@@ -162,7 +162,7 @@ let getUserPosts = async (req, res) => {
             select: {
                 type: true
             }
-        })
+        })) != null
 
         newPosts.push(item)
     }
@@ -235,6 +235,18 @@ let getPost = async (req, res) => {
         checkPostInfo.isReacted = false
         checkPostInfo.userInfo = null
     } 
+
+    checkPostInfo.activity = await db.postActivity.findFirst({
+        where: {
+            id: checkPostInfo.activity_id
+        }
+    })
+
+    checkPostInfo.feeling = await db.postFeelings.findFirst({
+        where: {
+            id: checkPostInfo.feeling_id
+        }
+    })
 
     return res.status(200).json(checkPostInfo)
 

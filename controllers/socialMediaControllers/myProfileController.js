@@ -156,7 +156,7 @@ let getMyPosts = async (req, res) => {
         })) 
 
         // get reacted or not.
-        item.isReacted = await db.reactions.findFirst({
+        item.isReacted = (await db.reactions.findFirst({
             where: {
                 post_id: parseInt(item.id),
                 comment_id: 0,
@@ -165,7 +165,7 @@ let getMyPosts = async (req, res) => {
             select: {
                 type: true,
             }
-        })
+        })) != null
 
         newPosts.push(item)
     }
@@ -665,15 +665,6 @@ let getMainPage = async (req, res) => {
         console.log(items.user.posts.userInfo)
         console.log(items)
         posts.push(items)
-    }
-
-    for (item of getMyFollowing) {
-        item.user.posts.userInfo = await db.users.findFirst({
-            where: {
-                id: item.user.posts.user_id
-            }
-        })
-        posts.push(item)
     }
 
     // let filteredFriendsPosts = posts.filter( (result) => {
