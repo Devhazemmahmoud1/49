@@ -51,8 +51,10 @@ router.post('/upload-profile-picture', upload.array('attachments', 12), async (r
         })
 
         let createNewAd = await db.posts.create({
-            type: 1,
-            user_id: parseInt(req.body.id)
+            data: {
+                type: 1,
+                user_id: parseInt(req.body.id)
+            }
         })
 
         for (item of file) {
@@ -103,8 +105,10 @@ router.post('/upload-cover-picture', upload.array('attachments', 12), async (req
             }
         })
         let createNewAd = await db.posts.create({
-            type: 1,
-            user_id: parseInt(req.body.id)
+            data: {
+                type: 1,
+                user_id: parseInt(req.body.id)
+            }
         })
 
         for (item of file) {
