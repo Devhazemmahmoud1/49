@@ -655,12 +655,15 @@ let getMainPage = async (req, res) => {
     })
 
     for (item of getMyFriends) {
-        console.log(item.user.posts)
+        //console.log(item.user.posts)
         item.user.posts.userInfo = await db.users.findFirst({
             where: {
-                id: item.user.posts.user_id
+                id: parseInt(item.user.posts.user_id)
             }
         })
+
+        console.log(item.user.posts.userInfo)
+        console.log(item)
         posts.push(item)
     }
 
