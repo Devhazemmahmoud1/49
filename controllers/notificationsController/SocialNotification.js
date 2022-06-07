@@ -42,7 +42,7 @@ let sendNotification = async (notify, user) => {
             token: getUserFCM.fcm,
             notification: {
               title: getTheLanguage.value == 'en_US' ? 'New notification': 'اشعار جديد',
-              body: getTheLanguage.value == 'en_US' ? notify.notification_en : notify.notification_ar,
+              body: getTheLanguage.value == 'en_US' ? notify.notification_en.toString() : notify.notification_ar.toString(),
             }
         })
 
@@ -102,7 +102,7 @@ let sendBulkNotification = async (notify, user) => {
                 token: getUserFCM.fcm,
                 notification: {
                   title: getTheLanguage.value == 'en_US' ? 'New notification': 'اشعار جديد',
-                  body: getTheLanguage.value == 'en_US' ? notify.notification_en : notify.notification_ar,
+                  body: getTheLanguage.value == 'en_US' ? notify.notification_en.toString() : notify.notification_ar.toString(),
                 }
             })
         }
@@ -155,7 +155,7 @@ let sendBulkNotification = async (notify, user) => {
             token: getUserFCM.fcm,
             notification: {
               title: getTheLanguage.value == 'en_US' ? 'New notification': 'اشعار جديد',
-              body: getTheLanguage.value == 'en_US' ? notify.notification_en : notify.notification_ar,
+              body: getTheLanguage.value == 'en_US' ? notify.notification_en.toString() : notify.notification_ar.toString(),
             }
         })
 
