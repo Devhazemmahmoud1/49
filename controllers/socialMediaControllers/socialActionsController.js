@@ -950,7 +950,13 @@ let makeLikeOnPost = async (req, res) => {
                 }
             })
 
+
+
             let previousReaction = checkIfLiked.type
+
+            if (previousReaction == reaction) {
+                return res.status(200).send('ok');
+            }
 
             // get the actual previous reaction 
             await db.reactions.update({
