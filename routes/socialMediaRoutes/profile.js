@@ -114,6 +114,14 @@ router.post('/upload-cover-picture', upload.array('attachments', 12), async (req
         })
         let createNewAd = await db.posts.create({
             data: {
+                post_content:  '',
+                total_comments: 0,
+                total_reactions: 0,
+                feeling_id:  0,
+                activity_id:  0,
+                location: '',
+                lat:  '',
+                lng: '',
                 type: 1,
                 user_id: parseInt(req.body.id)
             }
