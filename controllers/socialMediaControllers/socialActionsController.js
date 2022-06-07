@@ -967,11 +967,11 @@ let makeLikeOnPost = async (req, res) => {
                     id: parseInt(postId)
                 },
                 data: {
-                    totalLikes: reaction == previousReaction ? (getReactionsForPost.totalLikes - 1) : undefined,
-                    totalLove: reaction == previousReaction ? (getReactionsForPost.totalLove - 1) : undefined,
-                    totalWoW: reaction == previousReaction ? (getReactionsForPost.totalWoW - 1) : undefined,
-                    totalSad: reaction == previousReaction ? (getReactionsForPost.totalSad - 1) : undefined,
-                    totalAngry: reaction == previousReaction ? (getReactionsForPost.totalAngry - 1) : undefined,
+                    totalLikes: reaction == previousReaction && getReactionsForPost.totalLikes > 0? (getReactionsForPost.totalLikes - 1) : undefined,
+                    totalLove: reaction == previousReaction && getReactionsForPost.totalLove > 0 ? (getReactionsForPost.totalLove - 1) : undefined,
+                    totalWoW: reaction == previousReaction && getReactionsForPost.totalWoW > 0 ? (getReactionsForPost.totalWoW - 1) : undefined,
+                    totalSad: reaction == previousReaction && getReactionsForPost.totalSad > 0 ? (getReactionsForPost.totalSad - 1) : undefined,
+                    totalAngry: reaction == previousReaction && getReactionsForPost.totalAngry > 0 ? (getReactionsForPost.totalAngry - 1) : undefined,
                 }
             })
 
