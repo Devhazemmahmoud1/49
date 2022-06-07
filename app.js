@@ -17,19 +17,6 @@ initializeApp({
   credential: applicationDefault(),
 });
 
-admin.messaging().send({
-  data: {
-      senderInfo: "1",
-      postId: "1" ?? "0",
-      type: "1"
-  },  
-  token: "f6_HcMEtRFSznJm3t7FZLn:APA91bHWBuX_ElCu-UDxdmX0qWo68HNhcOjn5SpNNw1KFbdtMMB93t0HRoQLYh9-VRFxt4uqYjTeb_J2pI1Z-QR_WxkdJSlshmmOunc4bPnzQGAZ9p1HIGt8jToq3kXOOtniqO0fwY2u",
-  notification: {
-    title: 'New notification',
-    body:  "Hello",
-  }
-})
-
 var cronJob = require('./controllers/cronJob/cronJobController')
 var cashBackCronJob = require('./controllers/cronJob/cashBackCronJobController')
 
