@@ -953,7 +953,7 @@ let makeLikeOnPost = async (req, res) => {
                 }
             })
 
-            return res.stauts(200).send('ok')
+            return res.status(200).send('ok')
         }
 
         let createReation = await db.reactions.create({
