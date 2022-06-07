@@ -788,7 +788,7 @@ let searchForResult = async (req, res) => {
             select: {
                 type: true,
             }
-        })) != null
+        }))
     }
 
     return res.status(200).json({
