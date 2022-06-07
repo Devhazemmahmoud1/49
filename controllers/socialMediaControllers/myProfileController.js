@@ -149,11 +149,11 @@ let getMyPosts = async (req, res) => {
             }
         })
 
-        item.activity = await db.postActivity.findFirst({
+        item.activity = (await db.postActivity.findFirst({
             where: {
                 id: item.activity_id
             }
-        })
+        })) 
 
         // get reacted or not.
         item.isReacted = await db.reactions.findFirst({
@@ -660,7 +660,7 @@ let getMainPage = async (req, res) => {
                 id: item.user.posts.user_id
             }
         })
-        posts.push(...item.user.posts)
+        posts.push(item)
     }
 
     for (item of getMyFollowing) {
@@ -669,12 +669,8 @@ let getMainPage = async (req, res) => {
                 id: item.user.posts.user_id
             }
         })
-        posts.push(...item.user.posts)
+        posts.push(item)
     }
-
-
-
-
 
     // let filteredFriendsPosts = posts.filter( (result) => {
     //     console.log(result.user)
@@ -793,7 +789,7 @@ let getTenderMales = async (req, res) => {
             }
 
             users.push(item)
-            
+
         } else {
             console.log('passed')
             item.isFriend = false;
