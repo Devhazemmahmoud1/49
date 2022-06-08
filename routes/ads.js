@@ -44,6 +44,8 @@ router.get('/props/:id', autoCatch(ads.getProperties));
 /* Get single ad according to the giving ID */
 router.get('/single/:id', autoCatch(ads.getAd))
 
+router.get('/get-all/ads/:id', autoCatch( ads.getAds ))
+
 /* Create a new ad */
 router.post('/create-ad/new', guard, autoCatch(ads.createNewAd) )
 

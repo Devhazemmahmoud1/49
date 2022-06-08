@@ -299,4 +299,50 @@ let getMyfavorates = async (req, res) => {
 
 }
 
-module.exports = { getProperties, getAd, createNewAd, addFavo, removeFavo, EditAd, getMyfavorates }
+let getAds = async (req, res) => {
+    let { page } = req.query
+    let { id } = req.params
+
+    if (!id) {
+        return res.status(403).send('Sub Category id is not defined')
+    }
+
+    if (!page) page = 1;
+
+    let maxAds = 15;   
+
+    let ads = await db.advertisment.findMany({
+        where: {
+            subCategory_id: parseInt(id)
+        },        
+        include: {
+            ads: {
+                include: {
+                    attachments: true,
+                    values: {
+                        include: {
+                            Subprops: true,
+                        }
+                    },
+                }
+            }
+        },
+        skip: page == 1 ? 0 : (page * maxAds) - maxAds,
+        take: maxAds,
+    })
+
+    for (item of ads) {
+        item.mainCategory = (await db.subCategories.findFirst({
+            where: {
+                id: parseInt(id)
+            },
+            include: {
+                Categories: true
+            }
+        }))
+    }
+
+    return res.json(ads)
+}
+
+module.exports = { getProperties, getAd, createNewAd, addFavo, removeFavo, EditAd, getMyfavorates, getAds }
