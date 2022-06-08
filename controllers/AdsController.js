@@ -334,7 +334,7 @@ let getAds = async (req, res) => {
     for (item of ads) {
         item.mainCategory = (await db.mainCategories.findFirst({
             where: {
-                id: parseInt(id)
+                id: parseInt(item.mainCategory_id)
             }
         }))
     }
