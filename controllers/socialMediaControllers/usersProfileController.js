@@ -252,7 +252,7 @@ let getPost = async (req, res) => {
 
 }
 
-let getUserGalary = async (async, res) => {
+let getUserGalary = async (req, res) => {
     const { id } = req.params
     let { page } = req.query
 
