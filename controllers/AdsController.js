@@ -316,16 +316,16 @@ let getAds = async (req, res) => {
             subCategory_id: parseInt(id)
         },        
         include: {
-            ads: {
+            sub: {
                 include: {
-                    attachments: true,
-                    values: {
+                    props: {
                         include: {
-                            Subprops: true,
+                            propValues: true
                         }
-                    },
+                    }
                 }
-            }
+            },
+            attachments: true
         },
         skip: page == 1 ? 0 : (page * maxAds) - maxAds,
         take: maxAds,
