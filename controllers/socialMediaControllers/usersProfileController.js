@@ -252,4 +252,51 @@ let getPost = async (req, res) => {
 
 }
 
-module.exports = { userProfile, getUserFriends, getUserFollowers, getUserPosts, getPost }
+let getUserGalary = async (async, res) => {
+    const { id } = req.params
+    let { page } = req.query
+
+    if (!page) page = 1;
+
+    if (! id) {
+        return res.status(403).send('user id must be provided')
+    }
+
+    let maxAds = 20;
+
+    let getUserPeerGallery = await db.gallary.findMany({
+        where: {
+            user_id: parseInt(id)
+        },
+        skip: page == 1 ? 0 : (page * maxAds) - maxAds,
+        take: maxAds,
+    })
+
+    return res.json(getUserPeerGallery)
+
+}
+
+let getUserPeerReels = async (req, res) => {
+    const { id } = req.params
+    let { page } = req.query
+    if (!page) page = 1;
+
+    if (! id) {
+        return res.status(403).send('user id must be provided')
+    }
+
+    let maxAds = 20; 
+
+    let getUserPeerReals = await db.reels.findMany({
+        where: {
+            user_id: parseInt(id),
+            type: 1
+        },
+        skip: page == 1 ? 0 : (page * maxAds) - maxAds,
+        take: maxAds,
+    })
+
+    return res.json(getUserPeerReals)
+}
+
+module.exports = { userProfile, getUserFriends, getUserFollowers, getUserPosts, getPost, getUserGalary, getUserPeerReels }

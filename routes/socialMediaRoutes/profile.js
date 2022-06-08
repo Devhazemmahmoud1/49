@@ -264,6 +264,10 @@ router.get('/friends/:id', guard, autoCatch(users.getUserFriends))
 // get followers Lists
 router.get('/followers/:id', guard, autoCatch(users.getUserFollowers))
 
+router.get('/get/user/galary/:id', guard, autoCatch(users.getUserGalary))
+
+router.get('/get/user/peer/reels/:id', guard, autoCatch(users.getUserPeerReels))
+
 // get list of feelings to post 
 router.get('/get-feelings/for-posts', guard, autoCatch(profile.getFeelings))
 
@@ -303,6 +307,7 @@ router.delete('/delete/from/gal-album', guard, autoCatch(profile.deleteFromMygal
 router.get('/get/tender-list/randomely/males', guard, autoCatch(profile.getTenderMales))
 
 router.get('/get/tender/list/randomely/females', guard, autoCatch(profile.getTenderFemales))
+
 
 
 
