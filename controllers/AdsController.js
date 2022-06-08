@@ -316,13 +316,14 @@ let getAds = async (req, res) => {
             subCategory_id: parseInt(id)
         },        
         include: {
-            sub: {
+            values: {
                 include: {
-                    props: {
-                        include: {
-                            propValues: true
-                        }
-                    }
+                    Subprops: true,
+                }
+            },
+            sub: {
+                select: {
+                    id: true,
                 }
             },
             attachments: true
