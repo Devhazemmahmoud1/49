@@ -241,12 +241,12 @@ router.get('/action/after/migrate', async function (req, res)  {
     //     }
     // })
 
-    await db.govFees.create({
-        data: {
-            VAT: "14",
-            Tax: "1.88"
-        }
-    })
+    // await db.govFees.create({
+    //     data: {
+    //         VAT: "14",
+    //         Tax: "1.88"
+    //     }
+    // })
 
     await db.paymentMethods.create({
         data: {
