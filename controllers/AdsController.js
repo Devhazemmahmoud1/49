@@ -49,6 +49,42 @@ let getAd = async (req, res) => {
         }
     })
 
+    adDetails.mainCategory = (await db.mainCategories.findFirst({
+            where: {
+                id: parseInt(adDetails.mainCategory_id)
+            }
+        }))
+        adDetails.userInfo = await db.users.findFirst({
+            where: {
+                id: adDetails.user_id
+            }
+        })
+        adDetails.isPremium = false
+        adDetails.isSubscribed = (await db.subscriptions.findFirst({
+            where: {
+                user_id: adDetails.user_id,
+                subCat_id: adDetails.subCategory_id
+            }
+        })) != null
+        if (req.user) {
+            adDetails.isRequested = (await db.requests.findFirst({
+                where: {
+                    user_id: req.user.id,
+                    ad_id: adDetails.id
+                }
+            })) != null    
+            adDetails.isFavo = await db.favorates.findFirst({
+                where: {
+                    user_id: req.user.id,
+                    ad_id: parseInt(adDetails.id)
+                }
+            })
+        } else {
+            item.isFavo = null
+            item.isRequested = null
+        }
+    
+
     return res.status(200).json(adDetails)
 }
 
@@ -350,13 +386,13 @@ let getAds = async (req, res) => {
                 subCat_id: item.subCategory_id
             }
         })) != null
-        item.isRequested = (await db.requests.findFirst({
-            where: {
-                user_id: req.user.id,
-                ad_id: item.id
-            }
-        })) != null
         if (req.user) {
+            item.isRequested = (await db.requests.findFirst({
+                where: {
+                    user_id: req.user.id,
+                    ad_id: item.id
+                }
+            })) != null    
             item.isFavo = await db.favorates.findFirst({
                 where: {
                     user_id: req.user.id,
@@ -365,6 +401,7 @@ let getAds = async (req, res) => {
             })
         } else {
             item.isFavo = null
+            item.isRequested = null
         }
     }
 
