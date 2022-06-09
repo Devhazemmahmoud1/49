@@ -10,12 +10,12 @@ var payment;
 router.post('/transaction', guard, async (req, res, next) => {
     var { paymentInfo } = req.body
 
-    let amount = (paymentInfo.amount * 100)
+    let amount = (parseInt(paymentInfo.amount_cents) * 100)
     var token = await getPaymobToken()
     //console.log(token)
     var orderId = await makeOrder(token, amount)
     //console.log(orderId)
-    var paymentKey = await paymentKeys(token, orderId, amount, req.user.id, paymentInfo.subCategory_id, paymentInfo.isPremium)
+    var paymentKey = await paymentKeys(token, orderId, amount, req.user.id, paymentInfo.billing_data.floor, paymentInfo.billing_data.street)
     //console.log(paymentKey)
     return res.status(200).json({
         url: `https://accept.paymob.com/api/acceptance/iframes/354120?payment_token=${paymentKey}`

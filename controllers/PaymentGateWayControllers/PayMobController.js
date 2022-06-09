@@ -78,7 +78,7 @@ async function getHMACByOrderId(token, orderId) {
 
 let completeOP =  async (paymentInfo) => {
 
-    console.log(paymentInfo)
+    //console.log(paymentInfo)
     let checkUser = await db.users.findFirst({
         where: {
             id: parseInt(paymentInfo.billing_data.state)
