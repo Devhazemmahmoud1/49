@@ -338,6 +338,34 @@ let getAds = async (req, res) => {
                 id: parseInt(item.mainCategory_id)
             }
         }))
+        item.userInfo = await db.users.findFirst({
+            where: {
+                id: item.user_id
+            }
+        })
+        item.isPremium = false
+        item.isSubscribed = (await db.subscriptions.findFirst({
+            where: {
+                user_id: item.user_id,
+                subCat_id: item.subCategory_id
+            }
+        })) != null
+        item.isRequested = (await db.requests.findFirst({
+            where: {
+                user_id: req.user.id,
+                ad_id: item.id
+            }
+        })) != null
+        if (req.user) {
+            item.isFavo = await db.favorates.findFirst({
+                where: {
+                    user_id: req.user.id,
+                    ad_id: parseInt(item.id)
+                }
+            })
+        } else {
+            item.isFavo = null
+        }
     }
 
     return res.json(ads)

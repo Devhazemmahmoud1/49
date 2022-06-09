@@ -179,6 +179,7 @@ model subscriptions {
   id         Int      @id @default(autoincrement())
   user_id    Int
   period     String   @db.VarChar(5000)
+  subCat_id  Int
   isPermium  Int      @default(0)
   user       Users    @relation(fields: [user_id], references: [id])
   created_at DateTime @default(now())
@@ -513,7 +514,7 @@ model AdsAttachments {
 }
 
 model subCategoryProperties {
-  id             Int             @id @default(autoincrement())
+  id             Int              @id @default(autoincrement())
   prop_en        String
   prop_ar        String
   dataType       Int
@@ -524,9 +525,9 @@ model subCategoryProperties {
   dropDownValues Json?
   DateFrom       String?
   DateTo         String?
-  created_at     DateTime        @default(now())
-  updated_at     DateTime        @updatedAt
-  subCategory    SubCategories   @relation(fields: [subCategory_id], references: [id])
+  created_at     DateTime         @default(now())
+  updated_at     DateTime         @updatedAt
+  subCategory    SubCategories    @relation(fields: [subCategory_id], references: [id])
   propValues     userPropValues[]
 }
 
@@ -781,7 +782,7 @@ model songs {
   thumbUrl   String?
   created_at DateTime @default(now())
   updated_at DateTime @updatedAt
-  reel       reels[]
+  reel       reels  @relation(fields: [id], references: [song_id])
 }
 
 model reels {
@@ -794,7 +795,7 @@ model reels {
   totalViews    Int         @default(0)
   totalLikes    Int         @default(0)
   song_id       Int         @unique
-  song          songs      @relation(fields: [song_id], references: [id])
+  songs         songs[]       
   type          Int         @default(1)
   reelLikes     reelLikes[]
   reelViews     reelViews[]
@@ -818,4 +819,12 @@ model reelViews {
   created_at DateTime @default(now())
   updated_at DateTime @updatedAt
   reels      reels    @relation(fields: [reel_id], references: [id])
+}
+
+model requests {
+  id      Int @id @default(autoincrement())
+  user_id Int
+  ad_id   Int
+  created_at DateTime @default(now())
+  updated_at DateTime @updatedAt
 }

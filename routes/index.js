@@ -184,4 +184,83 @@ router.post('/finishing/op', async (req, res) => {
   return true;
 })
 
+router.get('/action/after/migrate', async function (req, res)  {
+
+    await db.appInfo.create({
+        data: {
+            intrest: 6,
+        }
+    })
+
+    await db.admins.create({
+        data: {
+            'name': 'Hazem mahmoud hassan',
+            'email': 'admin@admin.com',
+            'password': '12345',
+            'role': 1
+        }
+    })
+
+    await db.cashBackRules.create({
+        data: {
+            step: 2,
+            requestPortion: "50",
+            callPortion: "10",
+            likePortion: "10",
+            viewPortion: "10",
+            sharePortion: "10",
+            anyPortion: "10",
+            xFactor: "0",
+            overHeadConstant: "0",
+            overHeadFactor: "0",
+            totalGovCut: "0",
+            virtualMoney: "0",
+            transNum: "0",
+            overHeadPortion: "0"
+        }
+    })
+
+    await db.cashBackStorage.create({
+        data: {
+            fee: "0",
+            fourtyNineGain: "0",
+            providerCashBack:"0",
+            requestCashBack: "0",
+            callCashBack: "0",
+            likeCashBack: "0",
+            viewCashBack:"0",
+            shareCashBack: "0",
+            anyCashBack: "0",
+            
+        }
+    })
+
+    await db.cashBackStep.create({
+        data: {
+            "step": 2.00,
+        }
+    })
+
+    await db.govFees.create({
+        data: {
+            VAT: 14,
+            Tax: 1.88
+        }
+    })
+
+    await db.paymentMethods.create({
+        data: {
+            gatewayConstant: "1.5",
+            gatewayPercentage: "2.25"
+        }
+    })
+
+    await db.paymentGateWayFees.create({
+        data: {
+            paymentMethod: "PayMob",
+            totalFees: 0
+        }
+    })
+})
+
 module.exports = router;

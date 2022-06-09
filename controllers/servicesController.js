@@ -2016,5 +2016,57 @@ let callRequest = async (req, res) => {
     }
 }
 
+/* Request API */
+let makeRequest = async (req, res) => {
+    const { adId } = req.body
 
-module.exports = { getSubCategoryPrices, makeSubscriptionPayments, withdrawMoney, chargeBalance, transferTo, userInfo, callRequest }
+    if (! adId) {
+        return res.status(403).send('Ad id is not provided')
+    }
+
+    let CheckIfUserSendRequestBefore = await db.requests.findFirst({
+        where: {
+            user_id: req.user.id,
+            ad_id: parseInt(adId)
+        }
+    })
+
+    if (CheckIfUserSendRequestBefore) {
+        return res.status(403).json({
+            error: {
+                error_en: 'Request was send before .. cannot proccess.',
+                error_ar: 'تم ارسال الطلب سابقا.'
+            }
+        })
+    }
+
+    try {
+
+        await db.requests.create({
+            data: {
+                user_id: req.user.id,
+                ad_id: parseInt(adId)
+            }
+        })
+
+        return res.status(200).json({
+            success: {
+                success_en: 'Ok',
+                success_ar: 'Ok'
+            }
+        })
+
+    } catch (e) {
+        console.log(e)
+        return res.status(500).send(e)
+    }
+
+}
+
+module.exports = { 
+
+    getSubCategoryPrices, makeSubscriptionPayments, 
+    withdrawMoney, chargeBalance, transferTo, 
+    userInfo, callRequest, makeRequest
+
+}

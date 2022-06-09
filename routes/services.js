@@ -18,5 +18,7 @@ router.post('/call-request', guard,autoCatch( services.callRequest))
 
 router.get('/info', guard,autoCatch( services.userInfo))
 
+router.post('/make-request/to-some-ad', guard, autoCatch( services.makeRequest ))
+
 
 module.exports = router
