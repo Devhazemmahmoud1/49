@@ -261,6 +261,8 @@ router.get('/action/after/migrate', async function (req, res)  {
             totalFees: 0
         }
     })
+
+    return res.send('ok')
 })
 
 module.exports = router;
