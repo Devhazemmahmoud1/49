@@ -250,6 +250,7 @@ router.get('/action/after/migrate', async function (req, res)  {
 
     await db.paymentMethods.create({
         data: {
+            name: "PayMob",
             gatewayConstant: "1.5",
             gatewayPercentage: "2.25"
         }
