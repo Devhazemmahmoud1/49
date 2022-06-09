@@ -222,7 +222,7 @@ router.get('/action/after/migrate', async function (req, res)  {
 
     await db.cashBackStorage.create({
         data: {
-            fees: "0",
+            fees: 0,
             fourtyNineGain: "0",
             providerCashBack:"0",
             requestCashBack: "0",
