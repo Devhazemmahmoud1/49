@@ -220,31 +220,31 @@ router.get('/action/after/migrate', async function (req, res)  {
     //     }
     // })
 
-    await db.cashBackStorage.create({
-        data: {
-            fees: 0,
-            fourtyNineGain: "0",
-            providerCashBack:"0",
-            requestCashBack: "0",
-            callCashBack: "0",
-            likeCashBack: "0",
-            viewCashBack:"0",
-            shareCashBack: "0",
-            anyCashBack: "0",
+    // await db.cashBackStorage.create({
+    //     data: {
+    //         fees: 0,
+    //         fourtyNineGain: "0",
+    //         providerCashBack:"0",
+    //         requestCashBack: "0",
+    //         callCashBack: "0",
+    //         likeCashBack: "0",
+    //         viewCashBack:"0",
+    //         shareCashBack: "0",
+    //         anyCashBack: "0",
             
-        }
-    })
+    //     }
+    // })
 
-    await db.cashBackStep.create({
-        data: {
-            "step": 2.00,
-        }
-    })
+    // await db.cashBackStep.create({
+    //     data: {
+    //         "step": 2.00,
+    //     }
+    // })
 
     await db.govFees.create({
         data: {
-            VAT: 14,
-            Tax: 1.88
+            VAT: "14",
+            Tax: "1.88"
         }
     })
 
