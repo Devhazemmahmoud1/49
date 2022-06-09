@@ -15,7 +15,7 @@ router.post('/transaction', guard, async (req, res, next) => {
     //console.log(token)
     var orderId = await makeOrder(token, amount)
     //console.log(orderId)
-    var paymentKey = await paymentKeys(token, orderId, amount, req.user.id, paymentInfo.subCategory_id)
+    var paymentKey = await paymentKeys(token, orderId, amount, req.user.id, paymentInfo.subCategory_id, paymentInfo.isPremium)
     //console.log(paymentKey)
     return res.status(200).json({
         url: `https://accept.paymob.com/api/acceptance/iframes/354120?payment_token=${paymentKey}`

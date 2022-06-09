@@ -535,7 +535,7 @@ model userPropValues {
   id                     Int                   @id @default(autoincrement())
   subCategory_id         Int
   subCategoryProperty_id Int                   @unique
-  value                  String                @db.VarChar(5000)
+  value                  Json?
   ad_id                  Int
   created_at             DateTime              @default(now())
   updated_at             DateTime              @updatedAt
@@ -782,7 +782,7 @@ model songs {
   thumbUrl   String?
   created_at DateTime @default(now())
   updated_at DateTime @updatedAt
-  //reel       reels  
+  //reel       reels
 }
 
 model reels {
@@ -795,7 +795,7 @@ model reels {
   totalViews    Int         @default(0)
   totalLikes    Int         @default(0)
   song_id       Int         @unique
-  //songs         songs[]       
+  //songs         songs[]
   type          Int         @default(1)
   reelLikes     reelLikes[]
   reelViews     reelViews[]
@@ -822,9 +822,9 @@ model reelViews {
 }
 
 model requests {
-  id      Int @id @default(autoincrement())
-  user_id Int
-  ad_id   Int
+  id         Int      @id @default(autoincrement())
+  user_id    Int
+  ad_id      Int
   created_at DateTime @default(now())
   updated_at DateTime @updatedAt
 }
