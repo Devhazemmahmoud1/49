@@ -58,9 +58,6 @@ let getOneReel = async (req, res) => {
     let checkReel = await db.reels.findFirst({
         where: {
             id: parseInt(id)
-        },
-        include: {
-            song: true,
         }
     })
 
@@ -72,6 +69,12 @@ let getOneReel = async (req, res) => {
             }
         })
     }
+
+    checkReel.song = await db.songs.findFirst({
+        where: {
+            id: checkReel.song_id
+        }
+    })
 
     checkReel.isFriend = (await db.friends.findFirst({
         where: {
@@ -115,14 +118,17 @@ let getMyReels = async (req, res) => {
             user_id: req.user.id,
             type: 1
         },
-        include: {
-            song: true,
-        },
         skip: page == 1 ? 0 : (page * maxReels) - maxReels,
         take: maxReels,
     });
 
     for (item of getMyreelList) {
+        item.song = await db.songs.findFirst({
+            where: {
+                id: item.song_id
+            }
+        })
+
         item.isFriend = false
 
         item.isLiked = (await db.reelLikes.findFirst({
@@ -158,9 +164,6 @@ let publicReels = async (req, res) => {
     let getMyreelList = await db.reels.findMany({
         where: {
             type: 1
-        },
-        include: {
-            song: true,
         },
         skip: page == 1 ? 0 : (page * maxReels) - maxReels,
         take: maxReels,
@@ -198,6 +201,11 @@ let publicReels = async (req, res) => {
             item.isMine = false
         }
 
+        item.song = await db.songs.findFirst({
+            where: {
+                id: item.song_id
+            }
+        })
 
         item.userInfo = await db.users.findFirst({
             where: {

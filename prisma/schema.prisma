@@ -782,7 +782,7 @@ model songs {
   thumbUrl   String?
   created_at DateTime @default(now())
   updated_at DateTime @updatedAt
-  reel       reels  @relation(fields: [id], references: [song_id])
+  //reel       reels  
 }
 
 model reels {
@@ -795,7 +795,7 @@ model reels {
   totalViews    Int         @default(0)
   totalLikes    Int         @default(0)
   song_id       Int         @unique
-  songs         songs[]       
+  //songs         songs[]       
   type          Int         @default(1)
   reelLikes     reelLikes[]
   reelViews     reelViews[]

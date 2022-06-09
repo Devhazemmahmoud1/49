@@ -51,11 +51,12 @@ router.post('/create-reel', upload.array('reel', 12), async (req, res, next) => 
                 videoDuration: parseInt(videoDuration),
                 videoUrl: result[0].filename,
                 type: parseInt(type) ?? 1,
-                song: {
+                /*song: {
                     connect: {
                         id: parseInt(song_id) ?? undefined
                     }
-                }
+                }*/
+                song_id: parseInt(song_id)
             }
         })
 
@@ -97,11 +98,12 @@ router.post('/create-story', upload.array('reel', 12), async (req, res, next) =>
                 videoDuration: parseInt(videoDuration),
                 videoUrl: result[0].filename,
                 type: parseInt(type) ?? 1,
-                song: {
+                /*song: {
                     connect: {
                         id: parseInt(song_id) ?? undefined
                     }
-                }
+                }*/
+                song_id: parseInt(song_id)
             }
         })
 
