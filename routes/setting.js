@@ -13,4 +13,5 @@ router.post('/edit', guard,autoCatch( settings.editSettings))
 
 /* Edit on user privacy */
 router.post('/edit-privacy', guard,autoCatch( settings.editPrivacy))
+
 module.exports = router

@@ -7,14 +7,23 @@ const { PrismaClient } = require('@prisma/client');
 const db = new PrismaClient();
 var socketio = require("socket.io");
 const s3 = require('./controllers/s3Controller/s3Configiration')
-const { initializeApp, applicationDefault } = require('firebase-admin/app');
-const admin = require('firebase-admin')
+const admin = require('firebase-admin/app');
+const admins = require('firebase-admin')
 const secretKey = "fourtyninehub495051fourtynine";
 const socketUserHandler = require('./middleware/socketHandler')
 const Jwt = require('jsonwebtoken');
+const serviceAccount = require('./foutrynine-firebase.json')
 
-initializeApp({
-  credential: applicationDefault(),
+admin.initializeApp({
+  credential: admin.cert(serviceAccount),
+});
+
+admins.messaging().send({
+  token: 'doOoBpo9QfGYobzUcRlD7K:APA91bHgPwc5LmGLGjUngkmpLn1AiXy8JLGqhYem62k1iaS3_lodVO2qnfANTZ-K9KGtJWguu5x4yW_RrHciU98HtvqjVImIaGmkwkCuhpR2u7eyL3hRpF0qI-6lmP0xwiJxT1GT4e66',
+  notification: {
+    title: 'Hello notification',
+    body: 'This is a notification',
+  }
 });
 
 var cronJob = require('./controllers/cronJob/cronJobController')
@@ -39,7 +48,6 @@ var actions = require('./routes/socialMediaRoutes/usersAction')
 var Reels = require('./routes/Reels&stories')
 var notification = require('./routes/notifications')
 var paymob = require('./routes/payments/PayMob')
-
 var app = express();
 
 // Create the http server
@@ -187,5 +195,5 @@ io.use(async (socket, next) => {
   }
 });
 
-module.exports = { app, server, io, sockets }
+module.exports = { app, server }
 

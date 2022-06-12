@@ -61,4 +61,6 @@ router.delete('/remove-favo', guard, autoCatch(ads.removeFavo))
 /* Get my favorate list */
 router.get('/get-myfavorate', guard, autoCatch(ads.getMyfavorates))
 
+router.get('/my-custom-ads', guard, autoCatch( ads.customizeYourAds ))
+
 module.exports = router

@@ -408,4 +408,8 @@ let getAds = async (req, res) => {
     return res.json(ads)
 }
 
-module.exports = { getProperties, getAd, createNewAd, addFavo, removeFavo, EditAd, getMyfavorates, getAds }
+let customizeYourAds = async (req, res) => {
+    
+}
+
+module.exports = { getProperties, getAd, createNewAd, addFavo, removeFavo, EditAd, getMyfavorates, getAds, customizeYourAds }
