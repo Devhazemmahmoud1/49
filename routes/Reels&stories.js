@@ -4,6 +4,7 @@ const reels = require('./../controllers/Reels&StoriesController/reelsController'
 const multer = require('multer');
 const uploadMethod = require('../controllers/s3Controller/uploadS3Controller');
 const guard = require('../middleware/guard')
+const { sendBulkNotification } = require('../controllers/notificationsController/SocialNotification')
 const {PrismaClient} = require('@prisma/client');
 const {autoCatch} = require("../utils/auto_catch");
 const db = new PrismaClient();
@@ -43,7 +44,7 @@ router.post('/create-reel', upload.array('reel', 12), async (req, res, next) => 
         let {videoDuration, song_id, userId, type, desc} = req.body
         let result = await uploadMethod.getFileStream(file)
 
-        await db.reels.create({
+        let createReel = await db.reels.create({
             data: {
                 user_id: parseInt(userId),
                 desc: desc,
@@ -59,6 +60,23 @@ router.post('/create-reel', upload.array('reel', 12), async (req, res, next) => 
                 song_id: parseInt(song_id)
             }
         })
+        
+        let user = await db.users.findFirst({
+            where: {
+                id: parseInt(userId)
+            }
+        })
+
+        let notify = {
+            notification_ar: '' + user.firstName + ' ' + user.lastName + ' قام باضافه ريل جديد.',
+            notification_en: '' + user.firstName + ' ' + user.lastName + ' has added a new reel',
+            sender: user.id,
+            reciever: 0,
+            postId: parseInt(createReel.id),
+            type: 9,            
+        }
+
+        sendBulkNotification(notify, parseint(userId))
 
         return res.status(200).json({
             success: {
@@ -90,7 +108,7 @@ router.post('/create-story', upload.array('reel', 12), async (req, res, next) =>
         let {videoDuration, song_id, userId, desc, type} = req.body
         let result = await uploadMethod.getFileStream(file)
 
-        await db.reels.create({
+        let createStory =await db.reels.create({
             data: {
                 user_id: parseInt(userId),
                 desc: desc,
@@ -106,6 +124,23 @@ router.post('/create-story', upload.array('reel', 12), async (req, res, next) =>
                 song_id: parseInt(song_id)
             }
         })
+
+        let user = await db.users.findFirst({
+            where: {
+                id: parseInt(userId)
+            }
+        })
+
+        let notify = {
+            notification_ar: '' + user.firstName + ' ' + user.lastName + ' قام باضافه قصه جديده.',
+            notification_en: '' + user.firstName + ' ' + user.lastName + ' has added a new story.',
+            sender: user.id,
+            reciever: 0,
+            postId: parseInt(createStory.id),
+            type: 10,            
+        }
+
+        sendBulkNotification(notify, parseint(userId))
 
         return res.status(200).json({
             success: {

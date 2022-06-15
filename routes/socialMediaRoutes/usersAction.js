@@ -47,6 +47,9 @@ router.delete('/remove-comment', guard,autoCatch( action.removeComment))
 /* Add a saraha comment */
 router.post('/saraha', guard,autoCatch( action.addSaraha))
 
+/* Get my saraha messages */
+router.get('/get-my-saraha/messages', guard, autoCatch( action.getSaraha ))
+
 // search field for social media
 router.get('/search', guard,autoCatch( action.searchForResult))
 
@@ -57,7 +60,7 @@ router.post('/update-post-privacy', guard,autoCatch( action.updatePostPrivacy))
 router.post('/hide-post', guard,autoCatch( action.hidePost))
 
 // Report a specific User 
-router.post('/report-user', guard,autoCatch( action.reportUser))
+router.post('/report-user', guard, autoCatch( action.reportUser))
 
 // Make like on post
 router.post('/like-on-post', guard,autoCatch( action.makeLikeOnPost))

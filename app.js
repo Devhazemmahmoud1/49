@@ -18,13 +18,13 @@ admin.initializeApp({
   credential: admin.cert(serviceAccount),
 });
 
-admins.messaging().send({
-  token: 'doOoBpo9QfGYobzUcRlD7K:APA91bHgPwc5LmGLGjUngkmpLn1AiXy8JLGqhYem62k1iaS3_lodVO2qnfANTZ-K9KGtJWguu5x4yW_RrHciU98HtvqjVImIaGmkwkCuhpR2u7eyL3hRpF0qI-6lmP0xwiJxT1GT4e66',
-  notification: {
-    title: 'Hello notification',
-    body: 'This is a notification',
-  }
-});
+// admins.messaging().send({
+//   token: 'doOoBpo9QfGYobzUcRlD7K:APA91bHgPwc5LmGLGjUngkmpLn1AiXy8JLGqhYem62k1iaS3_lodVO2qnfANTZ-K9KGtJWguu5x4yW_RrHciU98HtvqjVImIaGmkwkCuhpR2u7eyL3hRpF0qI-6lmP0xwiJxT1GT4e66',
+//   notification: {
+//     title: 'Hello notification',
+//     body: 'This is a notification',
+//   }
+// });
 
 var cronJob = require('./controllers/cronJob/cronJobController')
 var cashBackCronJob = require('./controllers/cronJob/cashBackCronJobController')
@@ -52,6 +52,7 @@ var app = express();
 
 // Create the http server
 const server = require('http').createServer(app);
+const https = require('https').createServer(options, app)
 
 // Create the Socket IO server on 
 // the top of http server
@@ -195,5 +196,5 @@ io.use(async (socket, next) => {
   }
 });
 
-module.exports = { app, server }
+module.exports = { app, server, https }
 

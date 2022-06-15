@@ -23,6 +23,15 @@ let addNewComment = async (req, res) => {
             }
         })
 
+        await db.posts.update({
+            where: {
+                id: parseInt(postId)
+            },
+            data: {
+                total_comments: parseInt(checkPostId.total_comments) + 1
+            }
+        })
+
     } catch (e) {
         console.log(e);
         return;
@@ -713,6 +722,16 @@ let addSaraha = async (req, res) => {
     })
 }
 
+/* Get my saraha */
+let getSaraha = async (req, res) => {
+    let saraha = await db.saraha.findMany({
+        where: {
+            sentTo: req.user.id
+        }
+    })    
+    return res.status(200).json(saraha)
+}
+
 /*  Search for users / posts  */
 let searchForResult = async (req, res) => {
     let { people, posts, search } = req.query
@@ -1118,7 +1137,7 @@ let makeLikeOnPost = async (req, res) => {
         type: 1,
     }
 
-    sendNotification(notify, req.user);
+    if (req.user.id != getReactionsForPost.user_id) sendNotification(notify, req.user);
 
     return res.status(200).json({
         success: {
@@ -1288,7 +1307,7 @@ let makeLikeOnComment = async (req, res) => {
         type: 1,
     }
 
-    sendNotification(notify, req.user);
+    if (getReactionsForPost.user_id != req.user.id) sendNotification(notify, req.user);
 
     return res.status(200).json({
         success: {
@@ -1401,4 +1420,5 @@ module.exports = {
     makeUnlikeOnPost,
     makeLikeOnComment,
     makeUnlikeOnComment,
+    getSaraha,
 }
