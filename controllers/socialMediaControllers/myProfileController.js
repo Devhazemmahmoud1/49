@@ -721,7 +721,22 @@ let getMyAbout = async (req, res) => {
         })
     }
 
-    return res.status(200).json(checkUser)
+    let ref = await db.ref.findFirst({
+        where: {
+            invited: parseInt(id)
+        }
+    })
+
+    let refInfo = await db.users.findFirst({
+        where: {
+            id: parseInt(ref.inviter)
+        }
+    })
+
+    return res.status(200).json({    
+        userAbout: checkUser,
+        ref: refInfo
+    })
 }
 
 let getTenderMales = async (req, res) => {

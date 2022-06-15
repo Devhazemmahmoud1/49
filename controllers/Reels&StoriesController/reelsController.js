@@ -104,6 +104,10 @@ let getOneReel = async (req, res) => {
         }
     })
 
+    // reels update views 
+
+    
+
 
     return res.status(200).json(checkReel)
 }

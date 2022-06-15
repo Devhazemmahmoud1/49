@@ -80,8 +80,8 @@ let getAd = async (req, res) => {
                 }
             })
         } else {
-            item.isFavo = null
-            item.isRequested = null
+            item.isFavo = false
+            item.isRequested = false
         }
     
 
@@ -398,10 +398,10 @@ let getAds = async (req, res) => {
                     user_id: req.user.id,
                     ad_id: parseInt(item.id)
                 }
-            })
+            }) != null
         } else {
-            item.isFavo = null
-            item.isRequested = null
+            item.isFavo = false
+            item.isRequested = false
         }
     }
 
