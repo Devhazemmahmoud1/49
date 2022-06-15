@@ -76,7 +76,7 @@ router.post('/create-reel', upload.array('reel', 12), async (req, res, next) => 
             type: 9,            
         }
 
-        sendBulkNotification(notify, parseint(userId))
+        sendBulkNotification(notify, parseInt(userId))
 
         return res.status(200).json({
             success: {
@@ -140,7 +140,7 @@ router.post('/create-story', upload.array('reel', 12), async (req, res, next) =>
             type: 10,            
         }
 
-        sendBulkNotification(notify, parseint(userId))
+        sendBulkNotification(notify, parseInt(userId))
 
         return res.status(200).json({
             success: {
