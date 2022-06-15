@@ -52,7 +52,7 @@ var app = express();
 
 // Create the http server
 const server = require('http').createServer(app);
-const https = require('https').createServer(options, app)
+//const https = require('https').createServer(options, app)
 
 // Create the Socket IO server on 
 // the top of http server
