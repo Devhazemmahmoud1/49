@@ -196,5 +196,5 @@ io.use(async (socket, next) => {
   }
 });
 
-module.exports = { app, server, https }
+module.exports = { app, server }
 
