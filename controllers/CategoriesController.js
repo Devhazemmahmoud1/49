@@ -7,6 +7,9 @@ let getAllCategories = async (req, res, next) => {
     let categories = await db.mainCategories.findMany({
         include: {
             photo: true
+        },
+        orderBy: {
+            created_at: 'asc'
         }
     })
 
