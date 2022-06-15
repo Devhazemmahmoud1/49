@@ -28,7 +28,7 @@ let addNewComment = async (req, res) => {
                 id: parseInt(postId)
             },
             data: {
-                total_comments: parseInt(checkPostId.total_comments) + 1
+                total_comments: (parseInt(checkPostId.total_comments) + 1)
             }
         })
 
