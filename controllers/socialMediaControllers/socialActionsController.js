@@ -34,7 +34,7 @@ let addNewComment = async (req, res) => {
 
     } catch (e) {
         console.log(e);
-        return;
+        return false
     }
 
     // Notification is required
