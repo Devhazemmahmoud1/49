@@ -456,8 +456,8 @@ let addFavoToCategory = async (req, res) => {
 
         return res.status(200).json({
             success: {
-                success_en: 'Category has been removed from favorite',
-                success_ar: 'تم حذف القسم من المفضله'
+                success_en: 'Category has been added to favorite',
+                success_ar: 'تم اضافه القسم الي المفضله'
             }
         })
     }
@@ -506,8 +506,8 @@ let addFavoToSubCategory = async (req, res) => {
 
         return res.status(200).json({
             success: {
-                success_en: 'Category has been removed from favorite',
-                success_ar: 'تم حذف القسم من المفضله'
+                success_en: 'Category has been added to favorite',
+                success_ar: 'تم اضافه القسم الي المفضله'
             }
         })
     }    
