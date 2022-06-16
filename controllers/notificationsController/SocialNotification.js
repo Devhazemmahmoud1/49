@@ -54,6 +54,7 @@ let sendNotification = async (notify, user) => {
     return true
 }
 
+/* Sending the notification */
 let sendBulkNotification = async (notify, user) => {
 
     let duplicatedUsers = []
@@ -107,7 +108,7 @@ let sendBulkNotification = async (notify, user) => {
             })
             
         }
-
+        
         duplicatedUsers.push(item.friend_id)
     }
 

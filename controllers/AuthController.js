@@ -660,7 +660,7 @@ let resetPassword = async (req, res) => {
         }
     })
 
-    return res.status(403).json({
+    return res.status(200).json({
         success: {
             success_ar: 'تم استعاده كلمه السر.',
             success_en: 'Password has been updated.'

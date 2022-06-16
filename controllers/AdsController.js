@@ -78,7 +78,7 @@ let getAd = async (req, res) => {
                     user_id: req.user.id,
                     ad_id: parseInt(adDetails.id)
                 }
-            })
+            }) != null
         } else {
             item.isFavo = false
             item.isRequested = false
