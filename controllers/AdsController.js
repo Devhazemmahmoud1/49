@@ -525,6 +525,9 @@ let getMyMainCatsfavorates = async (req, res) => {
         item.categoryInfo = await db.mainCategories.findFirst({
             where: {
                 id: item.category_id
+            },
+            include: {
+                photo: true,
             }
         })
     }
@@ -546,6 +549,9 @@ let getMySubCatsfavorates = async (req, res) => {
         item.categoryInfo = await db.subCategories.findFirst({
             where: {
                 id: item.category_id
+            },
+            include: {
+                photo: true
             }
         })
     }
