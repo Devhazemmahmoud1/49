@@ -203,7 +203,6 @@ let EditAd = async (req, res) => {
 
 }
 
-
 /* Add a specific ad to favo list according to the giving ad_id  */
 let addFavo = async (req, res) => {
     const { ad_id } = req.body
@@ -530,6 +529,17 @@ let getMyMainCatsfavorates = async (req, res) => {
                 photo: true,
             }
         })
+
+        let total = await db.advertisment.aggregate({
+            _count: {
+                id: true
+            },
+            where: {
+                mainCategory_id: item.id
+            }
+        })
+
+        item.total = total
     }
 
     return res.json({
@@ -554,6 +564,16 @@ let getMySubCatsfavorates = async (req, res) => {
                 photo: true
             }
         })
+
+        let total = await db.advertisment.aggregate({
+            _count: {
+                id: true
+            },
+            where: {
+                subCategory_id: item.id
+            }
+        })
+        item.total = total
     }
 
     return res.json({
