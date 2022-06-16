@@ -2,7 +2,7 @@ var router = require('express').Router()
 var ride = require('../controllers/ridersController')
 var guard = require('../middleware/guard')
 var multer = require('multer')
-var { getFileStream, run } = require('../controllers/s3Controller/uploadS3Controller')
+var { getFileStream } = require('../controllers/s3Controller/uploadS3Controller')
 const {autoCatch} = require("../utils/auto_catch");
 
 /* Ride APis Goes down here */
@@ -33,7 +33,7 @@ var upload = multer({
 });
 
 /* Uploading Images using Multter Package */
-router.post('/upload-rider-attahcments' ,upload.array('attachments', 12), async (req, res, next) => {
+router.post('/upload-rider-attahcments' ,upload.array('attachments', 20), async (req, res, next) => {
     let file = req.files
     let result = await getFileStream(file)
     return res.status(200).json(result)

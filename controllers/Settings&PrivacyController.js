@@ -22,6 +22,8 @@ let editSettings = async (req, res) => {
             }
         })
 
+        console.log(getUserSetting)
+
         getUserSetting.shift();
         getUserSetting.shift();
         getUserSetting.shift();

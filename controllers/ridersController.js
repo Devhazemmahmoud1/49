@@ -67,6 +67,8 @@ var addRider = async (request, response) => {
     })
 }
 
+// 
+
 // accept a ride 
 
 let acceptRide = async (request, response) => {

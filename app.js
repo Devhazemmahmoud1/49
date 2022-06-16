@@ -149,6 +149,8 @@ io.on('connection', async (socket) => {
         user_id: socket.user.id,
       }
       sockets[socket.id] = userInfo
+
+      console.log(sockets[socket.id] + 'has joined');
     }
   }
 
