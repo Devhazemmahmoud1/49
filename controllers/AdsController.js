@@ -67,6 +67,7 @@ let getAd = async (req, res) => {
         }
     })) != null
     if (req.user) {
+        console.log(req.user.id)
         adDetails.isRequested = (await db.requests.findFirst({
             where: {
                 user_id: req.user.id,
@@ -80,6 +81,7 @@ let getAd = async (req, res) => {
             }
         }) != null
     } else {
+        console.log('pased')
         adDetails.isFavo = false
         adDetails.isRequested = false
     }

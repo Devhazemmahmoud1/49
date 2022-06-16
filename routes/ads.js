@@ -42,9 +42,9 @@ router.post('/upload-ads-attahcments' ,upload.array('attachments', 12), async (r
 router.get('/props/:id', autoCatch(ads.getProperties));
 
 /* Get single ad according to the giving ID */
-router.get('/single/:id', autoCatch(ads.getAd))
+router.get('/single/:id', guard, autoCatch(ads.getAd))
 
-router.get('/get-all/ads/:id', autoCatch( ads.getAds ))
+router.get('/get-all/ads/:id', guard, autoCatch( ads.getAds ))
 
 /* Create a new ad */
 router.post('/create-ad/new', guard, autoCatch(ads.createNewAd) )
