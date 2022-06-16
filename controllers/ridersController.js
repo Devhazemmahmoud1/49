@@ -5,7 +5,7 @@ const moment = require('moment')
 
 /* Add a new Rider according to the giving informaiton */
 var addRider = async (request, response) => {
-    const { carModel , pricePerDistance, attachments, category_id} = request.body
+    const { carModel, pricePerDistance, attachments, category_id } = request.body
 
     if (!carModel || !pricePerDistance || pricePerDistance == 0) {
         return response.status(403).json({
@@ -19,7 +19,7 @@ var addRider = async (request, response) => {
 
     // THIS IS FOR THE FLUTTER DEV
 
-    if (! attachments) {
+    if (!attachments) {
         return response.status(403).json({
             error: {
                 error_ar: 'خطا في الصور',
@@ -34,13 +34,13 @@ var addRider = async (request, response) => {
     let createNewRider = await db.ride.create({
         data: {
             user_id: request.user.id,
-            distancePerKilo:  parseInt(pricePerDistance),
+            distancePerKilo: parseInt(pricePerDistance),
             carModel: carModel.toString(),
-            category_id: parseInt(category_id), 
+            category_id: parseInt(category_id),
         }
     });
 
-    if (! createNewRider) {
+    if (!createNewRider) {
         return response.status(403).json({
             error: {
                 error_en: 'Error Occur',
@@ -53,9 +53,7 @@ var addRider = async (request, response) => {
 
     for (item of attachments) {
         await db.ridersAttachment.create({
-            data: [
-                { rideId: createNewRider.id, url: item.filename, type: item.type }
-            ]
+            data: { rideId: createNewRider.id, url: item.filename, type: item.type }
         })
     }
 
