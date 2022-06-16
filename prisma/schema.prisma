@@ -829,3 +829,19 @@ model requests {
   created_at DateTime @default(now())
   updated_at DateTime @updatedAt
 }
+
+model MainCategoriesFavo {
+  id Int @id @default(autoincrement())
+  user_id Int 
+  category_id Int
+  created_at DateTime @default(now())
+  updated_at DateTime @updatedAt
+}
+
+model SubCategoriesFavo {
+  id Int @id @default(autoincrement())
+  user_id Int 
+  category_id Int
+  created_at DateTime @default(now())
+  updated_at DateTime @updatedAt
+}

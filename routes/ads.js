@@ -58,6 +58,15 @@ router.post('/add-favo', guard, autoCatch(ads.addFavo))
 /* remove a specific ad from favo list */
 router.delete('/remove-favo', guard, autoCatch(ads.removeFavo))
 
+/* Add a MainCategory Favo */
+router.post('/category/add-favo', guard, autoCatch(ads.addFavoToCategory))
+
+router.post('/sub-category/add-favo', guard, autoCatch(ads.addFavoToSubCategory))
+
+router.get('/main-catgory/get-myfavorate', guard, autoCatch(ads.getMyMainCatsfavorates))
+
+router.get('/sub-category/get-myfavorate', guard, autoCatch(ads.getMySubCatsfavorates))
+
 /* Get my favorate list */
 router.get('/get-myfavorate', guard, autoCatch(ads.getMyfavorates))
 

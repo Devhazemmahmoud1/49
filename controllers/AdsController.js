@@ -414,4 +414,123 @@ let customizeYourAds = async (req, res) => {
 
 }
 
-module.exports = { getProperties, getAd, createNewAd, addFavo, removeFavo, EditAd, getMyfavorates, getAds, customizeYourAds }
+let addFavoToCategory = async (req, res) => {
+    const { category_id } = req.body
+
+    if (! category_id) {
+        return res.send('No category id was provided')
+    }
+
+    // check if there is already a favo to this category
+
+    let check = await db.MainCategoriesFavo.findFirst({
+        where: {
+            user_id: req.user.id,
+            category_id: parseInt(category_id)
+        }
+    })
+
+    if (check) {
+        // delete it
+
+        await db.MainCategoriesFavo.delete({
+            where: {
+                id: check.id
+            }
+        })
+
+        return res.status(200).json({
+            success: {
+                success_en: 'Category has been removed from favorite',
+                success_ar: 'تم حذف القسم من المفضله'
+            }
+        })
+
+    } else {
+        await db.MainCategoriesFavo.create({
+            data: {
+                user_id: req.user.id,
+                category_id: parseInt(category_id)
+            }
+        })
+
+        return res.status(200).json({
+            success: {
+                success_en: 'Category has been removed from favorite',
+                success_ar: 'تم حذف القسم من المفضله'
+            }
+        })
+    }
+}
+
+
+let addFavoToSubCategory = async (req, res) => {
+    const { category_id } = req.body
+
+    if (! category_id) {
+        return res.send('No category id was provided')
+    }
+
+    // check if there is already a favo to this category
+
+    let check = await db.SubCategoriesFavo.findFirst({
+        where: {
+            user_id: req.user.id,
+            category_id: parseInt(category_id)
+        }
+    })
+
+    if (check) {
+        // delete it
+
+        await db.SubCategoriesFavo.delete({
+            where: {
+                id: check.id
+            }
+        })
+
+        return res.status(200).json({
+            success: {
+                success_en: 'Category has been removed from favorite',
+                success_ar: 'تم حذف القسم من المفضله'
+            }
+        })
+
+    } else {
+        await db.SubCategoriesFavo.create({
+            data: {
+                user_id: req.user.id,
+                category_id: parseInt(category_id)
+            }
+        })
+
+        return res.status(200).json({
+            success: {
+                success_en: 'Category has been removed from favorite',
+                success_ar: 'تم حذف القسم من المفضله'
+            }
+        })
+    }    
+}
+
+let getMyMainCatsfavorates = async (req, res) => {
+    return res.json({
+        mainCategoryFavo: await db.MainCategoriesFavo.findFirst({
+            where: {
+                user_id: req.user.id
+            }
+        })
+    })
+}
+
+let getMySubCatsfavorates = async (req, res) => {
+    return res.json({
+        subCategoryFavo: await db.MainCategoriesFavo.findFirst({
+            where: {
+                user_id: req.user.id
+            }
+        })
+    })
+}
+
+module.exports = { getProperties, getAd, createNewAd, addFavo, removeFavo, EditAd, getMyfavorates, getAds, customizeYourAds, addFavoToCategory, addFavoToSubCategory, getMyMainCatsfavorates, getMySubCatsfavorates }
