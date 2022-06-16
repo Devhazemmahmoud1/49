@@ -5,9 +5,9 @@ const db = new PrismaClient();
 
 /* Make a new loading according to the giving informarion */
 let makeNewLoading = async (req, res) => {
-    const { carModel, lng, lat , category_id, attachments} = req.body
+    const { carModel, lng, lat , subCategory_id, attachments} = req.body
 
-    if (!carModel || !lng || !lat || !category_id) {
+    if (!carModel || !lng || !lat || !subCategory_id) {
         return res.status(403).json({
             error: {
                 error_en: 'Please fill out all fields.',
@@ -23,8 +23,17 @@ let makeNewLoading = async (req, res) => {
                 carModel: carModel,
                 lng: lng.toString(),
                 lat: lat.toString(),
-                category_id: parseInt(category_id),
+                category_id: parseInt(subCategory_id),
                 hashCode: '99'
+            }
+        })
+
+        await db.users.update({
+            where: {
+                id: req.user.id
+            },
+            data: {
+                accountType: parseInt(subCategory_id)
             }
         })
 

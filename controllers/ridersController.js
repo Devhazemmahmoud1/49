@@ -5,7 +5,7 @@ const moment = require('moment')
 
 /* Add a new Rider according to the giving informaiton */
 var addRider = async (request, response) => {
-    const { carModel, pricePerDistance, attachments, category_id } = request.body
+    const { carModel, pricePerDistance, attachments, subCategory_id } = request.body
 
     if (!carModel || !pricePerDistance || pricePerDistance == 0) {
         return response.status(403).json({
@@ -36,7 +36,7 @@ var addRider = async (request, response) => {
             user_id: request.user.id,
             distancePerKilo: parseInt(pricePerDistance),
             carModel: carModel.toString(),
-            category_id: parseInt(category_id),
+            category_id: parseInt(subCategory_id),
         }
     });
 
@@ -48,6 +48,15 @@ var addRider = async (request, response) => {
             }
         });
     }
+
+    await db.users.update({
+        where: {
+            id: req.user.id
+        },
+        data: {
+            accountType: parseInt(subCategory_id)
+        }
+    })
 
     // Create attachments for this rider
 
