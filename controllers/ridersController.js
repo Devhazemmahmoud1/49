@@ -51,7 +51,7 @@ var addRider = async (request, response) => {
 
     await db.users.update({
         where: {
-            id: req.user.id
+            id: request.user.id
         },
         data: {
             accountType: parseInt(subCategory_id)
