@@ -5,7 +5,7 @@ const db = new PrismaClient();
 
 /* Make a new loading according to the giving informarion */
 let makeNewLoading = async (req, res) => {
-    const { carModel, lng, lat , category_id} = req.body
+    const { carModel, lng, lat , category_id, attachments} = req.body
 
     if (!carModel || !lng || !lat || !category_id) {
         return res.status(403).json({
@@ -24,24 +24,11 @@ let makeNewLoading = async (req, res) => {
                 lng: lng.toString(),
                 lat: lat.toString(),
                 category_id: parseInt(category_id),
+                hashCode: '99'
             }
         })
 
-        let att = [
-            {
-                "fieldname": "attachments",
-                "originalname": "download.png",
-                "encoding": "7bit",
-                "mimetype": "image/png",
-                "destination": "./uploads/",
-                "filename": "1651423465287---download.png",
-                "path": "uploads/1651423465287---download.png",
-                "size": 2959,
-                "type": 1
-            }
-        ]
-
-        for (item of att) {
+        for (item of attachments) {
             await db.loadingAttachments.create({
                 data: {
                     loading_id: addNewoad.id, url: item.filename, type: item.type

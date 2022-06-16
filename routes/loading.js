@@ -35,7 +35,7 @@ var upload = multer({
 
 /* Upload attachments for a specific agent */
 /* Uploading Images using Multter Package */
-router.post('/upload-loading-attahcments' ,upload.array('attachments', 12), async(req, res, next) => {
+router.post('/upload-loading-attahcments' ,upload.array('attachments', 20), async(req, res, next) => {
     let file = req.files
     let result = await getFileStream(file)
     return res.status(200).json(result)
