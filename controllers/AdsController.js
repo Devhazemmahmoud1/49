@@ -514,22 +514,44 @@ let addFavoToSubCategory = async (req, res) => {
 }
 
 let getMyMainCatsfavorates = async (req, res) => {
-    return res.json({
-        mainCategoryFavo: await db.MainCategoriesFavo.findFirst({
+
+    let main = await db.MainCategoriesFavo.findMany({
+        where: {
+            user_id: req.user.id
+        }
+    })
+
+    for (item of main) {
+        item.categoryInfo = await db.mainCategories.findFirst({
             where: {
-                user_id: req.user.id
+                id: item.category_id
             }
         })
+    }
+
+    return res.json({
+        mainCategoryFavo: main
     })
 }
 
 let getMySubCatsfavorates = async (req, res) => {
-    return res.json({
-        subCategoryFavo: await db.MainCategoriesFavo.findFirst({
+
+    let sub = await db.SubCategoriesFavo.findMany({
+        where: {
+            user_id: req.user.id
+        }
+    })
+
+    for (item of sub) {
+        item.categoryInfo = await db.subCategories.findFirst({
             where: {
-                user_id: req.user.id
+                id: item.category_id
             }
         })
+    }
+
+    return res.json({
+        subCategoryFavo: sub
     })
 }
 

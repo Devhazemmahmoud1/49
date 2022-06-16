@@ -24,6 +24,17 @@ let getAllCategories = async (req, res, next) => {
         })
 
         item.total = total
+
+        if (req.user) {
+            item.isFavo = await db.MainCategoriesFavo.findFirst({
+                where: {
+                    user_id: req.user.id,
+                    category_id: item.id
+                }
+            }) != null
+        } else {
+            item.isFavo = false
+        }
     }
 
     return res.status(200).json(categories)
@@ -54,6 +65,17 @@ let getSubCats = async (req, res, next) => {
             }
         })
         item.total = total
+
+        if (req.user) {
+            item.isFavo = await db.SubCategoriesFavo.findFirst({
+                where: {
+                    user_id: req.user.id,
+                    category_id: item.id
+                }
+            }) != null
+        } else {
+            item.isFavo = false
+        }
     }
     
     return res.status(200).json(categories)    
