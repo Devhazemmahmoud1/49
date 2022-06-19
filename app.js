@@ -162,7 +162,7 @@ io.on('connection', async (socket) => {
         }
       }
       sockets[socket.id] = userInfo
-      console.log('socket connected')
+      console.log(sockets)
     }
   }
 
