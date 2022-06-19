@@ -81,14 +81,14 @@ let findRiders = async (req, res) => {
     console.log(Object.keys(sockets).length)
     if (Object.keys(sockets).length !== 0) {
         for (socket in sockets) {
-            console.log(sockets[socket].currentLocation.lng, sockets[socket].currentLocation.lat)
-            console.log(sockets[socket].isApproved, sockets[socket].userType)
             if (sockets[socket].userType == userType
                 && sockets[socket].isReady == true
                 && sockets[socket].currentLocation.lat != ''
                 && sockets[socket].currentLocation.lng != ''
                 && sockets[socket].isApproved != 0) {
-                
+                    
+                    console.log(sockets[socket])
+
                 if (sockets[socket].lastTrip && destinationLng && destinationLat) {
                     console.log('final destination')
                     let calculateDistance = calcCrow(sockets[socket].lastTrip.lat, sockets[socket].lastTrip.lng, destinationLat, destinationLng).toFixed(1)
