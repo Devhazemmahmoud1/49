@@ -89,7 +89,7 @@ let findRiders = async (req, res) => {
                     
                     console.log("23232" + sockets[socket])
 
-                if (sockets[socket].lastTrip && destinationLng && destinationLat) {
+                if (sockets[socket].lastTrip != null && destinationLng && destinationLat) {
                     console.log('final destination')
                     let calculateDistance = calcCrow(sockets[socket].lastTrip.lat, sockets[socket].lastTrip.lng, destinationLat, destinationLng).toFixed(1)
                     console.log("distance =" + calculateDistance)
@@ -107,6 +107,7 @@ let findRiders = async (req, res) => {
                 }   
 
                 let calculateDistance = calcCrow(lat, lng, sockets[socket].currentLocation.lat, sockets[socket].currentLocation.lng).toFixed(1)
+                console.log("distance1 =" + calculateDistance)
                 if (calculateDistance > 5) continue;
                 global.io.to(sockets[socket].socket_id).emit('request', JSON.stringify(
                     {
