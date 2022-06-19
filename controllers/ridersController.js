@@ -142,7 +142,7 @@ let driversToggleStatus = async (req, res) => {
 let updateDriversLocation = async (req, res) => {
     const { driver } = req.body
     for (socket in sockets) {
-        if (sockets[socket].userType != '0' && sockets[socket].user_id == driver.user_id) {
+        if (sockets[socket].userType != '0' && sockets[socket].user_id == req.user.id) {
             sockets[socket].currentLocation.lat = driver.lat ?? null
             sockets[socket].currentLocation.lng = driver.lng ?? null
             break;
