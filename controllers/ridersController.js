@@ -87,7 +87,7 @@ let findRiders = async (req, res) => {
                 && sockets[socket].currentLocation.lng != ''
                 && sockets[socket].isApproved != 0) {
                     
-                    console.log(sockets[socket])
+                    console.log("23232" + sockets[socket])
 
                 if (sockets[socket].lastTrip && destinationLng && destinationLat) {
                     console.log('final destination')
@@ -146,8 +146,8 @@ let updateDriversLocation = async (req, res) => {
             break;
         }
     }
-
-    return res.send('Drivers location has been updated')
+    console.log("Drivers" + sockets)
+    return res.send(sockets)
 }
 
 /*  accept a ride and keep it as pending  */
