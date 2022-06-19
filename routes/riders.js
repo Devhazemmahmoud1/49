@@ -49,7 +49,7 @@ router.get('/find-drivers', guard, autoCatch( ride.findRiders ))
 router.post('/driver-status-switch', guard, autoCatch( ride.driversToggleStatus ))
 
 /* Updates all drivers location */
-router.post('/update/drivers-location', autoCatch( ride.updateDriversLocation ))
+router.post('/update/drivers-location', guard, autoCatch( ride.updateDriversLocation ))
 
 /* Accept a ride and keep it as pending  */
 router.post('/add-trip-to-pending', guard, autoCatch( ride.addPendingRide ))
