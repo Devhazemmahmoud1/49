@@ -42,8 +42,22 @@ router.post('/upload-rider-attahcments' ,upload.array('attachments', 20), async 
 /* This route is for registering a new Rider */
 router.post('/add-rider', guard ,autoCatch( ride.addRider));
 
-/* This route is for accepting rides requests */
+/* This is for requesting ride and getting the people who's around a specfic point 5 KMs */
+router.get('/find-drivers', guard, autoCatch( ride.findRiders ))
 
+/* This is for toggle a driver status */
+router.post('/driver-status-switch', guard, autoCatch( ride.driversToggleStatus ))
+
+/* Updates all drivers location */
+router.post('/update/drivers-location', autoCatch( ride.updateDriversLocation ))
+
+/* Accept a ride and keep it as pending  */
+router.post('/add-trip-to-pending', guard, autoCatch( ride.addPendingRide ))
+
+/* Set aa final destination */
+router.post('/add-final-destination', guard, autoCatch( ride.addFinalDestination ))
+
+/* This route is for accepting rides requests */
 router.post('/accept-ride', guard,autoCatch( ride.acceptRide))
 
 module.exports = router

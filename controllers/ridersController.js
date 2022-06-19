@@ -1,7 +1,7 @@
 var express = require('express')
 const { PrismaClient } = require('@prisma/client')
 const db = new PrismaClient();
-const moment = require('moment')
+const moment = require('moment');
 
 /* Add a new Rider according to the giving informaiton */
 var addRider = async (request, response) => {
@@ -74,12 +74,179 @@ var addRider = async (request, response) => {
     })
 }
 
-// 
 
-// accept a ride 
+/* Find drivers around 5 KMs */
+let findRiders = async (req, res) => {
+    const { userType, From, To, distance, price, lat, lng, destinationLng, destinationLat } = req.query
+    console.log(Object.keys(sockets).length)
+    if (Object.keys(sockets).length !== 0) {
+        for (socket in sockets) {
+            console.log(sockets[socket].currentLocation.lng, sockets[socket].currentLocation.lat)
+            console.log(sockets[socket].isApproved, sockets[socket].userType)
+            if (sockets[socket].userType == userType
+                && sockets[socket].isReady == true
+                && sockets[socket].currentLocation.lat != ''
+                && sockets[socket].currentLocation.lng != ''
+                && sockets[socket].isApproved != 0) {
+                
+                if (sockets[socket].lastTrip && destinationLng && destinationLat) {
+                    console.log('final destination')
+                    let calculateDistance = calcCrow(sockets[socket].lastTrip.lat, sockets[socket].lastTrip.lng, destinationLat, destinationLng).toFixed(1)
+                    if (calculateDistance > 5) continue;
+                    global.io.to(sockets[socket].socket_id).emit('request', JSON.stringify(
+                        {
+                            user_id: req.user.id,
+                            price: price ?? 50,
+                            message_ar: `قام ${req.user.firstName} بطلب رحله من ... الي ... بسعر 50 جنيه`,
+                            message_en: req.user.firstName + ' Has requested a ride from' + From + ' to' + To + '' + 'for 50 L.E',
+                            distance: distance ? distance + ' KiloMeters' : 'Unknown'
+                        }
+                    ));
+                    continue;
+                }   
 
-let acceptRide = async (request, response) => {
-    // Socket Notification required .. 
+                let calculateDistance = calcCrow(lat, lng, sockets[socket].currentLocation.lat, sockets[socket].currentLocation.lng).toFixed(1)
+                if (calculateDistance > 5) continue;
+                global.io.to(sockets[socket].socket_id).emit('request', JSON.stringify(
+                    {
+                        user_id: req.user.id,
+                        price: price ?? 50,
+                        message_ar: `قام ${req.user.firstName} بطلب رحله من ... الي ... بسعر 50 جنيه`,
+                        message_en: req.user.firstName + ' Has requested a ride from' + From + ' to' + To + '' + 'for 50 L.E',
+                        distance: distance ? distance + ' KiloMeters' : 'Unknown'
+                    }
+                ));
+            }
+            continue;
+        }
+        res.send('Waiting for our drivers to connect')
+    } else {
+        return res.send('No socket users was found')
+    }
 }
 
-module.exports = { addRider, acceptRide }
+let driversToggleStatus = async (req, res) => {
+    for (socket in sockets) {
+        if (sockets[socket].userType != '0' && sockets[socket].user_id == req.user.id) {
+            sockets[socket].isReady = sockets[socket].isReady == true ? false : true
+            break;
+        }
+    }
+
+    return res.send('Status has been toggled')
+}
+
+/* Update all users location */
+let updateDriversLocation = async (req, res) => {
+    const { driver } = req.body
+    for (socket in sockets) {
+        if (sockets[socket].userType != '0' && sockets[socket].user_id == driver.user_id) {
+            sockets[socket].currentLocation.lat = driver.lat ?? null
+            sockets[socket].currentLocation.lng = driver.lng ?? null
+            break;
+        }
+    }
+
+    return res.send('Drivers location has been updated')
+}
+
+/*  accept a ride and keep it as pending  */
+let addPendingRide = async (req, res) => {
+
+}
+
+// accept a ride 
+let acceptRide = async (req, res) => {
+    const {
+            user_id, 
+            rider_id, 
+            distance, 
+            tripTime,             
+            customerLng, 
+            customerlat, 
+            destinationLat, 
+            destinationLng, 
+            streetFrom,
+            streetTo,
+            total,
+        } = req.body
+
+        if (
+            ! user_id ||
+            ! rider_id ||
+            ! distance ||
+            ! tripTime ||
+            ! customerLng ||
+            ! customerlat ||     
+            ! destinationLat || 
+            ! destinationLng ||
+            ! streetFrom ||
+            ! streetTo ||
+            ! total
+        ) 
+
+        return res.status(403).send('Something went wrong');
+
+        try {
+
+            // inserting a new 
+            await db.ridesRequested.create({
+                data: {
+                    client_id: parseInt(user_id),
+                    rider_id: parseInt(rider_id),
+                    distance: distance,
+                    tripTime: tripTime,
+                    customerLng: customerLng,
+                    customerlat: customerlat,
+                    destinationLng: destinationLng,
+                    destinationLat: destinationLat,
+                    streetFrom: streetFrom,
+                    streetTo: streetTo,
+                    total: total
+                }
+            })
+
+            return res.send('ok')
+
+        } catch (e) {
+            throw new e
+        }
+}
+
+let addFinalDestination = async (req, res) => {
+    const { lng, lat } = req.body
+
+    if (! lng || ! lat) return res.send('No lat or lng provided');
+
+    for (socket in sockets) {
+        if (sockets[socket].user_id == req.user.id) {
+            sockets[socket].lastTrip.lng = lng
+            sockets[socket].lastTrip.lat = lat
+            break;
+        }
+    }
+
+    return res.send('Final destination was added successfully')
+}
+
+//This function takes in latitude and longitude of two location and returns the distance between them as the crow flies (in km)
+function calcCrow(lat1, lon1, lat2, lon2) {
+    var R = 6371; // km
+    var dLat = toRad(lat2 - lat1);
+    var dLon = toRad(lon2 - lon1);
+    var lat1 = toRad(lat1);
+    var lat2 = toRad(lat2);
+
+    var a = Math.sin(dLat / 2) * Math.sin(dLat / 2) +
+        Math.sin(dLon / 2) * Math.sin(dLon / 2) * Math.cos(lat1) * Math.cos(lat2);
+    var c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a));
+    var d = R * c;
+    return d;
+}
+
+// Converts numeric degrees to radians
+function toRad(Value) {
+    return Value * Math.PI / 180;
+}
+
+module.exports = { addRider, acceptRide, findRiders, driversToggleStatus, updateDriversLocation, addPendingRide, addFinalDestination }

@@ -34,6 +34,7 @@ CREATE TABLE `Users` (
     `recentLikes` INTEGER NULL DEFAULT 0,
     `recentShare` INTEGER NULL DEFAULT 0,
     `recentViews` INTEGER NULL DEFAULT 0,
+    `accountType` INTEGER NULL DEFAULT 0,
 
     PRIMARY KEY (`id`)
 ) DEFAULT CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;
@@ -178,6 +179,7 @@ CREATE TABLE `subscriptions` (
     `id` INTEGER NOT NULL AUTO_INCREMENT,
     `user_id` INTEGER NOT NULL,
     `period` VARCHAR(5000) NOT NULL,
+    `subCat_id` INTEGER NOT NULL,
     `isPermium` INTEGER NOT NULL DEFAULT 0,
     `created_at` DATETIME(3) NOT NULL DEFAULT CURRENT_TIMESTAMP(3),
     `updated_at` DATETIME(3) NOT NULL,
@@ -368,6 +370,14 @@ CREATE TABLE `ridesRequested` (
     `client_id` INTEGER NOT NULL,
     `rider_id` INTEGER NOT NULL,
     `distance` VARCHAR(191) NOT NULL,
+    `customerLng` VARCHAR(191) NULL,
+    `customerlat` VARCHAR(191) NULL,
+    `destinationLat` VARCHAR(191) NULL,
+    `destinationLng` VARCHAR(191) NULL,
+    `streetFrom` VARCHAR(191) NOT NULL,
+    `streetTo` VARCHAR(191) NOT NULL,
+    `isPendding` INTEGER NOT NULL DEFAULT 0,
+    `isDone` INTEGER NOT NULL DEFAULT 0,
     `total` VARCHAR(191) NOT NULL,
     `created_at` DATETIME(3) NOT NULL DEFAULT CURRENT_TIMESTAMP(3),
     `updated_at` DATETIME(3) NOT NULL,
@@ -590,7 +600,7 @@ CREATE TABLE `userPropValues` (
     `id` INTEGER NOT NULL AUTO_INCREMENT,
     `subCategory_id` INTEGER NOT NULL,
     `subCategoryProperty_id` INTEGER NOT NULL,
-    `value` VARCHAR(5000) NOT NULL,
+    `value` JSON NULL,
     `ad_id` INTEGER NOT NULL,
     `created_at` DATETIME(3) NOT NULL DEFAULT CURRENT_TIMESTAMP(3),
     `updated_at` DATETIME(3) NOT NULL,
@@ -916,6 +926,39 @@ CREATE TABLE `reelViews` (
     PRIMARY KEY (`id`)
 ) DEFAULT CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;
 
+-- CreateTable
+CREATE TABLE `requests` (
+    `id` INTEGER NOT NULL AUTO_INCREMENT,
+    `user_id` INTEGER NOT NULL,
+    `ad_id` INTEGER NOT NULL,
+    `created_at` DATETIME(3) NOT NULL DEFAULT CURRENT_TIMESTAMP(3),
+    `updated_at` DATETIME(3) NOT NULL,
+
+    PRIMARY KEY (`id`)
+) DEFAULT CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;
+
+-- CreateTable
+CREATE TABLE `MainCategoriesFavo` (
+    `id` INTEGER NOT NULL AUTO_INCREMENT,
+    `user_id` INTEGER NOT NULL,
+    `category_id` INTEGER NOT NULL,
+    `created_at` DATETIME(3) NOT NULL DEFAULT CURRENT_TIMESTAMP(3),
+    `updated_at` DATETIME(3) NOT NULL,
+
+    PRIMARY KEY (`id`)
+) DEFAULT CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;
+
+-- CreateTable
+CREATE TABLE `SubCategoriesFavo` (
+    `id` INTEGER NOT NULL AUTO_INCREMENT,
+    `user_id` INTEGER NOT NULL,
+    `category_id` INTEGER NOT NULL,
+    `created_at` DATETIME(3) NOT NULL DEFAULT CURRENT_TIMESTAMP(3),
+    `updated_at` DATETIME(3) NOT NULL,
+
+    PRIMARY KEY (`id`)
+) DEFAULT CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;
+
 -- AddForeignKey
 ALTER TABLE `SubCategories` ADD CONSTRAINT `SubCategories_parent_fkey` FOREIGN KEY (`parent`) REFERENCES `MainCategories`(`id`) ON DELETE RESTRICT ON UPDATE CASCADE;
 
@@ -1029,9 +1072,6 @@ ALTER TABLE `friendRequests` ADD CONSTRAINT `friendRequests_friendRequestTo_fkey
 
 -- AddForeignKey
 ALTER TABLE `notifications` ADD CONSTRAINT `notifications_reciever_id_fkey` FOREIGN KEY (`reciever_id`) REFERENCES `Users`(`id`) ON DELETE RESTRICT ON UPDATE CASCADE;
-
--- AddForeignKey
-ALTER TABLE `reels` ADD CONSTRAINT `reels_song_id_fkey` FOREIGN KEY (`song_id`) REFERENCES `songs`(`id`) ON DELETE RESTRICT ON UPDATE CASCADE;
 
 -- AddForeignKey
 ALTER TABLE `reelLikes` ADD CONSTRAINT `reelLikes_reel_id_fkey` FOREIGN KEY (`reel_id`) REFERENCES `reels`(`id`) ON DELETE RESTRICT ON UPDATE CASCADE;

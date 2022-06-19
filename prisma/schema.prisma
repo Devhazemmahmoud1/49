@@ -7,8 +7,8 @@ generator client {
 
 datasource db {
   provider = "mysql"
-  //url      = "mysql://root:root@localhost:3306/fourtynine?schema=public"
-  url      = "mysql://49hub1:Database49hub@64.225.101.68:3306/fourtynine?schema=public"
+  url      = "mysql://root:root@localhost:3306/fourtynine?schema=public"
+  //url      = "mysql://49hub1:Database49hub@64.225.101.68:3306/fourtynine?schema=public"
 }
 
 model Admins {
@@ -45,6 +45,7 @@ model Users {
   recentShare      Int?                 @default(0)
   recentViews      Int?                 @default(0)
   accountType      Int?                 @default(0)
+  isApproved       Int?                 @default(0)
   Ride             ride[]
   resturants       resturants[]
   subscriptions    subscriptions[]
@@ -331,15 +332,25 @@ model ridesPendingRequests {
 }
 
 model ridesRequested {
-  id         Int      @id @default(autoincrement())
-  client_id  Int      @db.Int
-  rider_id   Int
-  distance   String
-  total      String
-  created_at DateTime @default(now())
-  updated_at DateTime @updatedAt
-  clientInfo Users    @relation(fields: [client_id], references: [id])
-  agentInfo  ride     @relation(fields: [rider_id], references: [user_id])
+  id             Int      @id @default(autoincrement())
+  client_id      Int      @db.Int
+  rider_id       Int
+  distance       String
+  tripTime       String
+  tripTotalTime  String?
+  customerLng    String?
+  customerlat    String?
+  destinationLat String?
+  destinationLng String?
+  streetFrom     String
+  streetTo       String
+  isPendding     Int      @default(0)
+  isDone         Int      @default(0)
+  total          String
+  created_at     DateTime @default(now())
+  updated_at     DateTime @updatedAt
+  clientInfo     Users    @relation(fields: [client_id], references: [id])
+  agentInfo      ride     @relation(fields: [rider_id], references: [user_id])
 }
 
 model loading {
@@ -831,17 +842,17 @@ model requests {
 }
 
 model MainCategoriesFavo {
-  id Int @id @default(autoincrement())
-  user_id Int 
+  id          Int      @id @default(autoincrement())
+  user_id     Int
   category_id Int
-  created_at DateTime @default(now())
-  updated_at DateTime @updatedAt
+  created_at  DateTime @default(now())
+  updated_at  DateTime @updatedAt
 }
 
 model SubCategoriesFavo {
-  id Int @id @default(autoincrement())
-  user_id Int 
+  id          Int      @id @default(autoincrement())
+  user_id     Int
   category_id Int
-  created_at DateTime @default(now())
-  updated_at DateTime @updatedAt
+  created_at  DateTime @default(now())
+  updated_at  DateTime @updatedAt
 }

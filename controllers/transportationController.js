@@ -38,7 +38,7 @@ let makeRide = async (request, response) => {
 /* calculate the distance between two points on the map */
 async function calculateDistance(req, res) 
 {
-   const { lat1, lon1, lat2, lon2 } = req.body 
+  const { lat1, lon1, lat2, lon2 } = req.body 
   var R = 6371; // km
   var dLat = toRad(lat2-lat1);
   var dLon = toRad(lon2-lon1);

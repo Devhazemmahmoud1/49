@@ -47,7 +47,8 @@ var socialProfile = require('./routes/socialMediaRoutes/profile')
 var actions = require('./routes/socialMediaRoutes/usersAction')
 var Reels = require('./routes/Reels&stories')
 var notification = require('./routes/notifications')
-var paymob = require('./routes/payments/PayMob')
+var paymob = require('./routes/payments/PayMob');
+//const { sockets } = require('./controllers/socketController/socketController');
 var app = express();
 
 // Create the http server
@@ -138,25 +139,75 @@ app.use(function (err, req, res, next) {
 });
 
 //var socket = require('./controllers/socketController/socketController')
-
 global.sockets = {}
-
 io.on('connection', async (socket) => {
   if (socket.handshake.headers.authorization.includes('Bearer ')) {
     if (socket.user.id != null) {
       let userInfo = {
         socket_id: socket.id,
         user_id: socket.user.id,
+        userType: socket.user.accountType ?? 0,
+        isApproved: socket.user.isApproved,
+        isReady: true,
+        status: null,
+        token: socket.token,
+        lastTrip: {
+          destinationAddress: null,
+          lat: null,
+          lng: null          
+        },
+        currentLocation: {
+          lat: socket.handshake.headers.lat ?? null,
+          lng: socket.handshake.headers.lng ?? null,
+        }
       }
       sockets[socket.id] = userInfo
-
-      console.log(sockets[socket.id] + 'has joined');
+      console.log('socket connected')
     }
   }
+
+  socket.on('change-price', (data) => {
+    var requestTo = ''
+    var requestFrom = ''
+    var price = JSON.parse(data).price
+
+    for (socket in sockets) {
+      if (sockets[socket].user_id == JSON.parse(data).user_id) {
+        requestTo = sockets[socket].socket_id
+      }
+
+      if (sockets[socket].user_id == JSON.parse(data).riderId) {
+        requestFrom = sockets[socket].user_id
+      }
+    }
+
+    io.to(requestTo).emit('agent-new-changed-price', JSON.stringify({
+      riderId: requestFrom,
+      user_id: requestTo,
+      price: price
+    }));
+
+  })
+
+  socket.on('userRequestAnotherPrice', (data) => {
+    for (socket in sockets) {
+      if (sockets[socket].user_id == JSON.parse(data).riderId) {
+        var requestTo = sockets[socket].socket_id
+      }
+    }
+
+    io.to(requestTo).emit('request', JSON.stringify(
+      {
+        user_id: JSON.parse(data).user_id,
+        price: JSON.parse(data).price ?? 50,
+      }
+    ))
+  })
 
   socket.on('disconnect', () => {
     console.log(socket.id + ' is out from here')
     delete sockets[socket.id]
+    console.log(sockets)
   })
 })
 
@@ -182,13 +233,17 @@ io.use(async (socket, next) => {
           lastName: true,
           email: true,
           id: true,
+          isApproved: true,
+          accountType: true,
         }
       });
       if (!user) {
-         socket.user = null
-         next();
+        socket.user = null
+        socket.token = null
+        next();
       }
       socket.user = user;
+      socket.token = authorization
       next();
     });
 
