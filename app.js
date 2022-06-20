@@ -167,6 +167,7 @@ io.on('connection', async (socket) => {
   }
 
   socket.on('change-price', (data) => {
+    console.log('Data')
     var requestTo = ''
     var requestFrom = ''
     var price = JSON.parse(data).price

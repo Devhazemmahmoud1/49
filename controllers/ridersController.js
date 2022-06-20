@@ -77,7 +77,7 @@ var addRider = async (request, response) => {
 
 /* Find drivers around 5 KMs */
 let findRiders = async (req, res) => {
-    const { userType, From, To, distance, price, lat, lng, destinationLng, destinationLat } = req.query
+    const { userType, From, To, distance, price, lat, lng, destinationLng, destinationLat, tripTime } = req.query
     console.log(Object.keys(sockets).length)
     if (Object.keys(sockets).length !== 0) {
         for (socket in sockets) {
@@ -100,7 +100,15 @@ let findRiders = async (req, res) => {
                             price: price ?? 50,
                             message_ar: `قام ${req.user.firstName} بطلب رحله من ... الي ... بسعر 50 جنيه`,
                             message_en: req.user.firstName + ' Has requested a ride from' + From + ' to' + To + '' + 'for 50 L.E',
-                            distance: distance ? distance + ' KiloMeters' : 'Unknown'
+                            distance: distance ? distance + ' KiloMeters' : 'Unknown',
+                            userType: userType,
+                            destinationFrom: From,
+                            destinationTo: To,
+                            customerLng: lng,
+                            customerLat: lat,
+                            destinationLat: destinationLat,
+                            destinationLng: destinationLng,
+                            tripTime: tripTime
                         }
                     ));
                     continue;
