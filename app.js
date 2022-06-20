@@ -154,7 +154,7 @@ io.on('connection', async (socket) => {
         isReady: true,
         status: null,
         token: socket.token,
-        subscription: socket.user.subscription ?? null,
+        subscription: socket.subscription ?? null,
         lastTrip: {
           destinationAddress: null,
           lat: null,
@@ -285,6 +285,7 @@ io.use(async (socket, next) => {
       if (!user) {
         socket.user = null
         socket.token = null
+        socket.subscription = null
         next();
       }
 
@@ -297,22 +298,23 @@ io.use(async (socket, next) => {
           }
       })
 
-      socket.user = user;
-      socket.token = authorization
       if (userSubscription) {
         if (moment(userSubscription.created_at).add(userSubscription.period, 'days').format('YYYY/MM/DD HH:mm:ss') <= moment().format('YYYY/MM/DD HH:mm:ss')) {
            // subscription still on
-           socket.user.subscription = {
+           socket.subscription = {
              categoryId: userSubscription.subCat_id,
              permium: userSubscription.isPermium,
              stauts: 1,
              startDate: userSubscription.created_at,
            }
+
+           socket.subscription = userSubscription
         }
       } else {
-        socket.user.subscription = null
+        socket.subscription = null
       }
-      
+      socket.user = user;
+      socket.token = authorization
       next();
     });
 
