@@ -58,7 +58,7 @@ router.post('/add-trip-to-pending', guard, autoCatch( ride.addPendingRide ))
 router.post('/add-final-destination', guard, autoCatch( ride.addFinalDestination ))
 
 /* Get the total price according to the giving information */
-router.get('/calculate-distance/per-kilo', autoCatch( ride.getPriceViaDistance ))
+router.get('/calculate-distance/per-kilo/:distance/:subCategory', autoCatch( ride.getPriceViaDistance ))
 
 /* This route is for accepting rides requests */
 router.post('/accept-ride', guard, autoCatch( ride.acceptRide))
