@@ -229,7 +229,7 @@ let getPriceViaDistance = async (req, res) => {
             category_id: parseInt(subCategory)
         },
         orderBy: {
-            asc: 'distancePerKilo'
+            "asc": 'distancePerKilo'
         }
     })
 
@@ -240,7 +240,7 @@ let getPriceViaDistance = async (req, res) => {
             category_id: parseInt(subCategory)
         },
         orderBy: {
-            desc: 'distancePerKilo'
+            "desc": 'distancePerKilo'
         }
     })
 
