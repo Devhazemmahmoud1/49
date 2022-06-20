@@ -93,8 +93,21 @@ let findRiders = async (req, res) => {
                 if (Object.keys(sockets[socket].subscription).length === 0 || sockets[socket].subscription == null) {
                     global.io.to(sockets[socket].socket_id).emit('no-subscription', JSON.stringify(
                         {
-                            message_ar: `لديك طلبات توصيله و لكنك غير مشترك اليوم من فضلك اشترك حتي تواصل العمل معنا`,
-                            message_en: 'You have ride requests but you did not subscribe today , Please subscribe to keep taking trips.',
+                            // message_ar: `لديك طلبات توصيله و لكنك غير مشترك اليوم من فضلك اشترك حتي تواصل العمل معنا`,
+                            // message_en: 'You have ride requests but you did not subscribe today , Please subscribe to keep taking trips.',
+                            user_id: req.user.id,
+                            price: price ?? 50,
+                            message_ar: `قام ${req.user.firstName} بطلب رحله من ... الي ... بسعر 50 جنيه`,
+                            message_en: req.user.firstName + ' Has requested a ride from' + From + ' to' + To + ' ' + 'for 50 L.E',
+                            distance: distance ? distance + ' KiloMeters' : 'Unknown',
+                            userType: userType,
+                            destinationFrom: From,
+                            destinationTo: To,
+                            customerLng: lng,
+                            customerLat: lat,
+                            destinationLat: destinationLat,
+                            destinationLng: destinationLng,
+                            tripTime: tripTime
                         }
                     ));
                     continue;
@@ -103,8 +116,21 @@ let findRiders = async (req, res) => {
                 if (moment(sockets[socket].subscription.startDate).add(sockets[socket].subscription.period, 'days').format('YYYY/MM/DD HH:mm:ss') >= moment().format('YYYY/MM/DD HH:mm:ss')) {
                     global.io.to(sockets[socket].socket_id).emit('no-subscription', JSON.stringify(
                         {
-                            message_ar: `لديك طلبات توصيله و لكنك غير مشترك اليوم من فضلك اشترك حتي تواصل العمل معنا`,
-                            message_en: 'You have ride requests but you did not subscribe today , Please subscribe to keep taking trips.',
+                            // message_ar: `لديك طلبات توصيله و لكنك غير مشترك اليوم من فضلك اشترك حتي تواصل العمل معنا`,
+                            // message_en: 'You have ride requests but you did not subscribe today , Please subscribe to keep taking trips.',
+                            user_id: req.user.id,
+                            price: price ?? 50,
+                            message_ar: `قام ${req.user.firstName} بطلب رحله من ... الي ... بسعر 50 جنيه`,
+                            message_en: req.user.firstName + ' Has requested a ride from' + From + ' to' + To + ' ' + 'for 50 L.E',
+                            distance: distance ? distance + ' KiloMeters' : 'Unknown',
+                            userType: userType,
+                            destinationFrom: From,
+                            destinationTo: To,
+                            customerLng: lng,
+                            customerLat: lat,
+                            destinationLat: destinationLat,
+                            destinationLng: destinationLng,
+                            tripTime: tripTime
                         }
                     ));
                     continue;
@@ -121,7 +147,7 @@ let findRiders = async (req, res) => {
                             user_id: req.user.id,
                             price: price ?? 50,
                             message_ar: `قام ${req.user.firstName} بطلب رحله من ... الي ... بسعر 50 جنيه`,
-                            message_en: req.user.firstName + ' Has requested a ride from' + From + ' to' + To + '' + 'for 50 L.E',
+                            message_en: req.user.firstName + ' Has requested a ride from' + From + ' to' + To + ' ' + 'for 50 L.E',
                             distance: distance ? distance + ' KiloMeters' : 'Unknown',
                             userType: userType,
                             destinationFrom: From,
@@ -144,7 +170,7 @@ let findRiders = async (req, res) => {
                         user_id: req.user.id,
                         price: price ?? 50,
                         message_ar: `قام ${req.user.firstName} بطلب رحله من ... الي ... بسعر 50 جنيه`,
-                        message_en: req.user.firstName + ' Has requested a ride from' + From + ' to' + To + '' + 'for 50 L.E',
+                        message_en: req.user.firstName + ' Has requested a ride from ' + From + ' to' + To + ' ' + ' for 50 L.E',
                         distance: distance ? distance + ' KiloMeters' : 'Unknown',
                         userType: userType,
                         destinationFrom: From,
