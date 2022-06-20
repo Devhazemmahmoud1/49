@@ -58,6 +58,13 @@ router.post('/add-trip-to-pending', guard, autoCatch( ride.addPendingRide ))
 router.post('/add-final-destination', guard, autoCatch( ride.addFinalDestination ))
 
 /* This route is for accepting rides requests */
-router.post('/accept-ride', guard,autoCatch( ride.acceptRide))
+router.post('/accept-ride', guard, autoCatch( ride.acceptRide))
+
+/*  Captians dashBoard  */
+router.post('/delete-rider-profile', guard, autoCatch( ride.deleteDriverProfile ))
+
+router.post('/change-price/per-kilo', guard, autoCatch( ride.changePricePerKilo ))
+
+router.get('/drivers-information/get', guard, autoCatch( ride.getDriverForm ))
 
 module.exports = router

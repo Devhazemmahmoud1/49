@@ -86,10 +86,32 @@ let findRiders = async (req, res) => {
                 && sockets[socket].currentLocation.lat != ''
                 && sockets[socket].currentLocation.lng != ''
                 && sockets[socket].isApproved != 0) {
-                    
-                    console.log("23232" + sockets[socket])
 
-                if (sockets[socket].lastTrip.lat != null && sockets[socket].lastTrip.lng != null  && destinationLng && destinationLat) {
+                console.log("23232" + sockets[socket])
+
+                // we need to check if this driver has already subscribed   
+                if (Object.keys(sockets[socket].subscription).length === 0 || sockets[socket].subscription == null) {
+                    global.io.to(sockets[socket].socket_id).emit('no-subscription', JSON.stringify(
+                        {
+                            message_ar: `لديك طلبات توصيله و لكنك غير مشترك اليوم من فضلك اشترك حتي تواصل العمل معنا`,
+                            message_en: 'You have ride requests but you did not subscribe today , Please subscribe to keep taking trips.',
+                        }
+                    ));
+                    continue;
+                }
+
+                if (moment(sockets[socket].subscription.startDate).add(sockets[socket].subscription.period, 'days').format('YYYY/MM/DD HH:mm:ss') >= moment().format('YYYY/MM/DD HH:mm:ss')) {
+                    global.io.to(sockets[socket].socket_id).emit('no-subscription', JSON.stringify(
+                        {
+                            message_ar: `لديك طلبات توصيله و لكنك غير مشترك اليوم من فضلك اشترك حتي تواصل العمل معنا`,
+                            message_en: 'You have ride requests but you did not subscribe today , Please subscribe to keep taking trips.',
+                        }
+                    ));
+                    continue;
+                }
+
+
+                if (sockets[socket].lastTrip.lat != null && sockets[socket].lastTrip.lng != null && destinationLng && destinationLat) {
                     console.log('final destination')
                     let calculateDistance = calcCrow(sockets[socket].lastTrip.lat, sockets[socket].lastTrip.lng, destinationLat, destinationLng).toFixed(1)
                     console.log("distance =" + calculateDistance)
@@ -112,7 +134,7 @@ let findRiders = async (req, res) => {
                         }
                     ));
                     continue;
-                }   
+                }
 
                 let calculateDistance = calcCrow(lat, lng, sockets[socket].currentLocation.lat, sockets[socket].currentLocation.lng).toFixed(1)
                 console.log("distance1 =" + calculateDistance)
@@ -123,7 +145,15 @@ let findRiders = async (req, res) => {
                         price: price ?? 50,
                         message_ar: `قام ${req.user.firstName} بطلب رحله من ... الي ... بسعر 50 جنيه`,
                         message_en: req.user.firstName + ' Has requested a ride from' + From + ' to' + To + '' + 'for 50 L.E',
-                        distance: distance ? distance + ' KiloMeters' : 'Unknown'
+                        distance: distance ? distance + ' KiloMeters' : 'Unknown',
+                        userType: userType,
+                        destinationFrom: From,
+                        destinationTo: To,
+                        customerLng: lng,
+                        customerLat: lat,
+                        destinationLat: destinationLat,
+                        destinationLng: destinationLng,
+                        tripTime: tripTime
                     }
                 ));
             }
@@ -160,6 +190,109 @@ let updateDriversLocation = async (req, res) => {
     return res.send(sockets)
 }
 
+/* Delete driver profile */
+let deleteDriverProfile = async (req, res) => {
+
+    try {
+
+        let ride = await db.ride.findFirst({
+            where: {
+                user_id: req.user.id
+            }
+        })
+
+        if (ride) {
+            await db.ridersAttachment.deleteMany({
+                where: {
+                    rideId: ride.id
+                }
+            })
+
+            await db.ride.delete({
+                where: {
+                    id: ride.id
+                }
+            })
+
+            await db.ridesRequested.deleteMany({
+                where: {
+                    rider_id: req.user.id
+                }
+            })
+
+            await db.users.update({
+                where: {
+                    id: req.user.id
+                },
+                data: {
+                    accountType: 0,
+                    isApproved: 0,
+                }
+            })
+        }
+
+        return res.json({
+            success: {
+                success_en: 'Your business account has been deactivated.',
+                success_ar: 'تم تعطيل حسابك.'
+            }
+        })
+
+    } catch (e) {
+        throw new e
+    }
+}
+
+/* Update users price per kilo */
+let changePricePerKilo = async (req, res) => {
+    const { rate } = req.body
+
+    if (!rate) {
+        return res.send('No Rate was provided')
+    }
+
+    await db.ride.update({
+        where: {
+            user_id: req.user.id
+        },
+        data: {
+            distancePerKilo: parseFloat(rate)
+        }
+    })
+
+    return res.json({
+        success: {
+            success_en: 'Done',
+            success_ar: 'تم'
+        }
+    })
+}
+
+let getDriverForm = async (req, res) => {
+    let getRiderInformation = await db.ride.findFirst({
+        where: {
+            user_id: req.user.id
+        },
+        include: {
+            riderPhoto: true
+        }
+    })
+
+    let getTotalTrips = await db.ridesRequested.aggregate({
+        where: {
+            rider_id: req.user.id
+        },
+        _count: {
+            id: true
+        }
+    })
+
+    return res.json({
+        riderInformation: getRiderInformation,
+        totalTrips: getTotalTrips,
+    })
+}
+
 /*  accept a ride and keep it as pending  */
 let addPendingRide = async (req, res) => {
 
@@ -168,65 +301,65 @@ let addPendingRide = async (req, res) => {
 // accept a ride 
 let acceptRide = async (req, res) => {
     const {
-            user_id, 
-            rider_id, 
-            distance, 
-            tripTime,             
-            customerLng, 
-            customerlat, 
-            destinationLat, 
-            destinationLng, 
-            streetFrom,
-            streetTo,
-            total,
-        } = req.body
+        user_id,
+        rider_id,
+        distance,
+        tripTime,
+        customerLng,
+        customerlat,
+        destinationLat,
+        destinationLng,
+        streetFrom,
+        streetTo,
+        total,
+    } = req.body
 
-        if (
-            ! user_id ||
-            ! rider_id ||
-            ! distance ||
-            ! tripTime ||
-            ! customerLng ||
-            ! customerlat ||     
-            ! destinationLat || 
-            ! destinationLng ||
-            ! streetFrom ||
-            ! streetTo ||
-            ! total
-        ) 
+    if (
+        !user_id ||
+        !rider_id ||
+        !distance ||
+        !tripTime ||
+        !customerLng ||
+        !customerlat ||
+        !destinationLat ||
+        !destinationLng ||
+        !streetFrom ||
+        !streetTo ||
+        !total
+    )
 
         return res.status(403).send('Something went wrong');
 
-        try {
+    try {
 
-            // inserting a new 
-            await db.ridesRequested.create({
-                data: {
-                    client_id: parseInt(user_id),
-                    rider_id: parseInt(rider_id),
-                    distance: distance,
-                    tripTime: tripTime,
-                    customerLng: customerLng,
-                    customerlat: customerlat,
-                    destinationLng: destinationLng,
-                    destinationLat: destinationLat,
-                    streetFrom: streetFrom,
-                    streetTo: streetTo,
-                    total: total
-                }
-            })
+        // inserting a new 
+        await db.ridesRequested.create({
+            data: {
+                client_id: parseInt(user_id),
+                rider_id: parseInt(rider_id),
+                distance: distance,
+                tripTime: tripTime,
+                customerLng: customerLng,
+                customerlat: customerlat,
+                destinationLng: destinationLng,
+                destinationLat: destinationLat,
+                streetFrom: streetFrom,
+                streetTo: streetTo,
+                total: total
+            }
+        })
 
-            return res.send('ok')
+        return res.send('ok')
 
-        } catch (e) {
-            throw new e
-        }
+    } catch (e) {
+        throw new e
+    }
 }
 
 let addFinalDestination = async (req, res) => {
     const { lng, lat } = req.body
 
-    if (! lng || ! lat) return res.send('No lat or lng provided');
+    if (!lng || !lat) return res.send('No lat or lng provided');
 
     for (socket in sockets) {
         if (sockets[socket].user_id == req.user.id) {
@@ -259,4 +392,15 @@ function toRad(Value) {
     return Value * Math.PI / 180;
 }
 
-module.exports = { addRider, acceptRide, findRiders, driversToggleStatus, updateDriversLocation, addPendingRide, addFinalDestination }
+module.exports = {
+    addRider,
+    acceptRide,
+    findRiders,
+    driversToggleStatus,
+    updateDriversLocation,
+    addPendingRide,
+    addFinalDestination,
+    deleteDriverProfile,
+    changePricePerKilo,
+    getDriverForm
+}

@@ -1,7 +1,7 @@
 const express = require('express')
 const { PrismaClient } = require('@prisma/client')
 const db = new PrismaClient();
-const moment = require('moment')
+const moment = require('moment');
 
 /*  Get Daily/Monthly/Weekly prices according to the giving information  */
 let getSubCategoryPrices = async (req, res, next) => {
@@ -57,10 +57,23 @@ let makeSubscriptionPayments = async (req, res, next) => {
     let createSubscription = await db.subscriptions.create({
         data: {
             user_id: req.user.id,
+            subCat_id: parseInt(subcategory_id),
             period: period,
             isPermium: Paymenttype,
         }
     });
+
+    for (socket in sockets) {
+        if (sockets[socket].user_id == req.user.id) {
+            sockets[socket].subscription = {
+                categoryId: createSubscription.subCat_id,
+                permium: createSubscription.isPermium,
+                stauts: 1,
+                startDate: createSubscription.created_at,
+            }
+            break;
+        }
+    }
 
     let methods = await db.paymentMethods.findMany({});
     let tax = await db.govFees.findFirst({});

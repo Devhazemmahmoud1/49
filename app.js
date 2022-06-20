@@ -12,7 +12,8 @@ const admins = require('firebase-admin')
 const secretKey = "fourtyninehub495051fourtynine";
 const socketUserHandler = require('./middleware/socketHandler')
 const Jwt = require('jsonwebtoken');
-const serviceAccount = require('./foutrynine-firebase.json')
+const serviceAccount = require('./foutrynine-firebase.json');
+const moment = require('moment');
 
 admin.initializeApp({
   credential: admin.cert(serviceAccount),
@@ -145,12 +146,15 @@ io.on('connection', async (socket) => {
     if (socket.user.id != null) {
       let userInfo = {
         socket_id: socket.id,
+        firstName: socket.user.firstName,
+        lastName: socket.user.lastName,
         user_id: socket.user.id,
         userType: socket.user.accountType ?? 0,
         isApproved: socket.user.isApproved,
         isReady: true,
         status: null,
         token: socket.token,
+        subscription: socket.user.subscription ?? null,
         lastTrip: {
           destinationAddress: null,
           lat: null,
@@ -167,10 +171,18 @@ io.on('connection', async (socket) => {
   }
 
   socket.on('change-price', (data) => {
-    console.log('Data')
     var requestTo = ''
     var requestFrom = ''
     var price = JSON.parse(data).price
+    var distance = JSON.parse(data).distance
+    var userType = JSON.parse(data).userType
+    var From = JSON.parse(data).destinationFrom
+    var To = JSON.parse(data).destinationTo
+    var lat = JSON.parse(data).customerLat
+    var lng = JSON.parse(data).customerLng
+    var destinationLat = JSON.parse(data).destinationLat
+    var destinationLng = JSON.parse(data).destinationLng
+    var tripTime = JSON.parse(data).tripTime
 
     for (socket in sockets) {
       if (sockets[socket].user_id == JSON.parse(data).user_id) {
@@ -185,12 +197,32 @@ io.on('connection', async (socket) => {
     io.to(requestTo).emit('agent-new-changed-price', JSON.stringify({
       riderId: requestFrom,
       user_id: requestTo,
-      price: price
+      price: price,
+      distance: distance ? distance + ' KiloMeters' : 'Unknown',
+      userType: userType,
+      destinationFrom: From,
+      destinationTo: To,
+      customerLng: lng,
+      customerLat: lat,
+      destinationLat: destinationLat,
+      destinationLng: destinationLng,
+      tripTime: tripTime
     }));
 
   })
 
   socket.on('userRequestAnotherPrice', (data) => {
+
+    var distance = JSON.parse(data).distance
+    var userType = JSON.parse(data).userType
+    var From = JSON.parse(data).destinationFrom
+    var To = JSON.parse(data).destinationTo
+    var lat = JSON.parse(data).customerLat
+    var lng = JSON.parse(data).customerLng
+    var destinationLat = JSON.parse(data).destinationLat
+    var destinationLng = JSON.parse(data).destinationLng
+    var tripTime = JSON.parse(data).tripTime
+
     for (socket in sockets) {
       if (sockets[socket].user_id == JSON.parse(data).riderId) {
         var requestTo = sockets[socket].socket_id
@@ -200,7 +232,19 @@ io.on('connection', async (socket) => {
     io.to(requestTo).emit('request', JSON.stringify(
       {
         user_id: JSON.parse(data).user_id,
+        riderId: JSON.parse(data).riderId,
         price: JSON.parse(data).price ?? 50,
+        message_ar: `قام ${req.user.firstName} بطلب رحله من ... الي ... بسعر 50 جنيه`,
+        message_en: req.user.firstName + ' Has requested a ride from ' + From + ' to' + To  + ' for 50 L.E',
+        distance: distance ? distance + ' KiloMeters' : 'Unknown',
+        userType: userType,
+        destinationFrom: From,
+        destinationTo: To,
+        customerLng: lng,
+        customerLat: lat,
+        destinationLat: destinationLat,
+        destinationLng: destinationLng,
+        tripTime: tripTime
       }
     ))
   })
@@ -243,8 +287,32 @@ io.use(async (socket, next) => {
         socket.token = null
         next();
       }
+
+      let userSubscription = await db.subscriptions.findFirst({
+          where: {
+            user_id: user.id
+          },
+          orderBy: {
+            'created_at': 'desc'
+          }
+      })
+
       socket.user = user;
       socket.token = authorization
+      if (userSubscription) {
+        if (moment(userSubscription.created_at).add(userSubscription.period, 'days').format('YYYY/MM/DD HH:mm:ss') <= moment().format('YYYY/MM/DD HH:mm:ss')) {
+           // subscription still on
+           socket.user.subscription = {
+             categoryId: userSubscription.subCat_id,
+             permium: userSubscription.isPermium,
+             stauts: 1,
+             startDate: userSubscription.created_at,
+           }
+        }
+      } else {
+        socket.user.subscription = null
+      }
+      
       next();
     });
 
