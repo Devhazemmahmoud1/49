@@ -216,6 +216,42 @@ let updateDriversLocation = async (req, res) => {
     return res.send(sockets)
 }
 
+/* Calculate total price  */
+let getPriceViaDistance = async (req, res) => {
+    const { subCategory, distance } = req.params 
+
+    if (! subCategory) {
+        return res.send('No sub Category was provided')
+    }
+
+    let getlowestPricePerKilo = await db.ride.findFirst({
+        where: {
+            category_id: parseInt(subCategory)
+        },
+        orderBy: {
+            asc: 'distancePerKilo'
+        }
+    })
+
+    let low = parseInt(getlowestPricePerKilo.distancePerKilo) * parseInt(distance) + parseInt(getlowestPricePerKilo.distancePerKilo)
+
+    let getHighestPricePerKilo = await db.ride.findFirst({
+        where: {
+            category_id: parseInt(subCategory)
+        },
+        orderBy: {
+            desc: 'distancePerKilo'
+        }
+    })
+
+    let high = parseInt(getHighestPricePerKilo.distancePerKilo) * parseInt(distance) + parseInt(getHighestPricePerKilo.distancePerKilo)
+
+    return res.json({
+        lowest: low,
+        highest: high
+    })
+}
+
 /* Delete driver profile */
 let deleteDriverProfile = async (req, res) => {
 
@@ -428,5 +464,6 @@ module.exports = {
     addFinalDestination,
     deleteDriverProfile,
     changePricePerKilo,
-    getDriverForm
+    getDriverForm,
+    getPriceViaDistance
 }
