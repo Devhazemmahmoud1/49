@@ -290,7 +290,7 @@ io.use(async (socket, next) => {
 
       let userSubscription = await db.subscriptions.findFirst({
           where: {
-            user_id: user.id
+            user_id: data.id
           },
           orderBy: {
             'created_at': 'desc'
