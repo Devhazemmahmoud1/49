@@ -90,7 +90,7 @@ let findRiders = async (req, res) => {
                 console.log("23232" + sockets[socket])
 
                 // we need to check if this driver has already subscribed   
-                if (Object.keys(sockets[socket].subscription).length === 0 || sockets[socket].subscription == null) {
+                if (sockets[socket].subscription == null) {
                     global.io.to(sockets[socket].socket_id).emit('no-subscription', JSON.stringify(
                         {
                             // message_ar: `لديك طلبات توصيله و لكنك غير مشترك اليوم من فضلك اشترك حتي تواصل العمل معنا`,
