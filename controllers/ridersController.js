@@ -124,7 +124,7 @@ let findRiders = async (req, res) => {
                             user_id: req.user.id,
                             price: price ?? 50,
                             message_ar: `قام ${req.user.firstName} بطلب رحله من ... الي ... بسعر ${price ?? 0} جنيه`,
-                            message_en: req.user.firstName + ' Has requested a ride from' + From + ' to' + To + ' ' + 'for ' `${price ?? 0}`,
+                            message_en: req.user.firstName + `Has requested a ride from ${From} to ${To}   for ${price ?? 0}`,
                             distance: distance ? distance + ' Km' : 'Unknown',
                             userType: userType,
                             destinationFrom: From,
