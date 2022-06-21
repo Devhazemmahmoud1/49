@@ -405,7 +405,7 @@ let acceptRide = async (req, res) => {
     try {
 
         // inserting a new 
-        await db.ridesRequested.create({
+        let ride = await db.ridesRequested.create({
             data: {
                 client_id: parseInt(user_id),
                 rider_id: parseInt(rider_id),
@@ -420,6 +420,15 @@ let acceptRide = async (req, res) => {
                 total: total
             }
         })
+
+
+        for (socket in sockets) {
+            if (sockets[socket].status != null) {
+                
+            }
+        }
+
+
 
         return res.send('ok')
 
@@ -464,6 +473,45 @@ function toRad(Value) {
     return Value * Math.PI / 180;
 }
 
+function calculateRate(total5Stars, total4Stars, total3Stars, total2Stars, total1Star) {
+    return (5*total5Stars + 4*total4Stars + 3*total3Stars + 2*total2Stars + 1*total1Star)
+        / (total5Stars+total4Stars+total3Stars+total2Stars+total1Star)
+}
+
+let customerFeedBack = async (req ,res) => {
+    const { rate, comment } = req.body
+    try {
+
+        let lastRide = await db.ridesRequested.findFirst({
+            where: {
+                client_id: req.user.id
+            },
+            orderBy: {
+                created_at: 'desc'
+            }
+        })
+
+        await db.ridesRatesAndComments.create({
+            data: {
+                rideId: lastRide.id,
+                user_id: req.user.id,
+                comment: comment ?? '',
+                rideRate: rate ?? 0
+            }
+        })
+
+        return res.json({
+            success: {
+                success_en: 'Thank you for taking a trip with us.',
+                success_ar: 'شكرا لطلب رحله من خلالنا.'
+            }
+        })
+
+    } catch (e) {
+        throw new e 
+    }   
+}
+
 module.exports = {
     addRider,
     acceptRide,
@@ -475,5 +523,6 @@ module.exports = {
     deleteDriverProfile,
     changePricePerKilo,
     getDriverForm,
-    getPriceViaDistance
+    getPriceViaDistance,
+    customerFeedBack
 }

@@ -353,6 +353,16 @@ model ridesRequested {
   agentInfo      ride     @relation(fields: [rider_id], references: [user_id])
 }
 
+model ridesRatesAndComments {
+  id       Int    @id @default(autoincrement())
+  user_id  Int
+  rideId   Int
+  comment  String @db.VarChar(5000)
+  rideRate Int
+  created_at     DateTime @default(now())
+  updated_at     DateTime @updatedAt
+}
+
 model loading {
   id                Int                  @id @default(autoincrement())
   user_id           Int

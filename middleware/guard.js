@@ -34,6 +34,7 @@ module.exports = ((req, res, next) => {
                             hashCode: true,
                             providerCashBack: true,
                             countryCode: true,
+                            accountType: true,
                         }
                     });
                     if (!user) {
