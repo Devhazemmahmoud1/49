@@ -233,7 +233,12 @@ let getPriceViaDistance = async (req, res) => {
         }
     })
 
-    let low = parseInt(getlowestPricePerKilo.distancePerKilo) * parseInt(distance) + parseInt(getlowestPricePerKilo.distancePerKilo)
+    if (getlowestPricePerKilo) {
+        var low = parseInt(getlowestPricePerKilo.distancePerKilo) * parseInt(distance) + parseInt(getlowestPricePerKilo.distancePerKilo)
+    } else {
+        var low = 0
+    }
+
 
     let getHighestPricePerKilo = await db.ride.findFirst({
         where: {
@@ -244,7 +249,12 @@ let getPriceViaDistance = async (req, res) => {
         }
     })
 
-    let high = parseInt(getHighestPricePerKilo.distancePerKilo) * parseInt(distance) + parseInt(getHighestPricePerKilo.distancePerKilo)
+    if (getHighestPricePerKilo) {
+        var high = parseInt(getHighestPricePerKilo.distancePerKilo) * parseInt(distance) + parseInt(getHighestPricePerKilo.distancePerKilo)
+    } else {
+        var high = 0
+    }
+
 
     return res.json({
         lowest: low,
