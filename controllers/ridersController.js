@@ -88,7 +88,7 @@ let findRiders = async (req, res) => {
                 && sockets[socket].isApproved != 0) {
 
                 console.log("23232" + sockets[socket])
-
+                console.log(sockets[socket].subscription)
                 // we need to check if this driver has already subscribed   
                 if (sockets[socket].subscription == null) {
                     global.io.to(sockets[socket].socket_id).emit('no-subscription', JSON.stringify(
@@ -114,15 +114,17 @@ let findRiders = async (req, res) => {
                 }
 
                 if (moment(sockets[socket].subscription.startDate).add(sockets[socket].subscription.period, 'days').format('YYYY/MM/DD HH:mm:ss') >= moment().format('YYYY/MM/DD HH:mm:ss')) {
+                    console.log('passed' + sockets[socket].subscription)
+                    console.log(sockets[socket].subscription)
                     global.io.to(sockets[socket].socket_id).emit('no-subscription', JSON.stringify(
                         {
                             // message_ar: `لديك طلبات توصيله و لكنك غير مشترك اليوم من فضلك اشترك حتي تواصل العمل معنا`,
                             // message_en: 'You have ride requests but you did not subscribe today , Please subscribe to keep taking trips.',
                             user_id: req.user.id,
                             price: price ?? 50,
-                            message_ar: `قام ${req.user.firstName} بطلب رحله من ... الي ... بسعر 50 جنيه`,
-                            message_en: req.user.firstName + ' Has requested a ride from' + From + ' to' + To + ' ' + 'for 50 L.E',
-                            distance: distance ? distance + ' KiloMeters' : 'Unknown',
+                            message_ar: `قام ${req.user.firstName} بطلب رحله من ... الي ... بسعر ${price ?? 0} جنيه`,
+                            message_en: req.user.firstName + ' Has requested a ride from' + From + ' to' + To + ' ' + 'for ' `${price ?? 0}`,
+                            distance: distance ? distance + ' Km' : 'Unknown',
                             userType: userType,
                             destinationFrom: From,
                             destinationTo: To,
@@ -403,7 +405,6 @@ let acceptRide = async (req, res) => {
         return res.status(403).send('Something went wrong');
 
     try {
-
         // inserting a new 
         let ride = await db.ridesRequested.create({
             data: {
@@ -417,18 +418,15 @@ let acceptRide = async (req, res) => {
                 destinationLat: destinationLat,
                 streetFrom: streetFrom,
                 streetTo: streetTo,
-                total: total
+                total: total,
             }
         })
 
-
         for (socket in sockets) {
-            if (sockets[socket].status != null) {
-                
+            if (sockets[socket].user_id == ride.rider_id) {
+                sockets[socket].status = 1
             }
         }
-
-
 
         return res.send('ok')
 
