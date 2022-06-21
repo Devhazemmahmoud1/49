@@ -189,16 +189,36 @@ io.on('connection', async (socket) => {
     for (socket in sockets) {
       if (sockets[socket].user_id == JSON.parse(data).user_id) {
         requestTo = sockets[socket].socket_id
+        var userId = sockets[socket].user_id
       }
 
       if (sockets[socket].user_id == JSON.parse(data).riderId) {
         requestFrom = sockets[socket].user_id
+        riderId = sockets[socket].user_id
+
+        var rideInfo = await db.ride.findFirst({
+          where: {
+            user_id: riderId
+          }
+        })
+
+        var userInfo = await db.users.findFirst({
+          where: {
+            id: riderId
+          },
+          select: {
+            profilePicture: true
+          }
+        })
+
       }
     }
 
+
+
     io.to(requestTo).emit('agent-new-changed-price', JSON.stringify({
-      riderId: requestFrom,
-      user_id: requestTo,
+      riderId: riderId,
+      user_id: userId,
       price: price,
       distance: distance ? distance + ' KiloMeters' : 'Unknown',
       userType: userType,
@@ -208,7 +228,8 @@ io.on('connection', async (socket) => {
       customerLat: lat,
       destinationLat: destinationLat,
       destinationLng: destinationLng,
-      tripTime: tripTime
+      tripTime: tripTime,
+      rideInfo: rideInfo
     }));
 
   })
@@ -246,7 +267,8 @@ io.on('connection', async (socket) => {
         customerLat: lat,
         destinationLat: destinationLat,
         destinationLng: destinationLng,
-        tripTime: tripTime
+        tripTime: tripTime,
+        riderPhoto: userInfo
       }
     ))
   })

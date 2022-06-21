@@ -77,7 +77,7 @@ var addRider = async (request, response) => {
 
 /* Find drivers around 5 KMs */
 let findRiders = async (req, res) => {
-    const { userType, From, To, distance, price, lat, lng, destinationLng, destinationLat, tripTime } = req.query
+    const { userType, From, To, distance, price, lat,  lng, destinationLng, destinationLat, tripTime } = req.query
     console.log(Object.keys(sockets).length)
     if (Object.keys(sockets).length !== 0) {
         for (socket in sockets) {
