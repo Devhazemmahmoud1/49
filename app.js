@@ -298,7 +298,7 @@ io.use(async (socket, next) => {
           orderBy: {
             'created_at': 'desc'
           }
-      }) != null
+      })
 
       if (userSubscription) {
         if (moment(userSubscription.created_at).add(userSubscription.period, 'days').format('YYYY/MM/DD HH:mm:ss') <= moment().format('YYYY/MM/DD HH:mm:ss')) {
@@ -309,8 +309,6 @@ io.use(async (socket, next) => {
              stauts: 1,
              startDate: userSubscription.created_at,
            }
-
-           socket.subscription = userSubscription
         }
       } else {
         socket.subscription = null
