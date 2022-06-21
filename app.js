@@ -172,7 +172,7 @@ io.on('connection', async (socket) => {
     }
   }
 
-  socket.on('change-price', (data) => {
+  socket.on('change-price', async (data) => {
     var requestTo = ''
     var requestFrom = ''
     var price = JSON.parse(data).price
@@ -229,7 +229,8 @@ io.on('connection', async (socket) => {
       destinationLat: destinationLat,
       destinationLng: destinationLng,
       tripTime: tripTime,
-      rideInfo: rideInfo
+      rideInfo: rideInfo,
+      riderPhoto: userInfo.profilePicture
     }));
 
   })
@@ -268,7 +269,6 @@ io.on('connection', async (socket) => {
         destinationLat: destinationLat,
         destinationLng: destinationLng,
         tripTime: tripTime,
-        riderPhoto: userInfo
       }
     ))
   })
