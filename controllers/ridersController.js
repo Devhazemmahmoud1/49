@@ -81,6 +81,7 @@ let findRiders = async (req, res) => {
     console.log(Object.keys(sockets).length)
     if (Object.keys(sockets).length !== 0) {
         for (socket in sockets) {
+            sockets[socket].subscription = true
             if (sockets[socket].userType == userType
                 && sockets[socket].isReady == true
                 && sockets[socket].currentLocation.lat != ''
