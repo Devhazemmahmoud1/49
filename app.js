@@ -286,7 +286,7 @@ io.on('connection', async (socket) => {
   socket.on('disconnect', () => {
     console.log(socket.id + ' is out from here')
     delete sockets[socket.id]
-    console.log(sockets)
+    console.log(socket.id + ' Was deleted')
   })
 })
 
