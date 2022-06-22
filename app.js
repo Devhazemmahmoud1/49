@@ -169,14 +169,18 @@ io.on('connection', async (socket) => {
 
       for (socket in sockets) {
         if (sockets[socket].user_id == socket.user.id ) {
+          console.log('was there and deleted');
           delete sockets[socket]
-          sockets[socket.id] = userInfo
-          break
+          sockets[socket.id].push(userInfo)
         } else {
-          sockets[socket.id] = userInfo
+          console.log('passed')
+          sockets[socket.id].push(userInfo)
         }
+
+        break;
       }
-      
+
+      console.log('this is the sockets info')
       console.log(sockets)
     }
   }
