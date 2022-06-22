@@ -81,6 +81,8 @@ let findRiders = async (req, res) => {
     console.log(Object.keys(sockets).length)
     if (Object.keys(sockets).length !== 0) {
         for (socket in sockets) {
+            console.log(lat, lng)
+            console.log(sockets[socket].currentLocation.lat, sockets[socket].currentLocation.lng)
             sockets[socket].subscription = {
                 categoryId: 897,
                 permium: 1,
