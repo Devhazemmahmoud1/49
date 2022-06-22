@@ -167,7 +167,7 @@ io.on('connection', async (socket) => {
         }
       }
 
-      if (Object(sockets).length != 0) {
+      if (Object.keys(sockets).length != 0) {
         console.log('passed Here')
         for (socket in sockets) {
           if (sockets[socket].user_id == socket.user.id ) {
