@@ -178,14 +178,15 @@ model Payment {
 }
 
 model subscriptions {
-  id         Int      @id @default(autoincrement())
-  user_id    Int
-  period     String   @db.VarChar(5000)
-  subCat_id  Int
-  isPermium  Int      @default(0)
-  user       Users    @relation(fields: [user_id], references: [id])
-  created_at DateTime @default(now())
-  updated_at DateTime @updatedAt
+  id                Int      @id @default(autoincrement())
+  user_id           Int
+  period            String   @db.VarChar(5000)
+  subCat_id         Int
+  isPermium         Int      @default(0)
+  isPersonalAccount Int      @default(0)
+  user              Users    @relation(fields: [user_id], references: [id])
+  created_at        DateTime @default(now())
+  updated_at        DateTime @updatedAt
 }
 
 model paymentMethods {

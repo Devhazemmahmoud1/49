@@ -26,7 +26,7 @@ async function makeOrder(token, amount) {
 
 }
 
-async function paymentKeys(token, orderId, amount, period, userId, catId, isPermium) {
+async function paymentKeys(token, orderId, amount, period, userId, catId, isPermium, isPersonal) {
 
     try {
         const result = await axios
@@ -36,7 +36,7 @@ async function paymentKeys(token, orderId, amount, period, userId, catId, isPerm
             "expiration": 3600, 
             "order_id": orderId,
             "billing_data": {
-              "apartment": "803", 
+              "apartment": isPersonal.toString(), 
               "email": "claudette09@exa.com", 
               "floor": catId.toString(), 
               "first_name": "Clifford", 
@@ -253,7 +253,8 @@ let completeOP =  async (paymentInfo) => {
             user_id: checkUser.id,
             period: paymentInfo.billing_data.building.toString(),
             isPermium: parseInt(paymentInfo.billing_data.street),
-            subCat_id: parseInt(paymentInfo.billing_data.floor)
+            subCat_id: parseInt(paymentInfo.billing_data.floor),
+            isPersonalAccount: parseInt(paymentInfo.billing_data.apartment)
         }
     });
   
@@ -357,11 +358,9 @@ let completeOP =  async (paymentInfo) => {
     })
   
     let NetAfterOverHead = parseFloat(newAmount) - parseFloat(overHeadConstant)
-    console.log(NetAfterOverHead, overHeadConstant)
     let xFactor = parseInt(NetAfterOverHead) / parseFloat(subCategories.paymentFactor)
     let fourtyNineGain = parseFloat(xFactor) * parseFloat(subCategories.portion)
     let ProviderCashBack = parseFloat(xFactor) * parseFloat(subCategories.providerPortion)
-    console.log(ProviderCashBack, fourtyNineGain)
     let NetAfterAllPortion = NetAfterOverHead - fourtyNineGain - ProviderCashBack
     let requestPortion = NetAfterAllPortion * parseFloat(fetchCashBackRules.requestPortion / 100)
     let requestCall = NetAfterAllPortion * parseFloat(fetchCashBackRules.callPortion / 100)
