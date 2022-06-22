@@ -81,8 +81,8 @@ var addRider = async (request, response) => {
 
 /* Find drivers around 5 KMs */
 let findRiders = async (req, res) => {
-    const { userType, From, To, distance, price, lat,  lng, destinationLng, destinationLat, tripTime } = req.query
-    console.log(Object.keys(sockets).length)
+    const { userType, From, To, distance, price, lat,  lng, destinationLng, destinationLat, tripTime } = req.query;
+
     if (Object.keys(sockets).length !== 0) {
         for (socket in sockets) {
             sockets[socket].subscription = {
@@ -90,7 +90,7 @@ let findRiders = async (req, res) => {
                 permium: 1,
                 stauts: 1,
                 startDate: '2022-06-21 22:14:55.000',
-              }
+            }
             if (sockets[socket].userType == userType
                 && sockets[socket].isReady == true
                 && sockets[socket].currentLocation.lat != ''
@@ -151,7 +151,6 @@ let findRiders = async (req, res) => {
                     ));
                     continue;
                 }
-
 
                 if (sockets[socket].lastTrip.lat != null && sockets[socket].lastTrip.lng != null && destinationLng && destinationLat) {
                     console.log('final destination')
@@ -216,7 +215,7 @@ let driversToggleStatus = async (req, res) => {
         }
     }
 
-    return res.send('Status has been toggled')
+    return res.send('Status has been toggle')
 }
 
 /* Update all users location */
@@ -419,6 +418,33 @@ let acceptRide = async (req, res) => {
 
         return res.status(403).send('Something went wrong');
 
+    for (socket in sockets) {
+        if (sockets[socket].user_id == ride.rider_id && sockets[socket].status == 1) {
+
+            let ride = await db.ridesRequested.create({
+                data: {
+                    client_id: parseInt(user_id),
+                    rider_id: parseInt(rider_id),
+                    distance: distance,
+                    tripTime: tripTime,
+                    customerLng: customerLng,
+                    customerlat: customerlat,
+                    destinationLng: destinationLng,
+                    destinationLat: destinationLat,
+                    streetFrom: streetFrom,
+                    streetTo: streetTo,
+                    total: total,
+                    isPendding: 1,
+                }
+            }) 
+            
+            sockets[socket].status = 2
+
+            return res.send('You already in a trip.')
+        }
+        break;
+    }
+
     try {
         // inserting a new 
         let ride = await db.ridesRequested.create({
@@ -456,6 +482,7 @@ let endRide = async (req,res) => {
     try {
         let getLastTripForDriver = await db.ridesRequested.findFirst({
             where: {
+                rider_id: req.user.id,
                 isDone: 0
             }
         })
@@ -466,6 +493,7 @@ let endRide = async (req,res) => {
             },
             data: {
                 isDone: 1,
+                isPendding: 0,
             }
         })
 
@@ -482,12 +510,59 @@ let endRide = async (req,res) => {
                     message_ar: `Please Pay ${req.user.firstName} ${finsih.total} L.E , It's our pleasure to serve you <3.`,
                     message_en: `Please Pay ${req.user.firstName} ${finsih.total} L.E , It's our pleasure to serve you <3.`,
                     user: getClientInfo.id,
+                    userFirstName: getClientInfo.firstName,
+                    rideId: finish.id,
                     type: 500,
                 }
 
                 pleasePayNotification(notify)
 
                 // socket event to be sent to the other user
+                for (socket in sockets) {
+                    if (sockets[socket].user_id == getClientInfo.id) {
+                        global.io.to(sockets[socket].socket_id).emit('end-of-trip', JSON.stringify({
+                            user_id: getClientInfo.id,
+                            riderId: finish.rider_id,
+                            ride: getLastTripForDriver.id
+                        }))
+                        break;
+                    }
+                }
+
+                // if there is pending rides for this rider
+
+                let checkIfRiderHasAnotherRequest = await db.ridesRequested.findFirst({
+                    where: {
+                        rider_id: req.user.id,
+                        isPendding: 1
+                    }
+                })
+
+                if (checkIfRiderHasAnotherRequest) {
+                    for (socket in sockets) {
+                        if (sockets[socket].user_id == req.user.id) {
+                            sockets[socket].status = 1
+                        }
+
+                        await db.ridesRequested.update({
+                            where: {
+                                id: checkIfRiderHasAnotherRequest.id
+                            },
+                            data: {
+                                isPendding: 0
+                            }
+                        })
+
+                        break;
+                    }
+                } else {
+                    for (socket in sockets) {
+                        if (sockets[socket].user.id == req.user.id) {
+                            sockets[socket].status = null
+                            break;
+                        }
+                    }
+                }
 
 
             } else {

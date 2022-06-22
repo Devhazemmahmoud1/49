@@ -153,7 +153,7 @@ io.on('connection', async (socket) => {
         userType: socket.user.accountType ?? 0,
         isApproved: socket.user.isApproved,
         isReady: true,
-        status: null,
+        status: socket.status ?? null,
         token: socket.token,
         subscription: socket.subscription ?? null,
         lastTrip: {
@@ -374,6 +374,30 @@ io.use(async (socket, next) => {
       } else {
         socket.subscription = null
       }
+
+      // check if he has any trips going on 
+
+      let checkTrip = await db.ridesRequested.findFirst({
+        where: {
+          rider_id: data.id,
+        },
+        orderBy: {
+          created_at: 'desc'
+        }
+      })
+
+      if (checkTrip && checkTrip.isDone == 0 && checkTrip.isPendding != 1) {
+        socket.status = 1
+      }
+
+      if (checkTrip && checkTrip.isDone == 0 && checkTrip.isPendding == 1) {
+        socket.status = 2
+      }
+
+      if (!checkTrip || checkTrip.isDone == 1 && checkTrip.isPendding == 0) {
+        socket.status = null
+      }
+
       socket.user = user;
       socket.token = authorization
       next();

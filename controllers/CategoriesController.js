@@ -81,4 +81,10 @@ let getSubCats = async (req, res, next) => {
     return res.status(200).json(categories)    
 }
 
-module.exports = { getAllCategories, getSubCats }
+/* Get a specific Sub category by id */
+let getSpecCat = async (req ,res) => {
+    const { id } = req.params
+    return res.json(await db.subCategories.findFirst({where: {id: parseInt(id)}, include: {photo: true}}))
+}
+
+module.exports = { getAllCategories, getSubCats, getSpecCat }

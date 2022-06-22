@@ -130,15 +130,22 @@ let deleteNotification = async (req, res) => {
 
 /* Notification for our clients [ Ride section ] */
 let pleasePayNotification = async (notify) => {
+
+    let getUserFCM = await db.users.findFirst({
+        where: {
+            id: parseInt(notify.user)
+        }
+    })
+
     admin.messaging().send({
         data: {
-            senderInfo: notify.user.toString(),
-            postId: notify.postId == null ? "0" : notify.postId.toString(),
+            reciever: notify.user.toString(),
+            rideId: notify.rideId == null ? "0" : notify.postId.toString(),
             type: notify.type.toString()
         },  
         token: getUserFCM.fcm,
         notification: {
-          title: getTheLanguage.value == 'en_US' ? 'New notification': 'اشعار جديد',
+          title: getTheLanguage.value == 'en_US' ? `Hi ${ notify.userFirstName }` : `${notify.userFirstName} اهلا`,
           body: getTheLanguage.value == 'en_US' ? notify.notification_en.toString() : notify.notification_ar.toString(),
         }
     })

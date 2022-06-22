@@ -36,7 +36,7 @@ let sendNotification = async (notify, user) => {
         admin.messaging().send({
             data: {
                 senderInfo: user.toString(),
-                postId: notify.postId == null ? "0" : notify.postId.toString(),
+                postId: notify.rideId == null ? "0" : notify.rideId.toString(),
                 type: notify.type.toString()
             },  
             token: getUserFCM.fcm,
