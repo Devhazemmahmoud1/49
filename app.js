@@ -207,7 +207,7 @@ io.on('connection', async (socket) => {
     var tripTime = JSON.parse(data).tripTime
 
     for (socket in sockets) {
-      if (sockets[socket].user_id == JSON.parse(data).user_id) {
+      if (sockets[socket].user_id == JSON.parse(data).userId) {
         var requestTo = sockets[socket].socket_id
         var userId = sockets[socket].user_id
       }
