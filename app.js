@@ -167,7 +167,16 @@ io.on('connection', async (socket) => {
           lng: socket.handshake.headers.lng ?? null,
         }
       }
-      sockets[socket.id] = userInfo
+
+      for (socket in sockets) {
+        if (sockets[socket].user_id == socket.user.id) {
+          sockets[socket] = userInfo
+          break;
+        } else {
+          sockets[socket.id] = userInfo
+        }
+      }
+
       console.log(sockets)
     }
   }
@@ -198,13 +207,13 @@ io.on('connection', async (socket) => {
 
         var rideInfo = await db.ride.findFirst({
           where: {
-            user_id: riderId
+            user_id: parseInt(riderId)
           }
         })
 
         var userInfo = await db.users.findFirst({
           where: {
-            id: riderId
+            id: parseInt(riderId)
           },
           select: {
             profilePicture: true
@@ -213,8 +222,6 @@ io.on('connection', async (socket) => {
 
       }
     }
-
-
 
     io.to(requestTo).emit('agent-new-changed-price', JSON.stringify({
       riderId: riderId,
