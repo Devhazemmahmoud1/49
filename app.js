@@ -167,19 +167,16 @@ io.on('connection', async (socket) => {
         }
       }
 
-      if (Object(sockets).length != 0) {
-        for (socket in sockets) {
-          if (sockets[socket].user_id == socket.user.id) {
-            sockets[socket] = userInfo
-            break;
-          } else {
-            sockets[socket.id] = userInfo
-          }
+      for (socket in sockets) {
+        if (sockets[socket].user_id == socket.user.id ) {
+          delete sockets[socket]
+          sockets[socket.id] = userInfo
+          break
+        } else {
+          sockets[socket.id] = userInfo
         }
-      } else {
-        sockets[socket.id] = userInfo
       }
-
+      
       console.log(sockets)
     }
   }
