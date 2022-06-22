@@ -26,7 +26,7 @@ async function makeOrder(token, amount) {
 
 }
 
-async function paymentKeys(token, orderId, amount, userId, catId, isPermium) {
+async function paymentKeys(token, orderId, amount, period, userId, catId, isPermium) {
 
     try {
         const result = await axios
@@ -41,7 +41,7 @@ async function paymentKeys(token, orderId, amount, userId, catId, isPermium) {
               "floor": catId.toString(), 
               "first_name": "Clifford", 
               "street": isPermium.toString(), 
-              "building": "8028", 
+              "building": period.toString(), 
               "phone_number": "+86(8)9135210487", 
               "shipping_method": "PKG", 
               "postal_code": "01898", 
@@ -78,7 +78,165 @@ async function getHMACByOrderId(token, orderId) {
 
 let completeOP =  async (paymentInfo) => {
 
-    //console.log(paymentInfo)
+    // //console.log(paymentInfo)
+    // let checkUser = await db.users.findFirst({
+    //     where: {
+    //         id: parseInt(paymentInfo.billing_data.state)
+    //     }
+    // })
+  
+    // if (!checkUser) {
+    //   console.log('here')
+    //     return false
+    // }
+  
+    // await db.subscriptions.create({
+    //     data: {
+    //         user_id: checkUser.id,
+    //         period: "1",
+    //         isPermium: parseInt(paymentInfo.billing_data.street),
+    //     }
+    // });
+  
+    // let amount = parseInt(paymentInfo.amount_cents / 100)
+  
+    // let methods = await db.paymentMethods.findMany({});
+    // let tax = await db.govFees.findFirst({});
+    // let cashBackRules = await db.cashBackRules.findFirst({})
+    // let newAmount = parseInt(amount) - (parseInt(amount) * (methods[0].gatewayPercentage / 100)) - methods[0].gatewayConstant
+    // let TaxAndVat = parseFloat(newAmount) - (parseFloat(amount) * (parseFloat(tax.VAT) / 100)) - (parseInt(amount) * (parseFloat(tax.Tax) / 100))
+    // let totalGovCuts = parseFloat(newAmount) - parseFloat(TaxAndVat)
+    // let newtotalGovCuts = parseFloat(cashBackRules.totalGovCut) + parseFloat(totalGovCuts)
+    // await db.cashBackRules.update({
+    //     where: {
+    //         id: 1
+    //     },
+    //     data: {
+    //         totalGovCut: '' + newtotalGovCuts + ''
+    //     }
+    // })
+  
+    // // total fees for paymob
+    // let fees = (parseInt(amount) * (methods[0].gatewayPercentage / 100)) + parseFloat(methods[0].gatewayConstant)
+    // console.log(fees, amount)
+    // console.log((methods[0].gatewayPercentage / 100), parseFloat(methods[0].gatewayConstant))
+    // let perviousFees = await db.paymentGateWayFees.findFirst({
+    //     where: {
+    //         id: 1
+    //     }
+    // })
+  
+    // await db.paymentGateWayFees.update({
+    //     where: {
+    //         id: 1,
+    //     },
+    //     data: {
+    //         totalFees: parseFloat(perviousFees.totalFees) + fees
+    //     }
+    // })
+  
+    // // gross Money
+    // let getSubCatGross = await db.subCategories.findFirst({
+    //     where: {
+    //         id: parseInt(paymentInfo.billing_data.floor)
+    //     }
+    // })
+  
+    // let gross = parseFloat(getSubCatGross.grossMoney) + parseFloat(newAmount)
+  
+    // await db.subCategories.update({
+    //     where: {
+    //         id: parseInt(paymentInfo.billing_data.floor)
+    //     },
+    //     data: {
+    //         grossMoney: "" + gross + ""
+    //     }
+    // })
+  
+    // // Number of transaction
+  
+    // let NumOfTransaction = parseInt(cashBackRules.transNum) + 1
+  
+    // await db.cashBackRules.update({
+    //     where: {
+    //         id: 1
+    //     },
+    //     data: {
+    //         transNum: "" + NumOfTransaction + ""
+    //     }
+    // })
+  
+    // let grossMoney = 0;
+    // let cost = 0;
+  
+    // let fetchCashBackRules = await db.cashBackRules.findFirst({})
+    // let fetchCashBackStorage = await db.cashBackStorage.findFirst({})
+    // let subCategory = await db.subCategories.findMany({});
+  
+    // for (item of subCategory) {
+    //   console.log(item.grossMoney, item.paymentFactor)
+    //     let newGross = parseFloat(item.grossMoney) / parseFloat(item.paymentFactor)
+    //     grossMoney += parseFloat(newGross)
+    // }
+  
+    // console.log(grossMoney)
+  
+    // let overHeadFactor = parseFloat(grossMoney)
+    // let runningCost = await db.runningCost.findMany({})
+    
+    // for (item of runningCost) {
+    //     cost += parseInt(item.amount)
+    // }
+  
+    // let overHeadConstant = (cost / overHeadFactor)
+  
+    // // update gross money for this category
+    // let subCategories = await db.subCategories.findFirst({
+    //     where: {
+    //         id: parseInt(paymentInfo.billing_data.floor)
+    //     }
+    // })
+  
+    // let NetAfterOverHead = parseFloat(newAmount) - parseFloat(overHeadConstant)
+    // console.log(NetAfterOverHead, overHeadConstant)
+    // let xFactor = parseInt(NetAfterOverHead) / parseFloat(subCategories.paymentFactor)
+    // let fourtyNineGain = parseFloat(xFactor) * parseFloat(subCategories.portion)
+    // let ProviderCashBack = parseFloat(xFactor) * parseFloat(subCategories.providerPortion)
+    // console.log(ProviderCashBack, fourtyNineGain)
+    // let NetAfterAllPortion = NetAfterOverHead - fourtyNineGain - ProviderCashBack
+    // let requestPortion = NetAfterAllPortion * parseFloat(fetchCashBackRules.requestPortion / 100)
+    // let requestCall = NetAfterAllPortion * parseFloat(fetchCashBackRules.callPortion / 100)
+    // let requestLike = NetAfterAllPortion * parseFloat(fetchCashBackRules.likePortion / 100)
+    // let requestShare = NetAfterAllPortion * parseFloat(fetchCashBackRules.sharePortion / 100)
+    // let requestView = NetAfterAllPortion * parseFloat(fetchCashBackRules.viewPortion / 100)
+    // let requestAny = NetAfterAllPortion * parseFloat(fetchCashBackRules.anyPortion / 100)
+    // let newFourtyNineGain = parseFloat(fetchCashBackStorage.fourtyNineGain) + parseFloat(fourtyNineGain)
+    // let newProviderCashBack = parseFloat(ProviderCashBack) + parseFloat(fetchCashBackStorage.providerCashBack)
+    // let newRequestCash = parseFloat(requestPortion) + parseFloat(fetchCashBackStorage.requestCashBack)
+    // let newCallCash = parseFloat(requestCall) + parseFloat(fetchCashBackStorage.callCashBack)
+    // let newLikeCash = parseFloat(requestLike) + parseFloat(fetchCashBackStorage.likeCashBack)
+    // let newShareCash = parseFloat(requestShare) + parseFloat(fetchCashBackStorage.shareCashBack)
+    // let newViewCash = parseFloat(requestView) + parseFloat(fetchCashBackStorage.viewCashBack)
+    // let newAnyCash = parseFloat(requestAny) + parseFloat(fetchCashBackStorage.anyCashBack)
+  
+    // await db.cashBackStorage.update({
+    //     where: {
+    //         id: 1
+    //     },
+    //     data: {
+    //         fourtyNineGain: "" + newFourtyNineGain + "",
+    //         providerCashBack: "" + newProviderCashBack + "",
+    //         requestCashBack: "" + newRequestCash + "",
+    //         callCashBack: "" + newCallCash + "",
+    //         likeCashBack: "" + newLikeCash + "",
+    //         shareCashBack: "" + newShareCash + "",
+    //         viewCashBack: "" + newViewCash + "",
+    //         anyCashBack: "" + newAnyCash + "",
+    //     }
+    // })
+  
+    // return true;
+
     let checkUser = await db.users.findFirst({
         where: {
             id: parseInt(paymentInfo.billing_data.state)
@@ -93,8 +251,9 @@ let completeOP =  async (paymentInfo) => {
     await db.subscriptions.create({
         data: {
             user_id: checkUser.id,
-            period: "1",
+            period: paymentInfo.billing_data.building.toString(),
             isPermium: parseInt(paymentInfo.billing_data.street),
+            subCat_id: parseInt(paymentInfo.billing_data.floor)
         }
     });
   

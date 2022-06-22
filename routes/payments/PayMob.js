@@ -15,7 +15,7 @@ router.post('/transaction', guard, async (req, res, next) => {
     //console.log(token)
     var orderId = await makeOrder(token, amount)
     //console.log(orderId)
-    var paymentKey = await paymentKeys(token, orderId, amount, req.user.id, paymentInfo.billing_data.floor, paymentInfo.billing_data.street)
+    var paymentKey = await paymentKeys(token, orderId, amount, paymentInfo.billing_data.building ,req.user.id, paymentInfo.billing_data.floor, paymentInfo.billing_data.street)
     //console.log(paymentKey)
     return res.status(200).json({
         url: `https://accept.paymob.com/api/acceptance/iframes/354120?payment_token=${paymentKey}`
@@ -26,13 +26,12 @@ router.post('/callback', async (req, res) => {
     const { hmac } = req.query
     const { id, success, payment_key_claims } = req.body.obj
     
-    payment = payment_key_claims 
     //return res.json(payment_key_claims)
     const paymentToken = await getPaymobToken()
 
     if (success == true && (await getHMACByOrderId(paymentToken, id)) == hmac) {
         try {
-            await completeOP(payment)
+            await completeOP(payment_key_claims)
         } catch (e) {
             console.log(e)
         }
