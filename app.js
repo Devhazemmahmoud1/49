@@ -234,6 +234,25 @@ io.on('connection', async (socket) => {
       }
     }
 
+    let s = {
+      riderId: riderId,
+      user_id: userId,
+      price: price,
+      distance: distance ? distance + ' KiloMeters' : 'Unknown',
+      userType: userType,
+      destinationFrom: From,
+      destinationTo: To,
+      customerLng: lng,
+      customerLat: lat,
+      destinationLat: destinationLat,
+      destinationLng: destinationLng,
+      tripTime: tripTime,
+      rideInfo: rideInfo,
+      riderPhoto: userInfo.profilePicture
+    }
+
+    console.log(s)
+
     io.to(requestTo).emit('agent-new-changed-price', JSON.stringify({
       riderId: riderId,
       user_id: userId,
