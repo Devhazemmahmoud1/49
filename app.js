@@ -194,8 +194,7 @@ io.on('connection', async (socket) => {
   }
 
   socket.on('change-price', async (data) => {
-    var requestTo = ''
-    var requestFrom = ''
+    console.log(data)
     var price = JSON.parse(data).price
     var distance = JSON.parse(data).distance
     var userType = JSON.parse(data).userType
@@ -209,13 +208,13 @@ io.on('connection', async (socket) => {
 
     for (socket in sockets) {
       if (sockets[socket].user_id == JSON.parse(data).user_id) {
-        requestTo = sockets[socket].socket_id
+        var requestTo = sockets[socket].socket_id
         var userId = sockets[socket].user_id
       }
 
       if (sockets[socket].user_id == JSON.parse(data).riderId) {
-        requestFrom = sockets[socket].user_id
-        riderId = sockets[socket].user_id
+        var requestFrom = sockets[socket].user_id
+        var riderId = sockets[socket].user_id
 
         var rideInfo = await db.ride.findFirst({
           where: {
@@ -251,6 +250,8 @@ io.on('connection', async (socket) => {
       rideInfo: rideInfo,
       riderPhoto: userInfo.profilePicture
     }));
+
+    console.log('event emitted')
 
   })
 
