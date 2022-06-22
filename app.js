@@ -169,10 +169,10 @@ io.on('connection', async (socket) => {
 
       if (Object.keys(sockets).length != 0) {
         console.log('passed Here')
-        for (socket in sockets) {
-          if (sockets[socket].user_id == socket.user.id ) {
+        for (sockett in sockets) {
+          if (sockets[sockett].user_id == socket.user.id) {
             console.log('was there and deleted');
-            delete sockets[socket]
+            delete sockets[sockett]
             sockets[socket.id] = userInfo
           } else {
             console.log('passed')
