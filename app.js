@@ -145,7 +145,6 @@ global.sockets = {}
 io.on('connection', async (socket) => {
   if (socket.handshake.headers.authorization.includes('Bearer ')) {
     if (socket.user.id != null) {
-      console.log(socket)
       let userInfo = {
         socket_id: socket.id,
         firstName: socket.user.firstName,
@@ -169,6 +168,7 @@ io.on('connection', async (socket) => {
       }
 
       if (Object(sockets).length != 0) {
+        console.log('passed Here')
         for (socket in sockets) {
           if (sockets[socket].user_id == socket.user.id ) {
             console.log('was there and deleted');
@@ -182,6 +182,8 @@ io.on('connection', async (socket) => {
         }
       } else {
         sockets[socket.id] = userInfo 
+        console.log('passed Here Please')
+        console.log(sockets)
       }
 
 
