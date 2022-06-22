@@ -56,7 +56,9 @@ let makeSubscriptionPayments = async (req, res, next) => {
     }
     let createSubscription = await db.subscriptions.create({
         data: {
-            user_id: req.user.id,
+            user: {
+                connect: req.user.id
+            },
             subCat_id: parseInt(subcategory_id),
             period: period,
             isPermium: Paymenttype,
