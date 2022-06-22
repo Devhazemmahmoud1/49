@@ -295,17 +295,20 @@ model Profit {
 }
 
 model ride {
-  id              Int                @id @default(autoincrement())
-  user_id         Int
-  carModel        String             @db.VarChar(255)
-  distancePerKilo Decimal            @db.Decimal(9, 2)
-  isApproved      Int                @default(0)
-  category_id     Int                @default(0)
-  user            Users              @relation(fields: [user_id], references: [id])
-  riderPhoto      ridersAttachment[]
-  created_at      DateTime           @default(now())
-  updated_at      DateTime           @updatedAt
-  requestRide     ridesRequested[]
+  id                Int                @id @default(autoincrement())
+  user_id           Int
+  carModel          String             @db.VarChar(255)
+  carType           String?
+  metalPaletLetters String?
+  metalPaletNumbers String?
+  distancePerKilo   Decimal            @db.Decimal(9, 2)
+  isApproved        Int                @default(0)
+  category_id       Int                @default(0)
+  user              Users              @relation(fields: [user_id], references: [id])
+  riderPhoto        ridersAttachment[]
+  created_at        DateTime           @default(now())
+  updated_at        DateTime           @updatedAt
+  requestRide       ridesRequested[]
 }
 
 model ridersAttachment {
@@ -354,13 +357,13 @@ model ridesRequested {
 }
 
 model ridesRatesAndComments {
-  id       Int    @id @default(autoincrement())
-  user_id  Int
-  rideId   Int
-  comment  String @db.VarChar(5000)
-  rideRate Int
-  created_at     DateTime @default(now())
-  updated_at     DateTime @updatedAt
+  id         Int      @id @default(autoincrement())
+  user_id    Int
+  rideId     Int
+  comment    String   @db.VarChar(5000)
+  rideRate   Int
+  created_at DateTime @default(now())
+  updated_at DateTime @updatedAt
 }
 
 model loading {

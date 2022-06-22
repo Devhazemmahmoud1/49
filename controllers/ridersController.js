@@ -6,7 +6,7 @@ const { pleasePayNotification } = require('../controllers/notificationsControlle
 
 /* Add a new Rider according to the giving informaiton */
 var addRider = async (request, response) => {
-    const { carModel, pricePerDistance, attachments, subCategory_id } = request.body
+    const { carModel, carType, metalLetters, metalNumbers, pricePerDistance, attachments, subCategory_id } = request.body
 
     if (!carModel || !pricePerDistance || pricePerDistance == 0) {
         return response.status(403).json({
@@ -37,6 +37,9 @@ var addRider = async (request, response) => {
             user_id: request.user.id,
             distancePerKilo: parseInt(pricePerDistance),
             carModel: carModel.toString(),
+            carType: carType.toString(),
+            metalPaletLetters: metalLetters.toString(),
+            metalPaletNumbers: metalNumbers.toString(),
             category_id: parseInt(subCategory_id),
         }
     });
