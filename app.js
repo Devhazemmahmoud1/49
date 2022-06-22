@@ -10,7 +10,6 @@ const s3 = require('./controllers/s3Controller/s3Configiration')
 const admin = require('firebase-admin/app');
 const admins = require('firebase-admin')
 const secretKey = "fourtyninehub495051fourtynine";
-const socketUserHandler = require('./middleware/socketHandler')
 const Jwt = require('jsonwebtoken');
 const serviceAccount = require('./foutrynine-firebase.json');
 const moment = require('moment');
@@ -168,13 +167,17 @@ io.on('connection', async (socket) => {
         }
       }
 
-      for (socket in sockets) {
-        if (sockets[socket].user_id == socket.user.id) {
-          sockets[socket] = userInfo
-          break;
-        } else {
-          sockets[socket.id] = userInfo
+      if (Object(sockets).length != 0) {
+        for (socket in sockets) {
+          if (sockets[socket].user_id == socket.user.id) {
+            sockets[socket] = userInfo
+            break;
+          } else {
+            sockets[socket.id] = userInfo
+          }
         }
+      } else {
+        sockets[socket.id] = userInfo
       }
 
       console.log(sockets)
