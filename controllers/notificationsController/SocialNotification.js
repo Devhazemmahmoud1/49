@@ -37,7 +37,7 @@ let sendNotification = async (notify, user) => {
             data: {
                 senderInfo: user.toString(),
                 postId: notify.postId == null ? "0" : notify.postId.toString(),
-                type: "1"
+                type: notify.type.toString()
             },  
             token: getUserFCM.fcm,
             notification: {
@@ -98,7 +98,7 @@ let sendBulkNotification = async (notify, user) => {
                 data: {
                     senderInfo: user.toString(),
                     postId: notify.postId == null ? "0" : notify.postId.toString(),
-                    type: "1"
+                    type: notify.type.toString()
                 },  
                 token: getUserFCM.fcm,
                 notification: {

@@ -2,6 +2,7 @@ var express = require('express')
 const { PrismaClient } = require('@prisma/client')
 const db = new PrismaClient();
 const moment = require('moment');
+const { pleasePayNotification } = require('../controllers/notificationsController/notifications')
 
 /* Add a new Rider according to the giving informaiton */
 var addRider = async (request, response) => {
@@ -81,8 +82,6 @@ let findRiders = async (req, res) => {
     console.log(Object.keys(sockets).length)
     if (Object.keys(sockets).length !== 0) {
         for (socket in sockets) {
-            console.log(lat, lng)
-            console.log(sockets[socket].currentLocation.lat, sockets[socket].currentLocation.lng)
             sockets[socket].subscription = {
                 categoryId: 897,
                 permium: 1,
@@ -93,12 +92,16 @@ let findRiders = async (req, res) => {
                 && sockets[socket].isReady == true
                 && sockets[socket].currentLocation.lat != ''
                 && sockets[socket].currentLocation.lng != ''
-                && sockets[socket].isApproved != 0) {
+                && sockets[socket].isApproved != 0
+                && sockets[socket].status != 2) {   
 
+                console.log(lat, lng)
+                console.log(sockets[socket].currentLocation.lat, sockets[socket].currentLocation.lng)    
                 console.log("23232" + sockets[socket])
                 console.log(sockets[socket].subscription)
                 // we need to check if this driver has already subscribed   
                 if (sockets[socket].subscription == null) {
+                    console.log(111)
                     global.io.to(sockets[socket].socket_id).emit('no-subscription', JSON.stringify(
                         {
                             // message_ar: `لديك طلبات توصيله و لكنك غير مشترك اليوم من فضلك اشترك حتي تواصل العمل معنا`,
@@ -173,6 +176,7 @@ let findRiders = async (req, res) => {
                 }
 
                 let calculateDistance = calcCrow(lat, lng, sockets[socket].currentLocation.lat, sockets[socket].currentLocation.lng).toFixed(1)
+                console.log(222)
                 console.log("distance1 =" + calculateDistance)
                 if (calculateDistance > 5) continue;
                 global.io.to(sockets[socket].socket_id).emit('request', JSON.stringify(
@@ -376,7 +380,7 @@ let getDriverForm = async (req, res) => {
 }
 
 /*  accept a ride and keep it as pending  */
-let addPendingRide = async (req, res) => {
+let acceptPendingRide = async (req, res) => {
 
 }
 
@@ -437,6 +441,57 @@ let acceptRide = async (req, res) => {
         }
 
         return res.send('ok')
+
+    } catch (e) {
+        throw new e
+    }
+}
+
+// finish  a ride 
+let endRide = async (req,res) => {
+
+    try {
+        let getLastTripForDriver = await db.ridesRequested.findFirst({
+            where: {
+                isDone: 0
+            }
+        })
+
+        let finish = await db.ridesRequested.update({
+            where: {
+                id: getLastTripForDriver.id
+            },
+            data: {
+                isDone: 1,
+            }
+        })
+
+        if (finish) {
+            let getClientInfo = await db.users.findFirst({
+                where: {
+                    id: finish.client_id
+                }
+            })
+
+            if (getClientInfo) {
+
+                let notify = {
+                    message_ar: `Please Pay ${req.user.firstName} ${finsih.total} L.E , It's our pleasure to serve you <3.`,
+                    message_en: `Please Pay ${req.user.firstName} ${finsih.total} L.E , It's our pleasure to serve you <3.`,
+                    user: getClientInfo.id,
+                    type: 500,
+                }
+
+                pleasePayNotification(notify)
+
+                // socket event to be sent to the other user
+
+
+            } else {
+                return res.send('something went wrong')
+            }
+
+        }
 
     } catch (e) {
         throw new e
@@ -524,11 +579,12 @@ module.exports = {
     findRiders,
     driversToggleStatus,
     updateDriversLocation,
-    addPendingRide,
+    acceptPendingRide,
     addFinalDestination,
     deleteDriverProfile,
     changePricePerKilo,
     getDriverForm,
     getPriceViaDistance,
-    customerFeedBack
+    customerFeedBack,
+    endRide
 }

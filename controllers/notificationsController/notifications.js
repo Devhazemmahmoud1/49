@@ -128,4 +128,20 @@ let deleteNotification = async (req, res) => {
     }
 }
 
-module.exports = { userNotification, setNotificationAsRead, recentUnreadNotifications, deleteNotification }
+/* Notification for our clients [ Ride section ] */
+let pleasePayNotification = async (notify) => {
+    admin.messaging().send({
+        data: {
+            senderInfo: notify.user.toString(),
+            postId: notify.postId == null ? "0" : notify.postId.toString(),
+            type: notify.type.toString()
+        },  
+        token: getUserFCM.fcm,
+        notification: {
+          title: getTheLanguage.value == 'en_US' ? 'New notification': 'اشعار جديد',
+          body: getTheLanguage.value == 'en_US' ? notify.notification_en.toString() : notify.notification_ar.toString(),
+        }
+    })
+}
+
+module.exports = { userNotification, setNotificationAsRead, recentUnreadNotifications, deleteNotification, pleasePayNotification }
