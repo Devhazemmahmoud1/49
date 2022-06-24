@@ -166,7 +166,7 @@ let findRiders = async (req, res) => {
                                 type: 510,
                             }
 
-                            //pleasePayNotification(notify)
+                            pleasePayNotification(notify)
 
                         } else {
                             let notify = {
@@ -178,7 +178,7 @@ let findRiders = async (req, res) => {
                                 type: 510,
                             }
 
-                            //pleasePayNotification(notify)
+                            pleasePayNotification(notify)
                         }
                         continue;
                     }
@@ -238,7 +238,7 @@ let findRiders = async (req, res) => {
                                 type: 510,
                             }
 
-                            //pleasePayNotification(notify)
+                            pleasePayNotification(notify)
                             continue;
                         } else {
                             console.log('passed there')
@@ -299,7 +299,7 @@ let findRiders = async (req, res) => {
 
                             drivers.push(sockets[rider].user_id)
 
-                            //pleasePayNotification(notify)
+                            pleasePayNotification(notify)
                             continue;
                         }
 
