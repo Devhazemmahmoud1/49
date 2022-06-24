@@ -1191,14 +1191,16 @@ let makeRequest = async (req, res) => {
             }
         })
 
-        var getRefUser = await db.users.findFirst({
-            where: {
-                id: getMyinvitor.inviter ?? undefined
-            },
-            include: {
-                Wallet: true,
-            }
-        })
+        if (getMyinvitor) {
+            var getRefUser = await db.users.findFirst({
+                where: {
+                    id: getMyinvitor.inviter ?? undefined
+                },
+                include: {
+                    Wallet: true,
+                }
+            })
+        }
 
 
         if (totalStepsOfToday._sum.amount >= 10) {
