@@ -252,7 +252,7 @@ let findRiders = async (req, res) => {
 
                             if (drivers.includes(sockets[rider].user_id)) continue;
 
-                            let checkIfHadFreeRideBefore = await db.freeRide.findFirst({
+                            let checkIfHadFreeRideBefore = await db.freeRides.findFirst({
                                 where: {
                                     rider_id: parseInt(sockets[rider].user_id)
                                 },
