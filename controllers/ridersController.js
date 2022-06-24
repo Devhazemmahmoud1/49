@@ -81,32 +81,67 @@ var addRider = async (request, response) => {
 
 /* Find drivers around 5 KMs */
 let findRiders = async (req, res) => {
-    const { userType, From, To, distance, price, lat,  lng, destinationLng, destinationLat, tripTime } = req.query;
+    const { userType, From, To, distance, price, lat, lng, destinationLng, destinationLat, tripTime, isFast } = req.query;
+
+    var drivers = [];
 
     if (Object.keys(sockets).length !== 0) {
         for (socket in sockets) {
-            if (sockets[socket].userType == userType
-                && sockets[socket].isReady == true
-                && sockets[socket].currentLocation.lat != ''
-                && sockets[socket].currentLocation.lng != ''
-                && sockets[socket].isApproved != 0
-                && sockets[socket].status != 2) {   
+            //check if a user is permuim 
+            if (sockets[socket].user_id == req.user.id &&
+                sockets[socket].subscription != null &&
+                sockets[socket].subscription.isPersonalAccount == 1 &&
+                sockets[socket].subscription.permium == 1 &&
+                moment(sockets[socket].subscription.startDate).add(sockets[socket].subscription.period, 'days').format('YYYY/MM/DD HH:mm:ss') >= moment().format('YYYY/MM/DD HH:mm:ss')
+            ) {
 
-                console.log(lat, lng)
-                console.log(sockets[socket].currentLocation.lat, sockets[socket].currentLocation.lng)    
-                console.log("23232" + sockets[socket])
-                console.log(sockets[socket].subscription)
-                // we need to check if this driver has already subscribed   
-                if (sockets[socket].subscription == null) {
-                    console.log(111)
-                    global.io.to(sockets[socket].socket_id).emit('no-subscription', JSON.stringify(
-                        {
-                            // message_ar: `لديك طلبات توصيله و لكنك غير مشترك اليوم من فضلك اشترك حتي تواصل العمل معنا`,
-                            // message_en: 'You have ride requests but you did not subscribe today , Please subscribe to keep taking trips.',
+                console.log('i am a perium user')
+                for (rider in sockets) {
+                    if (sockets[rider].userType == userType
+                        && sockets[rider].isReady == true
+                        && sockets[rider].currentLocation.lat != ''
+                        && sockets[rider].currentLocation.lng != ''
+                        && sockets[rider].isApproved != 0
+                        && sockets[rider].status != 2) {
+
+                        console.log('a preium user is looking for riders')
+
+                        if (drivers.includes(sockets[rider].user_id)) continue;
+
+                        if (userType == 897 || userType == 891 || userType == 898) {
+                            let calculateDistance = calcCrow(lat, lng, sockets[rider].currentLocation.lat, sockets[rider].currentLocation.lng).toFixed(1)
+                            console.log(222)
+                            console.log("Perium distance1 =" + calculateDistance)
+                            if (calculateDistance > 5) continue;
+                        }
+
+                        if (sockets[rider].subscription == null) {
+
+                            let checkIfHadFreeRideBefore = await db.freeRide.findFirst({
+                                where: {
+                                    rider_id: parseInt(sockets[rider].user_id)
+                                },
+                                orderBy: {
+                                    created_at: 'desc'
+                                }
+                            })
+
+                            if (checkIfHadFreeRideBefore) {
+                                if (moment(checkIfHadFreeRideBefore.created_at).add('1', 'days').format('YYYY/MM/DD HH:mm:ss') >= moment().format('YYYY/MM/DD HH:mm:ss')) {
+
+                                    drivers.push(sockets[rider].user_id)
+                                    continue
+                                    
+                                }
+                            }
+                        }
+
+                        global.io.to(sockets[rider].socket_id).emit('request', JSON.stringify({
                             user_id: req.user.id,
-                            price: price ?? 50,
+                            price: price ?? 0,
+                            user_name: req.user.firstName, 
                             message_ar: `قام ${req.user.firstName} بطلب رحله من ... الي ... بسعر 50 جنيه`,
-                            message_en: req.user.firstName + ' Has requested a ride from' + From + ' to' + To + ' ' + 'for 50 L.E',
+                            message_en: req.user.firstName + ' Has requested a ride from ' + From + ' to' + To + ' ' + ' for 50 L.E',
                             distance: distance ? distance + ' KiloMeters' : 'Unknown',
                             userType: userType,
                             destinationFrom: From,
@@ -115,84 +150,271 @@ let findRiders = async (req, res) => {
                             customerLat: lat,
                             destinationLat: destinationLat,
                             destinationLng: destinationLng,
-                            tripTime: tripTime
-                        }
-                    ));
-                    continue;
-                }
+                            tripTime: tripTime,
+                            freeRide: null
+                        }));
 
-                if (moment(sockets[socket].subscription.startDate).add(sockets[socket].subscription.period, 'days').format('YYYY/MM/DD HH:mm:ss') >= moment().format('YYYY/MM/DD HH:mm:ss')) {
-                    console.log('passed' + sockets[socket].subscription)
-                    console.log(sockets[socket].subscription)
-                    global.io.to(sockets[socket].socket_id).emit('no-subscription', JSON.stringify(
-                        {
-                            // message_ar: `لديك طلبات توصيله و لكنك غير مشترك اليوم من فضلك اشترك حتي تواصل العمل معنا`,
-                            // message_en: 'You have ride requests but you did not subscribe today , Please subscribe to keep taking trips.',
-                            user_id: req.user.id,
-                            price: price ?? 50,
-                            message_ar: `قام ${req.user.firstName} بطلب رحله من ... الي ... بسعر ${price ?? 0} جنيه`,
-                            message_en: req.user.firstName + `Has requested a ride from ${From} to ${To}   for ${price ?? 0}`,
-                            distance: distance ? distance + ' Km' : 'Unknown',
-                            userType: userType,
-                            destinationFrom: From,
-                            destinationTo: To,
-                            customerLng: lng,
-                            customerLat: lat,
-                            destinationLat: destinationLat,
-                            destinationLng: destinationLng,
-                            tripTime: tripTime
-                        }
-                    ));
-                    continue;
-                }
+                        drivers.push(sockets[rider].user_id)
 
-                if (sockets[socket].lastTrip.lat != null && sockets[socket].lastTrip.lng != null && destinationLng && destinationLat) {
-                    console.log('final destination')
-                    let calculateDistance = calcCrow(sockets[socket].lastTrip.lat, sockets[socket].lastTrip.lng, destinationLat, destinationLng).toFixed(1)
-                    console.log("distance =" + calculateDistance)
-                    if (calculateDistance > 5) continue;
-                    global.io.to(sockets[socket].socket_id).emit('request', JSON.stringify(
-                        {
-                            user_id: req.user.id,
-                            price: price ?? 50,
-                            message_ar: `قام ${req.user.firstName} بطلب رحله من ... الي ... بسعر 50 جنيه`,
-                            message_en: req.user.firstName + ' Has requested a ride from' + From + ' to' + To + ' ' + 'for 50 L.E',
-                            distance: distance ? distance + ' KiloMeters' : 'Unknown',
-                            userType: userType,
-                            destinationFrom: From,
-                            destinationTo: To,
-                            customerLng: lng,
-                            customerLat: lat,
-                            destinationLat: destinationLat,
-                            destinationLng: destinationLng,
-                            tripTime: tripTime
-                        }
-                    ));
-                    continue;
-                }
+                        if (sockets[rider].subscription == null) {
+                            let notify = {
+                                message_ar: 'Congratulations, You have a free ride from 49, Stay tuned.',
+                                message_en: 'تهانينا لقد حصلت علي رحله مجانيه من تطبيق ٤٩.',
+                                user: sockets[rider].user_id,
+                                userFirstName: 0,
+                                rideId: 0,
+                                type: 510,
+                            }
 
-                let calculateDistance = calcCrow(lat, lng, sockets[socket].currentLocation.lat, sockets[socket].currentLocation.lng).toFixed(1)
-                console.log(222)
-                console.log("distance1 =" + calculateDistance)
-                if (calculateDistance > 5) continue;
-                global.io.to(sockets[socket].socket_id).emit('request', JSON.stringify(
-                    {
-                        user_id: req.user.id,
-                        price: price ?? 50,
-                        message_ar: `قام ${req.user.firstName} بطلب رحله من ... الي ... بسعر 50 جنيه`,
-                        message_en: req.user.firstName + ' Has requested a ride from ' + From + ' to' + To + ' ' + ' for 50 L.E',
-                        distance: distance ? distance + ' KiloMeters' : 'Unknown',
-                        userType: userType,
-                        destinationFrom: From,
-                        destinationTo: To,
-                        customerLng: lng,
-                        customerLat: lat,
-                        destinationLat: destinationLat,
-                        destinationLng: destinationLng,
-                        tripTime: tripTime
+                            //pleasePayNotification(notify)
+
+                        } else {
+                            let notify = {
+                                message_ar: `New ride request from ${req.firstName}.`,
+                                message_en: `${req.firstName} ليك طلب توصيله جديد.`,
+                                user: sockets[rider].user_id,
+                                userFirstName: 0,
+                                rideId: 0,
+                                type: 510,
+                            }
+
+                            //pleasePayNotification(notify)
+                        }
+                        continue;
                     }
-                ));
+                }
+
+            } else {
+                console.log('i am a noraml user')
+
+                for (rider in sockets) {
+                    if (sockets[rider].userType == userType
+                        && sockets[rider].isReady == true
+                        && sockets[rider].currentLocation.lat != ''
+                        && sockets[rider].currentLocation.lng != ''
+                        && sockets[rider].isApproved != 0
+                        && sockets[rider].status != 2) {
+                        
+                        console.log(sockets[rider].user_id)    
+                        console.log('passed here')
+
+                        if (drivers.includes(sockets[rider].user_id)) continue;
+
+                        if (sockets[rider].subscription != null) {
+
+                            console.log('a normal user is looking for riders')
+                            if (userType == 897 || userType == 891 || userType == 898) {
+                                let calculateDistance = calcCrow(lat, lng, sockets[rider].currentLocation.lat, sockets[rider].currentLocation.lng).toFixed(1)
+                                console.log(222)
+                                console.log("Perium distance1 =" + calculateDistance)
+                                if (calculateDistance > 5) continue;
+                            }
+                            global.io.to(sockets[rider].socket_id).emit('request', JSON.stringify({
+                                user_id: req.user.id,
+                                user_id: req.user.id,
+                                price: price ?? 0,
+                                message_ar: `قام ${req.user.firstName} بطلب رحله من ... الي ... بسعر 50 جنيه`,
+                                message_en: req.user.firstName + ' Has requested a ride from ' + From + ' to' + To + ' ' + ' for 50 L.E',
+                                distance: distance ? distance + ' KiloMeters' : 'Unknown',
+                                userType: userType,
+                                destinationFrom: From,
+                                destinationTo: To,
+                                customerLng: lng,
+                                customerLat: lat,
+                                destinationLat: destinationLat,
+                                destinationLng: destinationLng,
+                                tripTime: tripTime,
+                                freeRide: null
+                            }));
+
+                            drivers.push(sockets[rider].user_id)
+
+                            let notify = {
+                                message_ar: `New ride request from ${req.firstName}.`,
+                                message_en: `${req.firstName} ليك طلب توصيله جديد من.`,
+                                user: sockets[rider].user_id,
+                                userFirstName: 0,
+                                rideId: 0,
+                                type: 510,
+                            }
+
+                            //pleasePayNotification(notify)
+                            continue;
+                        } else {
+                            console.log('passed there')
+                            console.log('a normal user for non sub is looking for riders')
+                            if (userType == 897 || userType == 891 || userType == 898) {
+                                let calculateDistance = calcCrow(lat, lng, sockets[rider].currentLocation.lat, sockets[rider].currentLocation.lng).toFixed(1)
+                                console.log(222)
+                                console.log("Perium distance1 =" + calculateDistance)
+                                if (calculateDistance > 5) continue;
+                            }
+
+                            if (drivers.includes(sockets[rider].user_id)) continue;
+
+                            let checkIfHadFreeRideBefore = await db.freeRide.findFirst({
+                                where: {
+                                    rider_id: parseInt(sockets[rider].user_id)
+                                },
+                                orderBy: {
+                                    created_at: 'desc'
+                                }
+                            })
+
+                            if (checkIfHadFreeRideBefore) {
+                                if (moment(checkIfHadFreeRideBefore.created_at).add('1', 'days').format('YYYY/MM/DD HH:mm:ss') >= moment().format('YYYY/MM/DD HH:mm:ss')) {
+
+                                    drivers.push(sockets[rider].user_id)
+                                    continue
+                                    
+                                }
+                            }
+
+                            global.io.to(sockets[rider].socket_id).emit('request', JSON.stringify({
+                                user_id: req.user.id,
+                                user_id: req.user.id,
+                                price: (price + 20) ?? 0,
+                                message_ar: `قام ${req.user.firstName} بطلب رحله من ... الي ... بسعر ${ parseInt(price + 20) } جنيه`,
+                                message_en: req.user.firstName + ' Has requested a ride from ' + From + ' to' + To + ' ' + ' for ' + parseInt(price + 20) + ' L.E',
+                                distance: distance ? distance + ' KiloMeters' : 'Unknown',
+                                userType: userType,
+                                destinationFrom: From,
+                                destinationTo: To,
+                                customerLng: lng,
+                                customerLat: lat,
+                                destinationLat: destinationLat,
+                                destinationLng: destinationLng,
+                                tripTime: tripTime,
+                                freeRide: 1
+                            }));
+
+                            let notify = {
+                                message_ar: 'Congratulations, You have a free ride from 49, 20 L.E will be paid extra from the client to us.',
+                                message_en: 'تهانينا لقد حصلت علي رحله مجانيه من تطبيق ٤٩ ، ٢٠ جنيهات سوف يتم تحصيلها من العميل ك رسوم اضافيه.',
+                                user: sockets[rider].user_id,
+                                userFirstName: 0,
+                                rideId: 0,
+                                type: 510,
+                            }
+
+                            drivers.push(sockets[rider].user_id)
+
+                            //pleasePayNotification(notify)
+                            continue;
+                        }
+
+                    }
+                }
             }
+
+            // if (sockets[socket].userType == userType
+            //     && sockets[socket].isReady == true
+            //     && sockets[socket].currentLocation.lat != ''
+            //     && sockets[socket].currentLocation.lng != ''
+            //     && sockets[socket].isApproved != 0
+            //     && sockets[socket].status != 2) {
+
+            //     console.log(lat, lng)
+            //     console.log(sockets[socket].currentLocation.lat, sockets[socket].currentLocation.lng)
+            //     console.log("23232" + sockets[socket])
+            //     console.log(sockets[socket].subscription)
+            //     // we need to check if this driver has already subscribed   
+            //     if (sockets[socket].subscription == null) {
+            //         console.log(111)
+            //         global.io.to(sockets[socket].socket_id).emit('no-subscription', JSON.stringify(
+            //             {
+            //                 // message_ar: `لديك طلبات توصيله و لكنك غير مشترك اليوم من فضلك اشترك حتي تواصل العمل معنا`,
+            //                 // message_en: 'You have ride requests but you did not subscribe today , Please subscribe to keep taking trips.',
+            //                 user_id: req.user.id,
+            //                 price: price ?? 50,
+            //                 message_ar: `قام ${req.user.firstName} بطلب رحله من ... الي ... بسعر 50 جنيه`,
+            //                 message_en: req.user.firstName + ' Has requested a ride from' + From + ' to' + To + ' ' + 'for 50 L.E',
+            //                 distance: distance ? distance + ' KiloMeters' : 'Unknown',
+            //                 userType: userType,
+            //                 destinationFrom: From,
+            //                 destinationTo: To,
+            //                 customerLng: lng,
+            //                 customerLat: lat,
+            //                 destinationLat: destinationLat,
+            //                 destinationLng: destinationLng,
+            //                 tripTime: tripTime
+            //             }
+            //         ));
+            //         continue;
+            //     }
+
+            //     if (moment(sockets[socket].subscription.startDate).add(sockets[socket].subscription.period, 'days').format('YYYY/MM/DD HH:mm:ss') >= moment().format('YYYY/MM/DD HH:mm:ss')) {
+            //         console.log('passed' + sockets[socket].subscription)
+            //         console.log(sockets[socket].subscription)
+            //         global.io.to(sockets[socket].socket_id).emit('no-subscription', JSON.stringify(
+            //             {
+            //                 // message_ar: `لديك طلبات توصيله و لكنك غير مشترك اليوم من فضلك اشترك حتي تواصل العمل معنا`,
+            //                 // message_en: 'You have ride requests but you did not subscribe today , Please subscribe to keep taking trips.',
+            //                 user_id: req.user.id,
+            //                 price: price ?? 50,
+            //                 message_ar: `قام ${req.user.firstName} بطلب رحله من ... الي ... بسعر ${price ?? 0} جنيه`,
+            //                 message_en: req.user.firstName + `Has requested a ride from ${From} to ${To}   for ${price ?? 0}`,
+            //                 distance: distance ? distance + ' Km' : 'Unknown',
+            //                 userType: userType,
+            //                 destinationFrom: From,
+            //                 destinationTo: To,
+            //                 customerLng: lng,
+            //                 customerLat: lat,
+            //                 destinationLat: destinationLat,
+            //                 destinationLng: destinationLng,
+            //                 tripTime: tripTime
+            //             }
+            //         ));
+            //         continue;
+            //     }
+
+            //     if (sockets[socket].lastTrip.lat != null && sockets[socket].lastTrip.lng != null && destinationLng && destinationLat) {
+            //         console.log('final destination')
+            //         let calculateDistance = calcCrow(sockets[socket].lastTrip.lat, sockets[socket].lastTrip.lng, destinationLat, destinationLng).toFixed(1)
+            //         console.log("distance =" + calculateDistance)
+            //         if (calculateDistance > 5) continue;
+            //         global.io.to(sockets[socket].socket_id).emit('request', JSON.stringify(
+            //             {
+            //                 user_id: req.user.id,
+            //                 price: price ?? 50,
+            //                 message_ar: `قام ${req.user.firstName} بطلب رحله من ... الي ... بسعر 50 جنيه`,
+            //                 message_en: req.user.firstName + ' Has requested a ride from' + From + ' to' + To + ' ' + 'for 50 L.E',
+            //                 distance: distance ? distance + ' KiloMeters' : 'Unknown',
+            //                 userType: userType,
+            //                 destinationFrom: From,
+            //                 destinationTo: To,
+            //                 customerLng: lng,
+            //                 customerLat: lat,
+            //                 destinationLat: destinationLat,
+            //                 destinationLng: destinationLng,
+            //                 tripTime: tripTime
+            //             }
+            //         ));
+            //         continue;
+            //     }
+
+            //     let calculateDistance = calcCrow(lat, lng, sockets[socket].currentLocation.lat, sockets[socket].currentLocation.lng).toFixed(1)
+            //     console.log(222)
+            //     console.log("distance1 =" + calculateDistance)
+            //     if (calculateDistance > 5) continue;
+            //     global.io.to(sockets[socket].socket_id).emit('request', JSON.stringify(
+            //         {
+            //             user_id: req.user.id,
+            //             price: price ?? 50,
+            //             message_ar: `قام ${req.user.firstName} بطلب رحله من ... الي ... بسعر 50 جنيه`,
+            //             message_en: req.user.firstName + ' Has requested a ride from ' + From + ' to' + To + ' ' + ' for 50 L.E',
+            //             distance: distance ? distance + ' KiloMeters' : 'Unknown',
+            //             userType: userType,
+            //             destinationFrom: From,
+            //             destinationTo: To,
+            //             customerLng: lng,
+            //             customerLat: lat,
+            //             destinationLat: destinationLat,
+            //             destinationLng: destinationLng,
+            //             tripTime: tripTime
+            //         }
+            //     ));
+            // }
             continue;
         }
         res.send('Waiting for our drivers to connect')
@@ -228,9 +450,9 @@ let updateDriversLocation = async (req, res) => {
 
 /* Calculate total price  */
 let getPriceViaDistance = async (req, res) => {
-    const { subCategory, distance } = req.params 
+    const { subCategory, distance } = req.params
 
-    if (! subCategory) {
+    if (!subCategory) {
         return res.send('No sub Category was provided')
     }
 
@@ -430,8 +652,8 @@ let acceptRide = async (req, res) => {
                     total: total,
                     isPendding: 1,
                 }
-            }) 
-            
+            })
+
             sockets[socket].status = 2
 
             return res.send('You already in a trip.')
@@ -471,7 +693,7 @@ let acceptRide = async (req, res) => {
 }
 
 // finish  a ride 
-let endRide = async (req,res) => {
+let endRide = async (req, res) => {
 
     try {
         let getLastTripForDriver = await db.ridesRequested.findFirst({
@@ -607,11 +829,11 @@ function toRad(Value) {
 }
 
 function calculateRate(total5Stars, total4Stars, total3Stars, total2Stars, total1Star) {
-    return (5*total5Stars + 4*total4Stars + 3*total3Stars + 2*total2Stars + 1*total1Star)
-        / (total5Stars+total4Stars+total3Stars+total2Stars+total1Star)
+    return (5 * total5Stars + 4 * total4Stars + 3 * total3Stars + 2 * total2Stars + 1 * total1Star)
+        / (total5Stars + total4Stars + total3Stars + total2Stars + total1Star)
 }
 
-let customerFeedBack = async (req ,res) => {
+let customerFeedBack = async (req, res) => {
     const { rate, comment } = req.body
     try {
 
@@ -641,8 +863,8 @@ let customerFeedBack = async (req ,res) => {
         })
 
     } catch (e) {
-        throw new e 
-    }   
+        throw new e
+    }
 }
 
 module.exports = {

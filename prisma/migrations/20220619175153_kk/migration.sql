@@ -1,2 +1,0 @@
--- AlterTable
-ALTER TABLE `Users` ADD COLUMN `isApproved` INTEGER NULL DEFAULT 0;

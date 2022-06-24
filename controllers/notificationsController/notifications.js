@@ -1,7 +1,8 @@
 
-const express = require('express')
+const app = require('express')
 const { PrismaClient } = require('@prisma/client');
 const db = new PrismaClient();
+const admin  = require('firebase-admin')
 
 /* Get the latest notifications */
 let userNotification = async (req, res) => {
@@ -137,16 +138,25 @@ let pleasePayNotification = async (notify) => {
         }
     })
 
+
+    let getTheLanguage = await db.userSettings.findFirst({
+        where: {
+            user_id: parseInt(notify.user),
+            identifier: 9,
+        }
+    })
+
+
     admin.messaging().send({
         data: {
             reciever: notify.user.toString(),
-            rideId: notify.rideId == null ? "0" : notify.postId.toString(),
+            rideId: notify.rideId == null ? "0" : notify.rideId.toString(),
             type: notify.type.toString()
         },  
         token: getUserFCM.fcm,
         notification: {
           title: getTheLanguage.value == 'en_US' ? `Hi ${ notify.userFirstName }` : `${notify.userFirstName} اهلا`,
-          body: getTheLanguage.value == 'en_US' ? notify.notification_en.toString() : notify.notification_ar.toString(),
+          body: getTheLanguage.value == 'en_US' ? notify.message_en.toString() : notify.message_ar.toString(),
         }
     })
 }

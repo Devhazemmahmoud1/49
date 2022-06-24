@@ -156,6 +156,7 @@ io.on('connection', async (socket) => {
         status: socket.status ?? null,
         token: socket.token,
         subscription: socket.subscription ?? null,
+        isPersonalAccount: socket.subscription != null ? socket.subscription.isPersonalAccount : null,
         lastTrip: {
           destinationAddress: null,
           lat: null,
@@ -186,15 +187,12 @@ io.on('connection', async (socket) => {
         console.log(sockets)
       }
 
-
-
       console.log('this is the sockets info')
       console.log(sockets)
     }
   }
 
   socket.on('change-price', async (data) => {
-    console.log(data)
     var price = JSON.parse(data).price
     var distance = JSON.parse(data).distance
     var userType = JSON.parse(data).userType
@@ -234,25 +232,6 @@ io.on('connection', async (socket) => {
       }
     }
 
-    let s = {
-      riderId: riderId,
-      user_id: userId,
-      price: price,
-      distance: distance ? distance + ' KiloMeters' : 'Unknown',
-      userType: userType,
-      destinationFrom: From,
-      destinationTo: To,
-      customerLng: lng,
-      customerLat: lat,
-      destinationLat: destinationLat,
-      destinationLng: destinationLng,
-      tripTime: tripTime,
-      rideInfo: rideInfo,
-      riderPhoto: userInfo.profilePicture
-    }
-
-    console.log(s)
-
     io.to(requestTo).emit('agent-new-changed-price', JSON.stringify({
       riderId: riderId,
       user_id: userId,
@@ -266,6 +245,7 @@ io.on('connection', async (socket) => {
       destinationLat: destinationLat,
       destinationLng: destinationLng,
       tripTime: tripTime,
+      freeRide: JSON.parse(data).freeRide,
       rideInfo: rideInfo,
       riderPhoto: userInfo.profilePicture
     }));
@@ -308,6 +288,7 @@ io.on('connection', async (socket) => {
         destinationLat: destinationLat,
         destinationLng: destinationLng,
         tripTime: tripTime,
+        freeRide: JSON.parse(data).freeRide
       }
     ))
   })
@@ -319,95 +300,98 @@ io.on('connection', async (socket) => {
   })
 })
 
-io.use(async (socket, next) => {
-  try {
+  io.use(async (socket, next) => {
+    try {
 
-    let token = socket.handshake.headers.authorization
-    if (!token) {
-      console.log("socket auth be provided !")
-      throw new Error("auth must be provided !")
-    }
-
-    let authorization = token.split('Bearer ')[1]
-    Jwt.verify(authorization, secretKey, async (err, data) => {
-      if (err) throw err;
-
-      let user = await db.users.findFirst({
-        where: {
-          id: parseInt(data.id) ?? undefined
-        },
-        select: {
-          firstName: true,
-          lastName: true,
-          email: true,
-          id: true,
-          isApproved: true,
-          accountType: true,
-        }
-      });
-      if (!user) {
-        socket.user = null
-        socket.token = null
-        socket.subscription = null
-        next();
+      let token = socket.handshake.headers.authorization
+      if (!token) {
+        console.log("socket auth be provided !")
+        throw new Error("auth must be provided !")
       }
 
-      let userSubscription = await db.subscriptions.findFirst({
+      let authorization = token.split('Bearer ')[1]
+      Jwt.verify(authorization, secretKey, async (err, data) => {
+        if (err) throw err;
+
+        let user = await db.users.findFirst({
           where: {
-            user_id: data.id
+            id: parseInt(data.id) ?? undefined
+          },
+          select: {
+            firstName: true,
+            lastName: true,
+            email: true,
+            id: true,
+            isApproved: true,
+            accountType: true,
+          }
+        });
+        if (!user) {
+          socket.user = null
+          socket.token = null
+          socket.subscription = null
+          next();
+        }
+
+        let userSubscription = await db.subscriptions.findFirst({
+            where: {
+              user_id: parseInt(data.id)
+            },
+            orderBy: {
+              'created_at': 'desc'
+            }
+        })
+
+        if (userSubscription) {
+          if (moment(userSubscription.updated_at).add(userSubscription.period, 'days').format('YYYY/MM/DD HH:mm:ss') >= moment().format('YYYY/MM/DD HH:mm:ss')) {
+
+            console.log('passed')
+            // subscription still on
+            socket.subscription = {
+              categoryId: userSubscription.subCat_id,
+              permium: userSubscription.isPermium,
+              stauts: 1,
+              isPersonalAccount: userSubscription.isPersonalAccount,
+              CounterStaterd: userSubscription.packageCounter != null,
+              startDate: userSubscription.updated_at,
+            }
+          }
+        } else {
+          socket.subscription = null
+        }
+
+        // check if he has any trips going on 
+        let checkTrip = await db.ridesRequested.findFirst({
+          where: {
+            rider_id: data.id,
           },
           orderBy: {
-            'created_at': 'desc'
+            created_at: 'desc'
           }
-      })
+        })
 
-      if (userSubscription) {
-        if (moment(userSubscription.created_at).add(userSubscription.period, 'days').format('YYYY/MM/DD HH:mm:ss') <= moment().format('YYYY/MM/DD HH:mm:ss')) {
-           // subscription still on
-           socket.subscription = {
-             categoryId: userSubscription.subCat_id,
-             permium: userSubscription.isPermium,
-             stauts: 1,
-             startDate: userSubscription.created_at,
-           }
+        if (checkTrip && checkTrip.isDone == 0 && checkTrip.isPendding != 1) {
+          socket.status = 1
         }
-      } else {
-        socket.subscription = null
-      }
 
-      // check if he has any trips going on 
-
-      let checkTrip = await db.ridesRequested.findFirst({
-        where: {
-          rider_id: data.id,
-        },
-        orderBy: {
-          created_at: 'desc'
+        if (checkTrip && checkTrip.isDone == 0 && checkTrip.isPendding == 1) {
+          socket.status = 2
         }
-      })
 
-      if (checkTrip && checkTrip.isDone == 0 && checkTrip.isPendding != 1) {
-        socket.status = 1
-      }
+        if (!checkTrip || checkTrip.isDone == 1 && checkTrip.isPendding == 0) {
+          socket.status = null
+        }
 
-      if (checkTrip && checkTrip.isDone == 0 && checkTrip.isPendding == 1) {
-        socket.status = 2
-      }
+        socket.user = user;
+        socket.token = authorization
+        next();
+      });
 
-      if (!checkTrip || checkTrip.isDone == 1 && checkTrip.isPendding == 0) {
-        socket.status = null
-      }
-
-      socket.user = user;
-      socket.token = authorization
-      next();
-    });
-
-  } catch (e) {
-    console.log("socket cant connect because => " + e.toString())
-    next(Error(e.toString()))
-  }
-});
+    } catch (e) {
+      console.log("socket cant connect because => " + e.toString())
+      next(Error(e.toString()))
+    }
+  });
 
 module.exports = { app, server }
 

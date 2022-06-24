@@ -35,6 +35,7 @@ CREATE TABLE `Users` (
     `recentShare` INTEGER NULL DEFAULT 0,
     `recentViews` INTEGER NULL DEFAULT 0,
     `accountType` INTEGER NULL DEFAULT 0,
+    `isApproved` INTEGER NULL DEFAULT 0,
 
     PRIMARY KEY (`id`)
 ) DEFAULT CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;
@@ -181,6 +182,8 @@ CREATE TABLE `subscriptions` (
     `period` VARCHAR(5000) NOT NULL,
     `subCat_id` INTEGER NOT NULL,
     `isPermium` INTEGER NOT NULL DEFAULT 0,
+    `isPersonalAccount` INTEGER NOT NULL DEFAULT 0,
+    `packageCounter` INTEGER NOT NULL DEFAULT 0,
     `created_at` DATETIME(3) NOT NULL DEFAULT CURRENT_TIMESTAMP(3),
     `updated_at` DATETIME(3) NOT NULL,
 
@@ -327,6 +330,9 @@ CREATE TABLE `ride` (
     `id` INTEGER NOT NULL AUTO_INCREMENT,
     `user_id` INTEGER NOT NULL,
     `carModel` VARCHAR(255) NOT NULL,
+    `carType` VARCHAR(191) NULL,
+    `metalPaletLetters` VARCHAR(191) NULL,
+    `metalPaletNumbers` VARCHAR(191) NULL,
     `distancePerKilo` DECIMAL(9, 2) NOT NULL,
     `isApproved` INTEGER NOT NULL DEFAULT 0,
     `category_id` INTEGER NOT NULL DEFAULT 0,
@@ -370,6 +376,8 @@ CREATE TABLE `ridesRequested` (
     `client_id` INTEGER NOT NULL,
     `rider_id` INTEGER NOT NULL,
     `distance` VARCHAR(191) NOT NULL,
+    `tripTime` VARCHAR(191) NOT NULL,
+    `tripTotalTime` VARCHAR(191) NULL,
     `customerLng` VARCHAR(191) NULL,
     `customerlat` VARCHAR(191) NULL,
     `destinationLat` VARCHAR(191) NULL,
@@ -378,7 +386,43 @@ CREATE TABLE `ridesRequested` (
     `streetTo` VARCHAR(191) NOT NULL,
     `isPendding` INTEGER NOT NULL DEFAULT 0,
     `isDone` INTEGER NOT NULL DEFAULT 0,
+    `isFreeForDriver` INTEGER NOT NULL DEFAULT 0,
     `total` VARCHAR(191) NOT NULL,
+    `created_at` DATETIME(3) NOT NULL DEFAULT CURRENT_TIMESTAMP(3),
+    `updated_at` DATETIME(3) NOT NULL,
+
+    PRIMARY KEY (`id`)
+) DEFAULT CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;
+
+-- CreateTable
+CREATE TABLE `ridersWallet` (
+    `id` INTEGER NOT NULL AUTO_INCREMENT,
+    `rider_id` INTEGER NOT NULL,
+    `income` DECIMAL(9, 2) NOT NULL DEFAULT 0,
+    `outcomes` DECIMAL(9, 2) NOT NULL DEFAULT 0,
+    `created_at` DATETIME(3) NOT NULL DEFAULT CURRENT_TIMESTAMP(3),
+    `updated_at` DATETIME(3) NOT NULL,
+
+    PRIMARY KEY (`id`)
+) DEFAULT CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;
+
+-- CreateTable
+CREATE TABLE `freeChargeForRiders` (
+    `id` INTEGER NOT NULL AUTO_INCREMENT,
+    `rider_id` INTEGER NOT NULL,
+    `created_at` DATETIME(3) NOT NULL DEFAULT CURRENT_TIMESTAMP(3),
+    `updated_at` DATETIME(3) NOT NULL,
+
+    PRIMARY KEY (`id`)
+) DEFAULT CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;
+
+-- CreateTable
+CREATE TABLE `ridesRatesAndComments` (
+    `id` INTEGER NOT NULL AUTO_INCREMENT,
+    `user_id` INTEGER NOT NULL,
+    `rideId` INTEGER NOT NULL,
+    `comment` VARCHAR(5000) NOT NULL,
+    `rideRate` INTEGER NOT NULL,
     `created_at` DATETIME(3) NOT NULL DEFAULT CURRENT_TIMESTAMP(3),
     `updated_at` DATETIME(3) NOT NULL,
 
@@ -959,6 +1003,31 @@ CREATE TABLE `SubCategoriesFavo` (
     PRIMARY KEY (`id`)
 ) DEFAULT CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;
 
+-- CreateTable
+CREATE TABLE `AdsPackages` (
+    `id` INTEGER NOT NULL AUTO_INCREMENT,
+    `packagePrice` INTEGER NOT NULL,
+    `type` INTEGER NOT NULL DEFAULT 1,
+    `created_at` DATETIME(3) NOT NULL DEFAULT CURRENT_TIMESTAMP(3),
+    `updated_at` DATETIME(3) NOT NULL,
+
+    PRIMARY KEY (`id`)
+) DEFAULT CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;
+
+-- CreateTable
+CREATE TABLE `companiesAds` (
+    `id` INTEGER NOT NULL AUTO_INCREMENT,
+    `user_id` INTEGER NOT NULL,
+    `package_id` INTEGER NOT NULL,
+    `adText` VARCHAR(1000) NOT NULL,
+    `banner` VARCHAR(191) NOT NULL,
+    `isApproved` INTEGER NOT NULL DEFAULT 0,
+    `created_at` DATETIME(3) NOT NULL DEFAULT CURRENT_TIMESTAMP(3),
+    `updated_at` DATETIME(3) NOT NULL,
+
+    PRIMARY KEY (`id`)
+) DEFAULT CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;
+
 -- AddForeignKey
 ALTER TABLE `SubCategories` ADD CONSTRAINT `SubCategories_parent_fkey` FOREIGN KEY (`parent`) REFERENCES `MainCategories`(`id`) ON DELETE RESTRICT ON UPDATE CASCADE;
 
@@ -1078,3 +1147,6 @@ ALTER TABLE `reelLikes` ADD CONSTRAINT `reelLikes_reel_id_fkey` FOREIGN KEY (`re
 
 -- AddForeignKey
 ALTER TABLE `reelViews` ADD CONSTRAINT `reelViews_reel_id_fkey` FOREIGN KEY (`reel_id`) REFERENCES `reels`(`id`) ON DELETE RESTRICT ON UPDATE CASCADE;
+
+-- AddForeignKey
+ALTER TABLE `companiesAds` ADD CONSTRAINT `companiesAds_package_id_fkey` FOREIGN KEY (`package_id`) REFERENCES `AdsPackages`(`id`) ON DELETE RESTRICT ON UPDATE CASCADE;

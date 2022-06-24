@@ -7,8 +7,8 @@ generator client {
 
 datasource db {
   provider = "mysql"
-  //url      = "mysql://root:root@localhost:3306/fourtynine?schema=public"
-  url      = "mysql://49hub1:Database49hub@64.225.101.68:3306/fourtynine?schema=public"
+  url      = "mysql://root:root@localhost:3306/fourtynine?schema=public"
+  //url      = "mysql://49hub1:Database49hub@64.225.101.68:3306/fourtynine?schema=public"
 }
 
 model Admins {
@@ -184,6 +184,7 @@ model subscriptions {
   subCat_id         Int
   isPermium         Int      @default(0)
   isPersonalAccount Int      @default(0)
+  packageCounter    Int      @default(0)
   user              Users    @relation(fields: [user_id], references: [id])
   created_at        DateTime @default(now())
   updated_at        DateTime @updatedAt
@@ -336,25 +337,49 @@ model ridesPendingRequests {
 }
 
 model ridesRequested {
-  id             Int      @id @default(autoincrement())
-  client_id      Int      @db.Int
-  rider_id       Int
-  distance       String
-  tripTime       String
-  tripTotalTime  String?
-  customerLng    String?
-  customerlat    String?
-  destinationLat String?
-  destinationLng String?
-  streetFrom     String
-  streetTo       String
-  isPendding     Int      @default(0)
-  isDone         Int      @default(0)
-  total          String
-  created_at     DateTime @default(now())
-  updated_at     DateTime @updatedAt
-  clientInfo     Users    @relation(fields: [client_id], references: [id])
-  agentInfo      ride     @relation(fields: [rider_id], references: [user_id])
+  id              Int      @id @default(autoincrement())
+  client_id       Int      @db.Int
+  rider_id        Int
+  distance        String
+  tripTime        String
+  tripTotalTime   String?
+  customerLng     String?
+  customerlat     String?
+  destinationLat  String?
+  destinationLng  String?
+  streetFrom      String
+  streetTo        String
+  isPendding      Int      @default(0)
+  isDone          Int      @default(0)
+  isFreeForDriver Int      @default(0)
+  total           String
+  created_at      DateTime @default(now())
+  updated_at      DateTime @updatedAt
+  clientInfo      Users    @relation(fields: [client_id], references: [id])
+  agentInfo       ride     @relation(fields: [rider_id], references: [user_id])
+}
+
+model ridersWallet {
+  id         Int      @id @default(autoincrement())
+  rider_id   Int
+  income     Decimal  @default(0) @db.Decimal(9, 2)
+  outcomes   Decimal  @default(0) @db.Decimal(9, 2)
+  created_at DateTime @default(now())
+  updated_at DateTime @updatedAt
+}
+
+model freeRides {
+  id Int @id @default(autoincrement())
+  rider_id Int
+  created_at DateTime @default(now())
+  updated_at DateTime @updatedAt  
+}
+
+model freeChargeForRiders {
+  id         Int      @id @default(autoincrement())
+  rider_id   Int
+  created_at DateTime @default(now())
+  updated_at DateTime @updatedAt
 }
 
 model ridesRatesAndComments {

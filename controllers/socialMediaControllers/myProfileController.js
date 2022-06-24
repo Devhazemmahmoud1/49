@@ -31,6 +31,25 @@ let getMyProfile = async (req, res) => {
         })
     }
 
+    let getSubscriptions = await db.subscriptions.findMany({
+        where: {
+            user_id: req.user.id
+        }
+    })
+
+    if (getSubscriptions) {
+        for (final of getSubscriptions) {
+            final.subCategory = await db.subCategories.findFirst({
+                where: {
+                    id: parseInt(final.subCat_id)
+                },
+                include: {
+                    photo: true,
+                }
+            })
+        }
+    }
+
 
     return res.status(200).json({
         userInfo: req.user,
@@ -75,7 +94,8 @@ let getMyProfile = async (req, res) => {
             _count: {
                 is_read: true,
             }
-        })
+        }),
+        subscriptions: getSubscriptions
     })
 }
 
