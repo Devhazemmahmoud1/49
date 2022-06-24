@@ -1713,7 +1713,7 @@ let makeRequest = async (req, res) => {
                 // check for if the first time of the day using this feater 
                 // timer code is missing
 
-                let isFirstStep = await db.dailyCashBack.first({
+                let isFirstStep = await db.dailyCashBack.findFirst({
                     where: {
                         user_id: req.user.id,
                     },
