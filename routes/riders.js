@@ -73,4 +73,6 @@ router.post('/change-price/per-kilo', guard, autoCatch( ride.changePricePerKilo 
 
 router.get('/drivers-information/get', guard, autoCatch( ride.getDriverForm ))
 
+router.delete('/delete-spec-rider', guard, autoCatch( ride.deleteRider ))
+
 module.exports = router

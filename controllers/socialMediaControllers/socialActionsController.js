@@ -507,7 +507,7 @@ let acceptFriendRequest = async (req, res) => {
             }
         })
 
-        let checkuser = await db.friendRequests.findFirst({
+        var checkuser = await db.friendRequests.findFirst({
             where: {
                 user_id: parseInt(friendId),
                 friendRequestTo: req.user.id
@@ -728,7 +728,7 @@ let getSaraha = async (req, res) => {
         where: {
             sentTo: req.user.id
         }
-    })    
+    })
     return res.status(200).json(saraha)
 }
 
@@ -761,7 +761,10 @@ let searchForResult = async (req, res) => {
                         contains: search
                     }
                 }
-            ]
+            ],
+            accountType: {
+                lte: 0
+            }
         },
         skip: people == 1 ? 0 : (people * maxAds) - maxAds,
         take: maxAds,
@@ -810,9 +813,45 @@ let searchForResult = async (req, res) => {
         }))
     }
 
+    let getMainCats = await db.mainCategories.findMany({
+        where: {
+            OR: [
+                {
+                    name_ar: {
+                        contains: search
+                    }
+                },
+                {
+                    name_en: {
+                        contains: search
+                    }
+                }
+            ]
+        }
+    })
+
+    let getSubCats = await db.subCategories.findMany({
+        where: {
+            OR: [
+                {
+                    name_ar: {
+                        contains: search
+                    }
+                },
+                {
+                    name_en: {
+                        contains: search
+                    }
+                }
+            ]
+        }
+    })
+
     return res.status(200).json({
         people: getPeople,
-        posts: getPosts
+        posts: getPosts,
+        mainCategories: getMainCats,
+        subCategories: getSubCats
     })
 }
 
@@ -977,9 +1016,9 @@ let makeLikeOnPost = async (req, res) => {
                         id: checkIfLiked.id
                     }
                 })
-        
+
                 if (!deleteReaction) return res.status(403).send('something went wrong')
-        
+
                 await db.posts.update({
                     where: {
                         id: parseInt(postId)
@@ -993,7 +1032,7 @@ let makeLikeOnPost = async (req, res) => {
                         total_reactions: getReactionsForPost.total_reactions > 0 ? getReactionsForPost.total_reactions - 1 : 0
                     }
                 })
-        
+
                 let deleteNotification = await db.notifications.findFirst({
                     where: {
                         sender_id: req.user.id,
@@ -1001,7 +1040,7 @@ let makeLikeOnPost = async (req, res) => {
                         type: 1
                     }
                 })
-        
+
                 await db.notifications.delete({
                     where: {
                         id: deleteNotification.id
@@ -1027,10 +1066,10 @@ let makeLikeOnPost = async (req, res) => {
                         id: parseInt(postId)
                     },
                     data: {
-                        totalLikes: (getReactionsForPost.totalLikes - 1) 
+                        totalLikes: (getReactionsForPost.totalLikes - 1)
                     }
                 })
-            } 
+            }
 
             if (previousReaction == 2) {
                 await db.posts.update({
@@ -1038,7 +1077,7 @@ let makeLikeOnPost = async (req, res) => {
                         id: parseInt(postId)
                     },
                     data: {
-                        totalLove: (getReactionsForPost.totalLove - 1) 
+                        totalLove: (getReactionsForPost.totalLove - 1)
                     }
                 })
             }
@@ -1049,7 +1088,7 @@ let makeLikeOnPost = async (req, res) => {
                         id: parseInt(postId)
                     },
                     data: {
-                        totalWoW: (getReactionsForPost.totalWoW - 1) 
+                        totalWoW: (getReactionsForPost.totalWoW - 1)
                     }
                 })
             }
@@ -1060,7 +1099,7 @@ let makeLikeOnPost = async (req, res) => {
                         id: parseInt(postId)
                     },
                     data: {
-                        totalSad: (getReactionsForPost.totalSad - 1) 
+                        totalSad: (getReactionsForPost.totalSad - 1)
                     }
                 })
             }
@@ -1071,7 +1110,7 @@ let makeLikeOnPost = async (req, res) => {
                         id: parseInt(postId)
                     },
                     data: {
-                        totalAngry: (getReactionsForPost.totalAngry - 1) 
+                        totalAngry: (getReactionsForPost.totalAngry - 1)
                     }
                 })
             }
@@ -1398,6 +1437,48 @@ let makeUnlikeOnComment = async (req, res) => {
     })
 }
 
+// add +1 to share
+let makeShare = async (req, res) => {
+    const { postId  } = req.body
+
+    if (! postId) {
+        return res.send('Post id must be provided')
+    }
+
+    var post = await db.posts.findFirst({
+        where: {
+            id: parseInt(postId)
+        }
+    })
+
+    if (! post ) {
+        return res.json({
+            error: {
+                error_ar: 'رقم المنشور غير متاح.',
+                error_en: 'Post id is not vaild'
+            }
+        })
+    }
+
+    try {
+
+        await db.posts.update({
+            where: {
+                id: parseInt(postId)
+            },
+            data: {
+                total_shares: (post.total_shares + 1)
+            }
+        })
+
+        return res.send('ok')
+
+    } catch(e) {
+        console.log(e)
+        return;
+    }
+}
+
 module.exports = {
     editComment,
     addNewComment,
@@ -1421,4 +1502,5 @@ module.exports = {
     makeLikeOnComment,
     makeUnlikeOnComment,
     getSaraha,
+    makeShare
 }

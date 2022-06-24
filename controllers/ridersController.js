@@ -3,6 +3,7 @@ const { PrismaClient } = require('@prisma/client')
 const db = new PrismaClient();
 const moment = require('moment');
 const { pleasePayNotification } = require('../controllers/notificationsController/notifications')
+const hash = require('bcrypt')
 
 /* Add a new Rider according to the giving informaiton */
 var addRider = async (request, response) => {
@@ -867,6 +868,54 @@ let customerFeedBack = async (req, res) => {
     }
 }
 
+
+let deleteRider = async (req, res) => {
+    const { password } = req.body
+
+    if (!password) {
+        return res.send('No password provided')
+    }
+
+    if (req.user) {
+        let getUser = await db.users.findFirst({
+            where: {
+                id: req.user.id
+            }
+        })
+
+        const validPassword = hash.compareSync(password, getUser.password);
+
+        if (validPassword) {
+
+            try {
+
+            let user = await db.ride.findFirst({
+                where: {
+                    user_id: req.user.id
+                }
+            })    
+
+            if (!user) {
+                return res.send('User is not a rider')
+            }
+
+            await db.$queryRaw`SET FOREIGN_KEY_CHECKS=0;`    
+            await db.$queryRaw`DELETE FROM ride WHERE id = ${user.id}`
+            await db.$queryRaw`SET FOREIGN_KEY_CHECKS=1;`     
+
+            return res.send('You account has been deleted')
+
+            } catch (e) {
+                console.log(e)
+                return;
+            }
+        }
+
+    } else {
+        return res.send('Something went wrong')
+    }
+}
+
 module.exports = {
     addRider,
     acceptRide,
@@ -880,5 +929,6 @@ module.exports = {
     getDriverForm,
     getPriceViaDistance,
     customerFeedBack,
-    endRide
+    endRide,
+    deleteRider
 }

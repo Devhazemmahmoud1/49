@@ -74,4 +74,7 @@ router.post('/like-on-comment', guard,autoCatch( action.makeLikeOnComment))
 // make unlike on comment
 router.delete('/unlike-on-comment', guard,autoCatch( action.makeUnlikeOnComment))
 
+// add share counter
+router.post('/add-share-to/post', guard, autoCatch( action.makeShare ))
+
 module.exports = router

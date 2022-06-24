@@ -5,6 +5,8 @@ const secretKey = "fourtyninehub495051fourtynine";
 const db = new PrismaClient();
 const hash = require('bcrypt')
 
+const admin = require('firebase-admin')
+
 
 /* Register Method  */
 
@@ -406,6 +408,14 @@ let register = async (req, res) => {
                     type: 1,
                     status: 1,
                 },
+                {
+                    user_id: create.id,
+                    identifier: 15  ,
+                    settingName_ar: 'المكالمات',
+                    settingName_en: 'Calls',
+                    type: 1,
+                    status: 1,
+                },
             ]
         })
 
@@ -435,6 +445,16 @@ let register = async (req, res) => {
                 intest: (await db.appInfo.findFirst({})).intrest,
             }
         })
+
+        // we need to send a notification 
+
+        admin.messaging().send({
+            token: fcm.toString(),
+            notification: {
+              title: lang == 'en_US' ? `Hi ${ create.firstName }` : `${create.firstName} اهلا`,
+              body: lang == 'en_US' ? 'Thank you for registering with us.' : 'شكرا جزيلا للتسجيل معنا.',
+            }
+        })        
 
         // we need to add a verfication code plus avoid the user to login without the verf code!
         return getToken(req, res, create.id);

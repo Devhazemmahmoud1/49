@@ -2,10 +2,11 @@ const express = require('express')
 const { PrismaClient } = require('@prisma/client')
 const db = new PrismaClient();
 const moment = require('moment');
+const { getTenderFemales } = require('./socialMediaControllers/myProfileController');
 
 /* Edit settings according to the giving information */
 let editSettings = async (req, res) => {
-    const { firstName,lastName, birthDate, socialStatus, job, city, lang } = req.body
+    const { firstName,lastName, birthDate, socialStatus, job, city, lang, gender,  email, phone } = req.body
 
     // update user settings 
 
@@ -25,20 +26,23 @@ let editSettings = async (req, res) => {
         console.log(getUserSetting)
 
         getUserSetting.shift();
-        getUserSetting.shift();
-        getUserSetting.shift();
+        //getUserSetting.shift();
+        //getUserSetting.shift();
 
         // update userSettings
 
         let values = [
+            { value: email.value, status: email.status},
+            { value: phone.value, status: phone.status},
             { value: birthDate.value, status: birthDate.status},
             { value: socialStatus.value, status: socialStatus.status},
             { value: job.value, status: job.status},
             { value: city.value, status: city.status},
             { value: lang.value, status: lang.status},
+            { value: gender.value, status: gender.status}
         ]
 
-        let updateUser = await db.users.update({
+        await db.users.update({
             where: {
                 id: req.user.id
             }, 
@@ -48,18 +52,18 @@ let editSettings = async (req, res) => {
             }
         })
 
+
+        console.log(getUserSetting)
+
         let x = 0;
         for (item of getUserSetting) {
-            if (item.identifier == 8) {
-                continue
-            }
 
             await db.userSettings.update({
                 where: {
                     id: item.id
                 },
                 data: {
-                    value: values[x].value,
+                    value: item.identifier == 8 || item.identifier == 2 || item.identifier == 3 ? undefined : values[x].value,
                     status: values[x].status
                 }
             })

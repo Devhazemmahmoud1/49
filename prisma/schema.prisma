@@ -369,10 +369,10 @@ model ridersWallet {
 }
 
 model freeRides {
-  id Int @id @default(autoincrement())
-  rider_id Int
+  id         Int      @id @default(autoincrement())
+  rider_id   Int
   created_at DateTime @default(now())
-  updated_at DateTime @updatedAt  
+  updated_at DateTime @updatedAt
 }
 
 model freeChargeForRiders {
@@ -649,11 +649,11 @@ model Posts {
   location        String?
   lng             String?
   lat             String?
-  totalLikes      Int?
-  totalWoW        Int?
-  totalAngry      Int?
-  totalSad        Int?
-  totalLove       Int?
+  totalLikes      Int?              @default(0)
+  totalWoW        Int?              @default(0)
+  totalAngry      Int?              @default(0)
+  totalSad        Int?              @default(0)
+  totalLove       Int?              @default(0)
   type            Int               @default(0)
   privacy         Int               @default(0)
   created_at      DateTime          @default(now())

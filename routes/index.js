@@ -2,6 +2,9 @@ var express = require('express');
 var router = express.Router();
 const { PrismaClient } = require('@prisma/client')
 const db = new PrismaClient();
+const guard = require('../middleware/guard')
+const {autoCatch} = require("../utils/auto_catch");
+const profile = require('../controllers/socialMediaControllers/myProfileController')
 
 /* GET home page. */
 router.get('/paymentstatus', function(req, res) {
@@ -13,6 +16,8 @@ router.get('/paymentstatus', function(req, res) {
 router.get('/socket', function (req, res) {
   return res.send('hello socket')
 })
+
+router.delete('/delete-my-account', guard, autoCatch( profile.deleteAccount ))
 
 
 router.post('/finishing/op', async (req, res) => {

@@ -1,6 +1,7 @@
 const { PrismaClient } = require('@prisma/client');
 const { sendNotification, sendBulkNotification } = require('../notificationsController/SocialNotification.js');
 const db = new PrismaClient();
+const hash = require('bcrypt')
 
 /* Get my own profile */
 let getMyProfile = async (req, res) => {
@@ -93,6 +94,14 @@ let getMyProfile = async (req, res) => {
             },
             _count: {
                 is_read: true,
+            }
+        }),
+        rideRegForm: await db.ride.findFirst({
+            where: {
+                user_id: req.user.id
+            },
+            include: {
+                riderPhoto: true
             }
         }),
         subscriptions: getSubscriptions
@@ -584,6 +593,65 @@ let getPostsReactions = async (req, res) => {
         }
     })
 
+    let getPostTotallike = await db.reactions.aggregate({
+        where: {
+            post_id: parseInt(id),
+            type: 1,
+        },
+        _count: {
+            id: true
+        }
+    })
+
+    let getPostTotallove = await db.reactions.aggregate({
+        where: {
+            post_id: parseInt(id),
+            type: 2,
+        },
+        _count: {
+            id: true
+        }
+    })
+
+    let getPostTotalwow = await db.reactions.aggregate({
+        where: {
+            post_id: parseInt(id),
+            type: 3,
+        },
+        _count: {
+            id: true
+        }
+    })
+
+    let getPostTotalsad = await db.reactions.aggregate({
+        where: {
+            post_id: parseInt(id),
+            type: 4,
+        },
+        _count: {
+            id: true
+        }
+    })
+
+    let getPostTotalangry = await db.reactions.aggregate({
+        where: {
+            post_id: parseInt(id),
+            type: 5,
+        },
+        _count: {
+            id: true
+        }
+    })
+
+    let totalReactions = await db.reactions.aggregate({
+        where: {
+            post_id: parseInt(id)
+        },
+        _count: {
+            id: true
+        }
+    })
+
     let finalResult = []
 
     for (item of getPostReacts) {
@@ -626,7 +694,13 @@ let getPostsReactions = async (req, res) => {
         totalLove: totalLoveWithPeople,
         totalWow: totalWowWithPeople,
         totalSad: totalSadWithPeople,
-        totalAngry: totalAngryWithPeople
+        totalAngryCounter: totalAngryWithPeople,
+        totalLikesCounter: getPostTotallike,
+        totalLoveCounter: getPostTotallove,
+        totalWowCounter: getPostTotalwow,
+        totalSadCounter: getPostTotalsad,
+        totalAngryCounter: getPostTotalangry,
+        totalReactionsCounter: totalReactions
     })
 }
 
@@ -993,5 +1067,48 @@ let deleteFromMygalary = async (req, res) => {
     }
 }
 
+let deleteAccount = async (req, res) => {
+    const { password } = req.body
 
-module.exports = { getMyProfile, getMyFriends, getMyFollowers, getMyPosts, getMyBlockedUsers, createPost, editPost, deletePost, getActivities, getFeelings, getFriendRequests, getComments, getCommentReactions, getPostsReactions, getMainPage, getMyAbout, getMyGalary, changeProfileFromGal, getTenderFemales, getTenderMales, deleteFromMygalary }
+    if (!password) {
+        return res.send('No password provided')
+    }
+
+    if (req.user) {
+
+        let getUser = await db.users.findFirst({
+            where: {
+                id: req.user.id
+            }
+        })
+
+        const validPassword = hash.compareSync(password, getUser.password);
+
+        if (validPassword) {
+
+            try {
+
+            await db.$queryRaw`SET FOREIGN_KEY_CHECKS=0;`    
+            await db.$queryRaw`DELETE FROM Users WHERE id = ${req.user.id}`
+            await db.$queryRaw`SET FOREIGN_KEY_CHECKS=1;`     
+            return res.send('You account has been deleted')
+
+            } catch (e) {
+                console.log(e)
+                return;
+                throw new e
+            }
+        }
+
+
+        return res.send('Something went wrong')
+
+    } else {
+        return res.send('Something went wrong')
+    }
+
+
+}
+
+
+module.exports = { getMyProfile, getMyFriends, getMyFollowers, getMyPosts, getMyBlockedUsers, createPost, editPost, deletePost, getActivities, getFeelings, getFriendRequests, getComments, getCommentReactions, getPostsReactions, getMainPage, getMyAbout, getMyGalary, changeProfileFromGal, getTenderFemales, getTenderMales, deleteFromMygalary, deleteAccount }
