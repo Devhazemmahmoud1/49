@@ -285,7 +285,7 @@ let getMyBlockedUsers = async (req, res) => {
 
 /* Create a new post according to the giving informaiton */
 let createPost = async (req, res) => {
-    const { title, attachments, feeling, activity, location, lng, lat, type } = req.body
+    const { title, attachments, feeling, activity, location, lng, lat, type, privacy } = req.body
 
     if (feeling) {
         let check = await db.postFeelings.findFirst({ where: { id: feeling } })
@@ -307,6 +307,7 @@ let createPost = async (req, res) => {
                 feeling_id: feeling != null ? parseInt(feeling) : 0,
                 activity_id: activity != null ? parseInt(activity) : 0,
                 location: location ?? '',
+                privacy: parseInt(privacy),
                 lat: lat ?? '',
                 lng: lng ?? '',
                 type: parseInt(type) ?? 0
