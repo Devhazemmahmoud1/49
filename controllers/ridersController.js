@@ -937,15 +937,23 @@ let ridersDashBoard = async (req, res) => {
         take: maxTrips,
     })
 
-    let RiderProfit = await db.ridesRequested.aggregate({
-        where: {
-            rider_id: req.user.id,
-            isDone: 1,
-        },
-        _sum: {
-            total: true
+    if (getRiderTrips) {
+        var RiderProfit = await db.ridesRequested.aggregate({
+            where: {
+                rider_id: req.user.id,
+                isDone: 1,
+            },
+            _sum: {
+                total: true
+            }
+        })
+    } else {
+        var RiderProfit = {
+            _sum: {
+                total: 0
+            }
         }
-    })
+    }
 
     let riders5StarRating = await db.ridesRatesAndComments.count({
         where: {
