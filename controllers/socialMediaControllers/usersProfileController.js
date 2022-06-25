@@ -173,25 +173,27 @@ let getUserPosts = async (req, res) => {
 let getUserFollowers = async (req, res) => {
     let { id } = req.params
     let { page } = req.query
-
     if (!page) page = 1;
-
     let maxAds = 20;
     let getFollowersList = await db.followers.findMany({
         where: {
-            user_id: parseInt(id)
+            follower_id: parseInt(id)
         },
         orderBy: {
             updated_at: 'desc'
         },
         skip: page == 1 ? 0 : (page * maxAds) - maxAds,
         take: maxAds,
-        include: {
-            user: true
-        }
     })
 
-    return res.status(200).json(getFollowersList)
+    for (item of getFollowersList) {
+        let user = await db.users.findFirst({
+            where: {
+                id: item.user_id
+            }
+        })
+        item.user = user
+    }
 }
 
 /* Get a specific post according to the giving informaiton */
