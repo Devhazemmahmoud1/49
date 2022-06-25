@@ -57,7 +57,7 @@ let getMyProfile = async (req, res) => {
                 }
             })
 
-            item.mainCatSubScription = await db.mainCategories.findFirst({
+            final.mainCatSubScription = await db.mainCategories.findFirst({
                 where: {
                     id: parseInt(subCategories.parent)
                 }
