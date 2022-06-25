@@ -75,4 +75,8 @@ router.get('/drivers-information/get', guard, autoCatch( ride.getDriverForm ))
 
 router.delete('/delete-spec-rider', guard, autoCatch( ride.deleteRider ))
 
+router.get('/rider-dashboard', guard, autoCatch( ride.ridersDashBoard ))
+
+router.post('/change-price-rate', guard, autoCatch( ride.modifyPriceRange ))
+
 module.exports = router

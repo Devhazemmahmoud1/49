@@ -132,7 +132,7 @@ let findRiders = async (req, res) => {
 
                                     drivers.push(sockets[rider].user_id)
                                     continue
-                                    
+
                                 }
                             }
                         }
@@ -140,7 +140,7 @@ let findRiders = async (req, res) => {
                         global.io.to(sockets[rider].socket_id).emit('request', JSON.stringify({
                             user_id: req.user.id,
                             price: price ?? 0,
-                            user_name: req.user.firstName, 
+                            user_name: req.user.firstName,
                             message_ar: `قام ${req.user.firstName} بطلب رحله من ... الي ... بسعر 50 جنيه`,
                             message_en: req.user.firstName + ' Has requested a ride from ' + From + ' to' + To + ' ' + ' for 50 L.E',
                             distance: distance ? distance + ' KiloMeters' : 'Unknown',
@@ -195,8 +195,8 @@ let findRiders = async (req, res) => {
                         && sockets[rider].currentLocation.lng != ''
                         && sockets[rider].isApproved != 0
                         && sockets[rider].status != 2) {
-                        
-                        console.log(sockets[rider].user_id)    
+
+                        console.log(sockets[rider].user_id)
                         console.log('passed here')
 
                         if (drivers.includes(sockets[rider].user_id)) continue;
@@ -267,7 +267,7 @@ let findRiders = async (req, res) => {
 
                                     drivers.push(sockets[rider].user_id)
                                     continue
-                                    
+
                                 }
                             }
 
@@ -275,7 +275,7 @@ let findRiders = async (req, res) => {
                                 user_id: req.user.id,
                                 user_id: req.user.id,
                                 price: (parseInt(price) + 20) ?? 0,
-                                message_ar: `قام ${req.user.firstName} بطلب رحله من ... الي ... بسعر ${ parseInt(price) + 20 } جنيه`,
+                                message_ar: `قام ${req.user.firstName} بطلب رحله من ... الي ... بسعر ${parseInt(price) + 20} جنيه`,
                                 message_en: req.user.firstName + ' Has requested a ride from ' + From + ' to' + To + ' ' + ' for ' + parseInt(price + 20) + ' L.E',
                                 distance: distance ? distance + ' KiloMeters' : 'Unknown',
                                 userType: userType,
@@ -889,21 +889,21 @@ let deleteRider = async (req, res) => {
 
             try {
 
-            let user = await db.ride.findFirst({
-                where: {
-                    user_id: req.user.id
+                let user = await db.ride.findFirst({
+                    where: {
+                        user_id: req.user.id
+                    }
+                })
+
+                if (!user) {
+                    return res.send('User is not a rider')
                 }
-            })    
 
-            if (!user) {
-                return res.send('User is not a rider')
-            }
+                await db.$queryRaw`SET FOREIGN_KEY_CHECKS=0;`
+                await db.$queryRaw`DELETE FROM ride WHERE id = ${user.id}`
+                await db.$queryRaw`SET FOREIGN_KEY_CHECKS=1;`
 
-            await db.$queryRaw`SET FOREIGN_KEY_CHECKS=0;`    
-            await db.$queryRaw`DELETE FROM ride WHERE id = ${user.id}`
-            await db.$queryRaw`SET FOREIGN_KEY_CHECKS=1;`     
-
-            return res.send('You account has been deleted')
+                return res.send('You account has been deleted')
 
             } catch (e) {
                 console.log(e)
@@ -914,6 +914,131 @@ let deleteRider = async (req, res) => {
     } else {
         return res.send('Something went wrong')
     }
+}
+
+let ridersDashBoard = async (req, res) => {
+    let { page } = req.query
+    if (!page) page = 1;
+    let maxTrips = 10
+
+    let getRiderTrips = await db.ridesRequested.findMany({
+        where: {
+            rider_id: req.user.id,
+            isDone: 1,
+        },
+        skip: page == 1 ? 0 : (page * maxTrips) - maxTrips,
+        take: maxTrips,
+    })
+
+    let RiderProfit = await db.ridesRequested.aggregate({
+        where: {
+            rider_id: req.user.id,
+            isDone: 1,
+        },
+        _sum: {
+            total: true
+        }
+    })
+
+    let riders5StarRating = await db.ridesRatesAndComments.count({
+        where: {
+            rideId: req.user.id,
+            rideRate: 5
+        }
+    })
+
+    let riders4StarRating = await db.ridesRatesAndComments.count({
+        where: {
+            rideId: req.user.id,
+            rideRate: 4
+        }
+    })
+
+    let riders3StarRating = await db.ridesRatesAndComments.count({
+        where: {
+            rideId: req.user.id,
+            rideRate: 3
+        }
+    })
+
+    let riders2StarRating = await db.ridesRatesAndComments.count({
+        where: {
+            rideId: req.user.id,
+            rideRate: 2
+        }
+    })
+
+    let riders1StarRating = await db.ridesRatesAndComments.count({
+        where: {
+            rideId: req.user.id,
+            rideRate: 1
+        }
+    })
+
+
+    let driverRate = calculateRate(riders5StarRating ?? 0,
+        riders4StarRating ?? 0,
+        riders3StarRating ?? 0,
+        riders2StarRating ?? 0,
+        riders1StarRating ?? 0
+    )
+
+    for (socket in sockets) {
+        if (sockets[socket].user_id == req.user.id) {
+            var lastDestination = sockets[socket].lastTrip
+        }
+    }
+
+    let registerationForm = await db.ride.findFirst({
+        where: {
+            user_id: req.user.id
+        },
+        include: {
+            riderPhoto: true
+        }
+    })
+
+    return res.json({
+        myTrips: getRiderTrips,
+        myProfit: RiderProfit._sum.total,
+        myRate: driverRate,
+        myFinalDestination: lastDestination,
+        myForm: registerationForm
+    })
+}
+
+let modifyPriceRange = async (req, res) => {
+    const { newPrice } = req.body
+    
+    if (! newPrice ||  isNaN(newPrice)) {
+        return res.send('No price range was provided')
+    }
+
+    let checkIfUserisRider = await db.ride.findFirst({
+        where: {
+            user_id: req.user.id
+        }
+    })
+
+    if (!checkIfUserisRider) {
+        return res.send('Something went wrong')
+    }
+
+    await db.ride.update({
+        where: {
+            id: checkIfUserisRider.id
+        },
+        data: {
+            distancePerKilo: parseFloat(newPrice)
+        }
+    })
+
+    return res.json({
+        success: {
+            success_en: 'Price has been updated.',
+            success_ar: 'تم التعديل.'
+        }
+    })
 }
 
 module.exports = {
@@ -930,5 +1055,7 @@ module.exports = {
     getPriceViaDistance,
     customerFeedBack,
     endRide,
-    deleteRider
+    deleteRider,
+    ridersDashBoard,
+    modifyPriceRange
 }

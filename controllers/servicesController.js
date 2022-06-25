@@ -1145,35 +1145,23 @@ let makeRequest = async (req, res) => {
 
         let getStep = await db.cashBackStep.findFirst();
 
-        let totalStepsOfToday = await db.dailyCashBack.aggregate({
+        let totalStepsOfToday = await db.dailyCashBack.findMany({
             where: {
                 user_id: req.user.id,
             },
-            _sum: {
-                amount: true
-            }
         });
 
-        // let totalStepsOfToday = await db.dailyCashBack.findMany({
-        //     where: {
-        //         user_id: req.user.id,
-        //     },
-        // });
+        var counter = 0;
 
-        // var counter = 0
+        for (item of totalStepsOfToday) {
+            console.log(dayjs(item.created_at, '"MM-DD-YYYY"').$d > dayjs().startOf('day').$d, dayjs().endOf('day').$d > dayjs(item.created_at, '"MM-DD-YYYY"').$d)
+            if (dayjs().startOf('day').$d <  dayjs(item.created_at, '"MM-DD-YYYY"').$d && dayjs().endOf('day').$d > dayjs(item.created_at, '"MM-DD-YYYY"').$d) {
+                console.log('still going on steps')
+                counter = parseInt(counter + parseInt(item.amount))
+            }
+        }
 
-        // for (item of totalStepsOfToday) {
-        //     if (dayjs(item.created_at, '"MM-DD-YYYY"').$d > dayjs().endOf('day')) {
-        //         counter = counter + 1
-        //     } //true)
-        // }
-
-        // console.log(counter)
-
-        // if (counter >= 5) {
-        //     return res.send('you maxed out')
-        // }
-
+        console.log(counter)
 
         let refundStorage = parseInt(req.user.Wallet.refundStorage)
 
@@ -1203,7 +1191,7 @@ let makeRequest = async (req, res) => {
         }
 
 
-        if (totalStepsOfToday._sum.amount >= 10) {
+        if (counter >= 10) {
             return res.status(200).send('you maxed out 10L.E');
         }
 
@@ -1480,6 +1468,8 @@ let makeRequest = async (req, res) => {
                         }
                     }
                 } else {
+
+                    console.log('it should go here ')
                     let getStorage = await db.cashBackStorage.findFirst({});
 
                     if (request == 2) {
@@ -1713,6 +1703,8 @@ let makeRequest = async (req, res) => {
                 // check for if the first time of the day using this feater 
                 // timer code is missing
 
+                console.log('goes here')
+
                 let isFirstStep = await db.dailyCashBack.findFirst({
                     where: {
                         user_id: req.user.id,
@@ -1723,7 +1715,7 @@ let makeRequest = async (req, res) => {
                 })
 
                 if (isFirstStep) {
-                    if (dayjs().startOf('day').$d > isFirstStep.created_at) {
+                    if (dayjs().startOf('day').$d > dayjs(isFirstStep.created_at).$d) {
                         var isNewest = false
                     } else {
                         var isNewest = true
@@ -1733,6 +1725,7 @@ let makeRequest = async (req, res) => {
                 }
 
                 if (isNewest == false) {
+                    console.log('its a brand new request today')
                     console.log('yes', req.user.providerCashBack)
                     if (parseInt(req.user.providerCashBack) > 0) {
                         if (parseInt(req.user.providerCashBack) - parseInt(getStep.step) >= 0) {
@@ -1831,6 +1824,7 @@ let makeRequest = async (req, res) => {
                                                 amount: parseInt(getStep.step)
                                             }
                                         })
+                                        console.log(32323333)
                                     } else {
                                         console.log(5)
                                         await db.cashBackStorage.update({
@@ -1855,6 +1849,7 @@ let makeRequest = async (req, res) => {
                                                 amount: getStep.step
                                             }
                                         })
+                                        console.log(32323)
                                     }
                                 }
                             } else if (request == 1) {
@@ -1905,6 +1900,8 @@ let makeRequest = async (req, res) => {
                                                 amount: parseInt(getStep.step)
                                             }
                                         })
+
+                                        console.log(99999999)
                                     } else {
                                         console.log(5)
                                         await db.cashBackStorage.update({
@@ -2007,14 +2004,14 @@ let makeRequest = async (req, res) => {
                                 }
                             }
                         }
-                    } else {
+                        } else {
                         console.log(3)
                         let getStorage = await db.cashBackStorage.findFirst({});
 
                         if (request == 2) {
                             let call = getStorage.callCashBack
                             if (parseInt(call) <= 0) {
-                                return res.status(200).send('cash back is empty');
+                                return res.status(200).send('cash back is empty 1');
                             } else {
                                 if (parseInt(call) - parseInt(getStep.step) >= 0) {
                                     await db.cashBackStorage.update({
@@ -2068,7 +2065,7 @@ let makeRequest = async (req, res) => {
                         } else if (request == 1) {
                             let requestcb = getStorage.requestCashBack
                             if (parseInt(requestcb) <= 0) {
-                                return res.status(200).send('cash back is empty');
+                                return res.status(200).send('cash back is empty 2');
                             } else {
                                 if (parseInt(requestcb) - parseInt(getStep.step) >= 0) {
                                     await db.cashBackStorage.update({
@@ -2122,7 +2119,7 @@ let makeRequest = async (req, res) => {
                         } else if (request == 3) {
                             let any = getStorage.anyCashBack
                             if (parseInt(any) <= 0) {
-                                return res.status(200).send('cash back is empty');
+                                return res.status(200).send('cash back is empty 3');
                             } else {
                                 if (parseInt(requestcb) - parseInt(getStep.step) >= 0) {
                                     await db.cashBackStorage.update({
