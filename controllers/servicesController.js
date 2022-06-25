@@ -2060,7 +2060,7 @@ let makeRequest = async (req, res) => {
                 
                                         cashBackNotification(notify)
 
-                                        return res.send(5565)
+                                        return res.send('5565')
                                     } else {
                                         console.log(5)
                                         await db.cashBackStorage.update({
@@ -2170,7 +2170,7 @@ let makeRequest = async (req, res) => {
                 
                                         cashBackNotification(notify)
 
-                                        return res.send(4434322)
+                                        return res.send('4434322')
                                     } else {
                                         console.log(5)
                                         await db.cashBackStorage.update({
@@ -2212,7 +2212,7 @@ let makeRequest = async (req, res) => {
                 
                                         cashBackNotification(notify)
 
-                                        return res.send(1122112)
+                                        return res.send('1122112')
                                     }
                                 }
                             } else if (request == 3) {
@@ -2280,7 +2280,7 @@ let makeRequest = async (req, res) => {
                 
                                         cashBackNotification(notify)
 
-                                        return res.send(443312)
+                                        return res.send('443312')
 
                                     } else {
                                         console.log(5)
@@ -2323,7 +2323,7 @@ let makeRequest = async (req, res) => {
                 
                                         cashBackNotification(notify)
 
-                                        return res.send(99000)
+                                        return res.send('99000')
                                     }
                                 }
                             }
@@ -2377,7 +2377,7 @@ let makeRequest = async (req, res) => {
             
                                     cashBackNotification(notify)
 
-                                    return res.send(1212)
+                                    return res.send('1212')
                                 } else {
                                     console.log(4)
                                     await db.cashBackStorage.update({
@@ -2419,7 +2419,7 @@ let makeRequest = async (req, res) => {
             
                                     cashBackNotification(notify)
 
-                                    return res.send(2321)
+                                    return res.send('2321')
                                 }
                             }
                         } else if (request == 1) {
@@ -2467,7 +2467,7 @@ let makeRequest = async (req, res) => {
             
                                     cashBackNotification(notify)
 
-                                    return res.send(23313)
+                                    return res.send('23313')
                                 } else {
                                     console.log(4)
                                     await db.cashBackStorage.update({
@@ -2509,7 +2509,7 @@ let makeRequest = async (req, res) => {
             
                                     cashBackNotification(notify)
 
-                                    return res.send(22223332)
+                                    return res.send('22223332')
                                 }
                             }
                         } else if (request == 3) {
@@ -2557,7 +2557,7 @@ let makeRequest = async (req, res) => {
             
                                     cashBackNotification(notify)
 
-                                    return res.send(8888)
+                                    return res.send('8888')
                                 } else {
                                     console.log(4)
                                     await db.cashBackStorage.update({
@@ -2599,7 +2599,7 @@ let makeRequest = async (req, res) => {
             
                                     cashBackNotification(notify)
 
-                                    return res.send(556655)
+                                    return res.send('556655')
                                 }
                             }
                         }
@@ -2638,7 +2638,7 @@ let makeRequest = async (req, res) => {
 
                     cashBackNotification(notify)
 
-                    return res.send(8867)
+                    return res.send('8867')
                 }
             }
         } else {
@@ -3094,7 +3094,7 @@ let makeRequest = async (req, res) => {
 
                 cashBackNotification(notify)
 
-                return res.send(887786);
+                return res.send('887786');
             } else {
                 let getStorage = await db.cashBackStorage.findFirst({});
                 if (req.user.providerCashBack <= 0) {
@@ -3167,7 +3167,7 @@ let makeRequest = async (req, res) => {
     
                         cashBackNotification(notify)
 
-                        return res.send(1111111)
+                        return res.send('1111111')
                     } else {
                         await db.cashBackStorage.update({
                             where: {
@@ -3210,7 +3210,7 @@ let makeRequest = async (req, res) => {
     
                         cashBackNotification(notify)
 
-                        return res.send(778668)
+                        return res.send('778668')
                     }
                 }
             }
@@ -3269,7 +3269,7 @@ let makeRequest = async (req, res) => {
 
                     cashBackNotification(notify)
 
-                    return res.send(33232)
+                    return res.send('33232')
                 } else {
                     let finalAmount = parseInt(getStep.step) - parseInt(getStorage.callCashBack)
                     await db.cashBackStorage.update({
