@@ -111,7 +111,6 @@ let register = async (req, res) => {
         })
     }
 
-
     const create = await db.users.create({
         data: {
             firstName: firstName,
@@ -122,7 +121,7 @@ let register = async (req, res) => {
             is_locked: 0,
             //gender: gender ?? 0,
             ref_number: refNumber ?? '',
-            //country: country,
+            countryCode: country,
             fcm: fcm,
             device_id: device_id,
             hashCode: Math.floor(Math.random() * 9000000000000).toString(),

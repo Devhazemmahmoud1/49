@@ -41,6 +41,13 @@ let getMyProfile = async (req, res) => {
 
     if (getSubscriptions) {
         for (final of getSubscriptions) {
+
+            let subCategories = await db.subCategories.findFirst({
+                where: {
+                    id: parseInt(final.subCat_id)
+                }
+            })
+
             final.subCategory = await db.subCategories.findFirst({
                 where: {
                     id: parseInt(final.subCat_id)
@@ -50,7 +57,11 @@ let getMyProfile = async (req, res) => {
                 }
             })
 
-            item.mainCatSubScription = final.subCategories.parent
+            item.mainCatSubScription = await db.mainCategories.findFirst({
+                where: {
+                    id: parseInt(subCategories.parent)
+                }
+            })
         }
     }
 
