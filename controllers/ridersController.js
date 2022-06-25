@@ -896,7 +896,7 @@ let deleteRider = async (req, res) => {
                 })
 
                 if (!user) {
-                    return res.send('User is not a rider')
+                    return res.status(403).send('User is not a rider')
                 }
 
                 await db.$queryRaw`SET FOREIGN_KEY_CHECKS=0;`
@@ -909,6 +909,13 @@ let deleteRider = async (req, res) => {
                 console.log(e)
                 return;
             }
+        } else {
+            res.status(403).json({
+                error: {
+                    error_en: 'Password is incorrect',
+                    error_ar: 'كلمه المرور غير صحيحه.'
+                }
+            })
         }
 
     } else {

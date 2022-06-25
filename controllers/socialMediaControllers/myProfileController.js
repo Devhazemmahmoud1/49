@@ -48,6 +48,8 @@ let getMyProfile = async (req, res) => {
                     photo: true,
                 }
             })
+
+            item.mainCatSubScription = final.subCategories.parent
         }
     }
 
