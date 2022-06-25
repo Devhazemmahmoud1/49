@@ -13,7 +13,6 @@ const job = new CronJob("59 * * * * *", async () => {
         let getIntrest =  (await db.appInfo.findFirst({})).intrest
         if (!lastUserProfitProfile) continue;
         if (moment(lastUserProfitProfile.updated_at).add(1, 'month').format('YYYY/MM/DD HH:mm:ss') <= moment().format('YYYY/MM/DD HH:mm:ss')) {
-
             let calculateProfit = lastUserProfitProfile.total * getIntrest / 100 / 12
             let calculateTotal = parseInt(lastUserProfitProfile.total + calculateProfit + getWalletBalance.startBalance)
 

@@ -827,6 +827,9 @@ let searchForResult = async (req, res) => {
                     }
                 }
             ]
+        },
+        include: {
+            photo: true,
         }
     })
 
@@ -844,6 +847,9 @@ let searchForResult = async (req, res) => {
                     }
                 }
             ]
+        },
+        include: {
+            photo: true,
         }
     })
 
