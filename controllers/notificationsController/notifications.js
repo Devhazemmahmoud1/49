@@ -161,4 +161,34 @@ let pleasePayNotification = async (notify) => {
     })
 }
 
-module.exports = { userNotification, setNotificationAsRead, recentUnreadNotifications, deleteNotification, pleasePayNotification }
+let cashBackNotification = async (notify) => {
+
+    let getUserFCM = await db.users.findFirst({
+        where: {
+            id: parseInt(notify.user)
+        }
+    })
+
+
+    let getTheLanguage = await db.userSettings.findFirst({
+        where: {
+            user_id: parseInt(notify.user),
+            identifier: 9,
+        }
+    })
+
+
+    admin.messaging().send({
+        data: {
+            reciever: notify.user.toString(),
+            type: notify.type.toString()
+        },  
+        token: getUserFCM.fcm,
+        notification: {
+          title: getTheLanguage.value == 'en_US' ? `Hi ${ notify.userFirstName }` : `${notify.userFirstName} اهلا`,
+          body: getTheLanguage.value == 'en_US' ? notify.message_en.toString() : notify.message_ar.toString(),
+        }
+    })
+}
+
+module.exports = { userNotification, setNotificationAsRead, recentUnreadNotifications, deleteNotification, pleasePayNotification, cashBackNotification }

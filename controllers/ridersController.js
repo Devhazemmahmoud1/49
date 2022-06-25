@@ -137,6 +137,8 @@ let findRiders = async (req, res) => {
                             }
                         }
 
+                        if (sockets[rider].user_id == req.user.id) continue;
+
                         global.io.to(sockets[rider].socket_id).emit('request', JSON.stringify({
                             user_id: req.user.id,
                             price: price ?? 0,
@@ -210,6 +212,9 @@ let findRiders = async (req, res) => {
                                 console.log("Perium distance1 =" + calculateDistance)
                                 if (calculateDistance > 5) continue;
                             }
+
+                            if (sockets[rider].user_id == req.user.id) continue;
+
                             global.io.to(sockets[rider].socket_id).emit('request', JSON.stringify({
                                 user_id: req.user.id,
                                 user_id: req.user.id,
@@ -271,6 +276,8 @@ let findRiders = async (req, res) => {
                                 }
                             }
 
+                            if (sockets[rider].user_id == req.user.id) continue;
+                            
                             global.io.to(sockets[rider].socket_id).emit('request', JSON.stringify({
                                 user_id: req.user.id,
                                 user_id: req.user.id,
