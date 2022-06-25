@@ -25,7 +25,8 @@ let register = async (req, res) => {
         device_id,
         hashCode,
         countryCode,
-        lang
+        lang,
+        uid
     } = req.body
 
     // check if the body is empty for username and password otherwise procced 
@@ -124,6 +125,7 @@ let register = async (req, res) => {
             countryCode: country,
             fcm: fcm,
             device_id: device_id,
+            uid: uid,
             hashCode: Math.floor(Math.random() * 9000000000000).toString(),
             countryCode: countryCode ?? '0'
         }
@@ -650,7 +652,7 @@ let changePassword = async (req, res, next) => {
 }
 
 let resetPassword = async (req, res) => {
-    const {newPassword, passwordConfirmation} = req.body
+    const {newPassword, passwordConfirmation, uid} = req.body
 
     if (!newPassword || !passwordConfirmation) {
         return res.status(403).json({
@@ -672,7 +674,7 @@ let resetPassword = async (req, res) => {
 
     await db.users.update({
         where: {
-            id: req.user.id
+            uid: uid
         },
         data: {
             password: hash.hashSync(newPassword, 10)

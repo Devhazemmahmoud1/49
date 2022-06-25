@@ -193,7 +193,7 @@ const job = new CronJob("00 00 00 * * *", async () => {
                         id: item.id
                     },
                     data: {
-                        recentLikes: item.recentShares + parseInt(currentSharesPerc)
+                        recentLikes: parseInt(item.recentShares) + parseInt(currentSharesPerc)
                     }
                 })
 

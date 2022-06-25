@@ -186,7 +186,7 @@ let cashBackNotification = async (notify) => {
         token: getUserFCM.fcm,
         notification: {
           title: getTheLanguage.value == 'en_US' ? `Hi ${ notify.userFirstName }` : `${notify.userFirstName} اهلا`,
-          body: getTheLanguage.value == 'en_US' ? notify.message_en.toString() : notify.message_ar.toString(),
+          body: getTheLanguage.value == 'en_US' ? `You have got ${notify.amount} as cashback for sharing from 49.` : `You have got ${notify.amount} as cashback for sharing from 49.`,
         }
     })
 }
