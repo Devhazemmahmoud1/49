@@ -194,6 +194,8 @@ let getUserFollowers = async (req, res) => {
         })
         item.user = user
     }
+
+    return res.json(getFollowersList)
 }
 
 /* Get a specific post according to the giving informaiton */

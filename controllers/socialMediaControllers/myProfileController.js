@@ -196,7 +196,7 @@ let getMyPosts = async (req, res) => {
             select: {
                 type: true,
             }
-        })) 
+        }))  
 
         newPosts.push(item)
     }
