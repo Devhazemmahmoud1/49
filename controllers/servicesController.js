@@ -47,9 +47,9 @@ let getSubCategoryPrices = async (req, res, next) => {
 }
 
 /*  Make a subscription for a specific user according to the givin information  */
-let makeSubscriptionPayments = async (req, res, next) => {
-    const { amount, Paymenttype, paymentMethod, period, isWithdrawing, paymentFactor, portion, providerPortion, subcategory_id } = req.body
-    if (!amount || !paymentMethod || !period) {
+let makeSubscriptionPayments = async (req, res) => {
+    const { amount, isPermium, subcategory_id, isPersonal, period } = req.body
+    if (!amount || !isPermium || !period || !subcategory_id) {
         return res.status(403).json({
             error: {
                 error_en: 'Amount , type and payment method are required',
@@ -57,14 +57,15 @@ let makeSubscriptionPayments = async (req, res, next) => {
             }
         })
     }
+
     let createSubscription = await db.subscriptions.create({
         data: {
-            user: {
-                connect: req.user.id
-            },
+            user_id: req.user.id,
             subCat_id: parseInt(subcategory_id),
-            period: period,
-            isPermium: Paymenttype,
+            period: period.toString(),
+            isPermium: parseInt(isPermium) ?? 0,
+            isPersonalAccount: parseInt(isPersonal) ?? 0,
+            packageCounter: 0,
         }
     });
 
@@ -74,561 +75,571 @@ let makeSubscriptionPayments = async (req, res, next) => {
                 categoryId: createSubscription.subCat_id,
                 permium: createSubscription.isPermium,
                 stauts: 1,
-                startDate: createSubscription.created_at,
+                startDate: createSubscription.updated_at,
+                isPersonalAccount: parseInt(isPersonal) ?? 0
             }
+
+            sockets[socket].isPersonalAccount = parseInt(isPersonal) ?? 0;
+
             break;
         }
     }
 
-    let methods = await db.paymentMethods.findMany({});
-    let tax = await db.govFees.findFirst({});
-    let cashBackRules = await db.cashBackRules.findFirst({})
+    // var methods = await db.paymentMethods.findMany({});
+    // var tax = await db.govFees.findFirst({});
+    // var cashBackRules = await db.cashBackRules.findFirst({})
 
-    if (paymentMethod == 2) {
-        // Wallet
-        if (parseInt(req.user.Wallet.balance) >= parseInt(amount)) {
-            let newBalance = parseInt(req.user.Wallet.balance) - parseInt(amount)
-            let total = parseInt(req.user.Wallet.total) - parseInt(amount)
-
-            if (req.user.Wallet.refundStorage > 0) {
-                await db.wallet.update({
-                    where: {
-                        user_id: req.user.id
-                    },
-                    data: {
-                        balance: "" + newBalance + "",
-                        //total: "" + total + "",
-                        //startBalance: "" + parseInt(req.user.Wallet.startBalance) - parseInt(amount) + ""
-                        //generatedBal: "" + total + "",
-                    }
-                })
-            } else {
-                await db.wallet.update({
-                    where: {
-                        user_id: req.user.id
-                    },
-                    data: {
-                        balance: "" + newBalance + "",
-                        total: "" + total + "",
-                        startBalance: "" + parseInt(req.user.Wallet.startBalance) - parseInt(amount) + ""
-                        //generatedBal: "" + total + "",
-                    }
-                })
-            }
-
-            let grossMoney = 0;
-            let cost = 0;
-
-            let fetchCashBackRules = await db.cashBackRules.findFirst({})
-            let fetchCashBackStorage = await db.cashBackStorage.findFirst({})
-            let subCategory = await db.subCategories.findMany({});
-
-            for (item of subCategory) {
-                let newGross = parseInt(item.grossMoney) / parseInt(item.paymentFactor)
-                grossMoney += parseInt(newGross)
-            }
-
-            let overHeadFactor = parseInt(grossMoney)
-
-            let runningCost = await db.runningCost.findMany({})
-            for (item of runningCost) {
-                cost += parseInt(item.amount)
-            }
-
-            let overHeadConstant = (cost / overHeadFactor)
-            let NetAfterOverHead = parseInt(amount) - parseInt(overHeadConstant)
-            let xFactor = parseInt(NetAfterOverHead) / parseInt(paymentFactor)
-            let fourtyNineGain = parseInt(xFactor) * parseInt(portion)
-            let ProviderCashBack = parseInt(xFactor) * parseInt(providerPortion)
-            let NetAfterAllPortion = NetAfterOverHead - fourtyNineGain - ProviderCashBack
-            let requestPortion = NetAfterAllPortion * (fetchCashBackRules.requestPortion / 100)
-            let requestCall = NetAfterAllPortion * (fetchCashBackRules.callPortion / 100)
-            let requestLike = NetAfterAllPortion * (fetchCashBackRules.likePortion / 100)
-            let requestShare = NetAfterAllPortion * (fetchCashBackRules.sharePortion / 100)
-            let requestView = NetAfterAllPortion * (fetchCashBackRules.viewPortion / 100)
-            let requestAny = NetAfterAllPortion * (fetchCashBackRules.anyPortion / 100)
-            let newFourtyNineGain = parseInt(fetchCashBackStorage.fourtyNineGain) + parseInt(fourtyNineGain)
-            let newProviderCashBack = parseInt(ProviderCashBack) + parseInt(fetchCashBackStorage.providerCashBack)
-            let newRequestCash = parseInt(requestPortion) + parseInt(fetchCashBackStorage.requestCashBack)
-            let newCallCash = parseInt(requestCall) + parseInt(fetchCashBackStorage.callCashBack)
-            let newLikeCash = parseInt(requestLike) + parseInt(fetchCashBackStorage.likeCashBack)
-            let newShareCash = parseInt(requestShare) + parseInt(fetchCashBackStorage.shareCashBack)
-            let newViewCash = parseInt(requestView) + parseInt(fetchCashBackStorage.viewCashBack)
-            let newAnyCash = parseInt(requestAny) + parseInt(fetchCashBackStorage.anyCashBack)
-
-            await db.cashBackStorage.update({
-                where: {
-                    id: 1
-                },
-                data: {
-                    fourtyNineGain: "" + newFourtyNineGain + "",
-                    //providerCashBack: "" + newProviderCashBack + "",
-                    requestCashBack: "" + newRequestCash + "",
-                    callCashBack: "" + newCallCash + "",
-                    likeCashBack: "" + newLikeCash + "",
-                    shareCashBack: "" + newShareCash + "",
-                    viewCashBack: "" + newViewCash + "",
-                    anyCashBack: "" + newAnyCash + "",
-                }
-            })
-
-            await db.users.update({
-                where: {
-                    id: req.user.id
-                },
-                data: {
-                    providerCashBack: newProviderCashBack
-                }
-            })
-
-
-
-            // update my profit every 30 days
-            /* let intrest = 6;
-             let profit = total * (intrest / 100) / 12
- 
-             // update total = oldtotal + profit
-            */
-        }
-    } else if (paymentMethod == 1) {
-        // PayMob   
-        let newAmount = parseInt(amount) - (parseInt(amount) * (methods[0].gatewayPercentage / 100)) - methods[0].gatewayConstant
-        let TaxAndVat = parseInt(newAmount) - (parseInt(amount) * (tax.VAT / 100)) - (parseInt(amount) * (tax.Tax / 100))
-        let totalGovCuts = parseInt(newAmount) - parseInt(TaxAndVat)
-        let newtotalGovCuts = parseInt(cashBackRules.totalGovCut) + parseInt(totalGovCuts)
-        await db.cashBackRules.update({
-            where: {
-                id: 1
-            },
-            data: {
-                totalGovCut: '' + newtotalGovCuts + ''
-            }
-        })
-        // total fees for paymob
-        let fees = (parseInt(amount) * (methods[0].gatewayPercentage / 100)) + parseInt(methods[0].gatewayConstant)
-
-        let perviousFees = await db.paymentGateWayFees.findFirst({
-            where: {
-                id: 2
-            }
-        })
-
-        await db.paymentGateWayFees.update({
-            where: {
-                id: 2,
-            },
-            data: {
-                totalFees: parseInt(perviousFees.totalFees) + fees
-            }
-        })
-
-        // gross Money
-        let getSubCatGross = await db.subCategories.findFirst({
-            where: {
-                id: parseInt(subcategory_id)
-            }
-        })
-
-        let gross = parseInt(getSubCatGross.grossMoney) + parseInt(newAmount)
-
-        await db.subCategories.update({
-            where: {
-                id: parseInt(subcategory_id)
-            },
-            data: {
-                grossMoney: "" + gross + ""
-            }
-        })
-
-        // Number of transaction
-
-        let NumOfTransaction = parseInt(cashBackRules.transNum) + 1
-
-        await db.cashBackRules.update({
-            where: {
-                id: 1
-            },
-            data: {
-                transNum: "" + NumOfTransaction + ""
-            }
-        })
-
-        // Start Balance , Total
-
-        /*let newBalance = parseInt(req.user.Wallet.balance) - parseInt(amount)
+    // if (paymentMethod == 2) {
+    // Wallet
+    if (parseInt(req.user.Wallet.balance) >= parseInt(amount)) {
+        let newBalance = parseInt(req.user.Wallet.balance) - parseInt(amount)
         let total = parseInt(req.user.Wallet.total) - parseInt(amount)
 
-        await db.wallet.update({
-            where: {
-                user_id: req.user.id
-            },
-            data: {
-                balance: "" + newBalance + "",
-                total: "" + total + "",
-                startBalance: "" + parseInt(req.user.Wallet.startBalance) - parseInt(amount) + ""
-                //generatedBal: "" + total + "",
-            }
-        })*/
-
-        // Profit
-
-        let grossMoney = 0;
-        let cost = 0;
-
-        let fetchCashBackRules = await db.cashBackRules.findFirst({})
-        let fetchCashBackStorage = await db.cashBackStorage.findFirst({})
-        let subCategory = await db.subCategories.findMany({});
-
-        for (item of subCategory) {
-            let newGross = parseInt(item.grossMoney) / parseInt(item.paymentFactor)
-            grossMoney += parseInt(newGross)
-        }
-
-        let overHeadFactor = parseInt(grossMoney)
-
-        let runningCost = await db.runningCost.findMany({})
-        for (item of runningCost) {
-            cost += parseInt(item.amount)
-        }
-
-        let overHeadConstant = (cost / overHeadFactor)
-
-        // update gross money for this category
-        let subCategories = await db.subCategories.findFirst({
-            where: {
-                id: parseInt(subcategory_id)
-            }
-        })
-
-        let NetAfterOverHead = parseInt(amount) - parseInt(overHeadConstant)
-        let xFactor = parseInt(NetAfterOverHead) / parseInt(paymentFactor)
-        let fourtyNineGain = parseInt(xFactor) * parseInt(portion)
-        let ProviderCashBack = parseInt(xFactor) * parseInt(providerPortion)
-        let NetAfterAllPortion = NetAfterOverHead - fourtyNineGain - `ProviderCashBack`
-        let requestPortion = NetAfterAllPortion * (fetchCashBackRules.requestPortion / 100)
-        let requestCall = NetAfterAllPortion * (fetchCashBackRules.callPortion / 100)
-        let requestLike = NetAfterAllPortion * (fetchCashBackRules.likePortion / 100)
-        let requestShare = NetAfterAllPortion * (fetchCashBackRules.sharePortion / 100)
-        let requestView = NetAfterAllPortion * (fetchCashBackRules.viewPortion / 100)
-        let requestAny = NetAfterAllPortion * (fetchCashBackRules.anyPortion / 100)
-        let newFourtyNineGain = parseInt(fetchCashBackStorage.fourtyNineGain) + parseInt(fourtyNineGain)
-        let newProviderCashBack = parseInt(ProviderCashBack) + parseInt(fetchCashBackStorage.providerCashBack)
-        let newRequestCash = parseInt(requestPortion) + parseInt(fetchCashBackStorage.requestCashBack)
-        let newCallCash = parseInt(requestCall) + parseInt(fetchCashBackStorage.callCashBack)
-        let newLikeCash = parseInt(requestLike) + parseInt(fetchCashBackStorage.likeCashBack)
-        let newShareCash = parseInt(requestShare) + parseInt(fetchCashBackStorage.shareCashBack)
-        let newViewCash = parseInt(requestView) + parseInt(fetchCashBackStorage.viewCashBack)
-        let newAnyCash = parseInt(requestAny) + parseInt(fetchCashBackStorage.anyCashBack)
-
-        await db.cashBackStorage.update({
-            where: {
-                id: 1
-            },
-            data: {
-                fourtyNineGain: "" + newFourtyNineGain + "",
-                providerCashBack: "" + newProviderCashBack + "",
-                requestCashBack: "" + newRequestCash + "",
-                callCashBack: "" + newCallCash + "",
-                likeCashBack: "" + newLikeCash + "",
-                shareCashBack: "" + newShareCash + "",
-                viewCashBack: "" + newViewCash + "",
-                anyCashBack: "" + newAnyCash + "",
-            }
-        })
-
-    } else if (paymentMethod == 3) {
-        // Paypal
-        let newAmount = parseInt(amount) - (parseInt(amount) * (methods[2].gatewayPercentage / 100)) - methods[2].gatewayConstant
-        let TaxAndVat = parseInt(newAmount) - (parseInt(amount) * (tax.VAT / 100)) - (parseInt(amount) * (tax.Tax / 100))
-        let totalGovCuts = parseInt(newAmount) - parseInt(TaxAndVat)
-        let newtotalGovCuts = parseInt(cashBackRules.totalGovCut) + parseInt(totalGovCuts)
-        await db.cashBackRules.update({
-            where: {
-                id: 1
-            },
-            data: {
-                totalGovCut: '' + newtotalGovCuts + ''
-            }
-        })
-
-        // total fees for Paypal
-
-        let fees = (parseInt(amount) * (methods[2].gatewayPercentage / 100)) + parseInt(methods[2].gatewayConstant)
-
-        let perviousFees = await db.paymentGateWayFees.findFirst({
-            where: {
-                id: 3
-            }
-        })
-
-        await db.paymentGateWayFees.update({
-            where: {
-                id: 3,
-            },
-            data: {
-                totalFees: parseInt(perviousFees.totalFees) + fees
-            }
-        })
-
-        // gross Money
-        let getSubCatGross = await db.subCategories.findFirst({
-            where: {
-                id: parseInt(subcategory_id)
-            }
-        })
-
-        let gross = parseInt(getSubCatGross.grossMoney) + parseInt(newAmount)
-
-        await db.subCategories.update({
-            where: {
-                id: parseInt(subcategory_id)
-            },
-            data: {
-                grossMoney: "" + gross + ""
-            }
-        })
-
-
-        // Number of transaction
-
-        let NumOfTransaction = parseInt(cashBackRules.transNum) + 1
-
-        await db.cashBackRules.update({
-            where: {
-                id: 1
-            },
-            data: {
-                transNum: "" + NumOfTransaction + ""
-            }
-        })
-
-        // Start Balance , Total
-
-        // Profit
-
-        let grossMoney = 0;
-        let cost = 0;
-
-        let fetchCashBackRules = await db.cashBackRules.findFirst({})
-        let fetchCashBackStorage = await db.cashBackStorage.findFirst({})
-        let subCategory = await db.subCategories.findMany({});
-
-        for (item of subCategory) {
-            let newGross = parseInt(item.grossMoney) / parseInt(item.paymentFactor)
-            grossMoney += parseInt(newGross)
-        }
-
-        let overHeadFactor = parseInt(grossMoney)
-
-        let runningCost = await db.runningCost.findMany({})
-        for (item of runningCost) {
-            cost += parseInt(item.amount)
-        }
-
-        let overHeadConstant = (cost / overHeadFactor)
-
-        // update gross money for this category
-        let subCategories = await db.subCategories.findFirst({
-            where: {
-                id: parseInt(subcategry_id)
-            }
-        })
-
-        let NetAfterOverHead = parseInt(amount) - parseInt(overHeadConstant)
-        let xFactor = parseInt(NetAfterOverHead) / parseInt(paymentFactor)
-        let fourtyNineGain = parseInt(xFactor) * parseInt(portion)
-        let ProviderCashBack = parseInt(xFactor) * parseInt(providerPortion)
-        let NetAfterAllPortion = NetAfterOverHead - fourtyNineGain - `ProviderCashBack`
-        let requestPortion = NetAfterAllPortion * (fetchCashBackRules.requestPortion / 100)
-        let requestCall = NetAfterAllPortion * (fetchCashBackRules.callPortion / 100)
-        let requestLike = NetAfterAllPortion * (fetchCashBackRules.likePortion / 100)
-        let requestShare = NetAfterAllPortion * (fetchCashBackRules.sharePortion / 100)
-        let requestView = NetAfterAllPortion * (fetchCashBackRules.viewPortion / 100)
-        let requestAny = NetAfterAllPortion * (fetchCashBackRules.anyPortion / 100)
-        let newFourtyNineGain = parseInt(fetchCashBackStorage.fourtyNineGain) + parseInt(fourtyNineGain)
-        let newProviderCashBack = parseInt(ProviderCashBack) + parseInt(fetchCashBackStorage.providerCashBack)
-        let newRequestCash = parseInt(requestPortion) + parseInt(fetchCashBackStorage.requestCashBack)
-        let newCallCash = parseInt(requestCall) + parseInt(fetchCashBackStorage.callCashBack)
-        let newLikeCash = parseInt(requestLike) + parseInt(fetchCashBackStorage.likeCashBack)
-        let newShareCash = parseInt(requestShare) + parseInt(fetchCashBackStorage.shareCashBack)
-        let newViewCash = parseInt(requestView) + parseInt(fetchCashBackStorage.viewCashBack)
-        let newAnyCash = parseInt(requestAny) + parseInt(fetchCashBackStorage.anyCashBack)
-
-        await db.cashBackStorage.update({
-            where: {
-                id: 1
-            },
-            data: {
-                fourtyNineGain: "" + newFourtyNineGain + "",
-                providerCashBack: "" + newProviderCashBack + "",
-                requestCashBack: "" + newRequestCash + "",
-                callCashBack: "" + newCallCash + "",
-                likeCashBack: "" + newLikeCash + "",
-                shareCashBack: "" + newShareCash + "",
-                viewCashBack: "" + newViewCash + "",
-                anyCashBack: "" + newAnyCash + "",
-            }
-        })
-
-
-    } else if (paymentMethod == 4) {
-        // Vodafone Cash
-        let newAmount = parseInt(amount) - (parseInt(amount) * (methods[3].gatewayPercentage / 100))
-        let TaxAndVat = parseInt(newAmount) - (parseInt(amount) * (tax.VAT / 100)) - (parseInt(amount) * (tax.Tax / 100))
-        let totalGovCuts = parseInt(newAmount) - parseInt(TaxAndVat)
-        let newtotalGovCuts = parseInt(cashBackRules.totalGovCut) + parseInt(totalGovCuts)
-        await db.cashBackRules.update({
-            where: {
-                id: 1
-            },
-            data: {
-                totalGovCut: '' + newtotalGovCuts + ''
-            }
-        })
-
-        let fees = (parseInt(amount) * (methods[3].gatewayPercentage / 100))
-
-        let perviousFees = await db.paymentGateWayFees.findFirst({
-            where: {
-                id: 4
-            }
-        })
-
-        await db.paymentGateWayFees.update({
-            where: {
-                id: 4,
-            },
-            data: {
-                totalFees: parseInt(perviousFees.totalFees) + fees
-            }
-        })
-
-        // gross Money
-        let getSubCatGross = await db.subCategories.findFirst({
-            where: {
-                id: parseInt(subcategory_id)
-            }
-        })
-
-        let gross = parseInt(getSubCatGross.grossMoney) + parseInt(newAmount)
-
-        await db.subCategories.update({
-            where: {
-                id: parseInt(subcategory_id)
-            },
-            data: {
-                grossMoney: "" + gross + ""
-            }
-        })
-
-
-        // Number of transaction
-
-        let NumOfTransaction = parseInt(cashBackRules.transNum) + 1
-
-        await db.cashBackRules.update({
-            where: {
-                id: 1
-            },
-            data: {
-                transNum: "" + NumOfTransaction + ""
-            }
-        })
-
-        // Start Balance , Total
-
-        let grossMoney = 0;
-        let cost = 0;
-
-        let fetchCashBackRules = await db.cashBackRules.findFirst({})
-        let fetchCashBackStorage = await db.cashBackStorage.findFirst({})
-        let subCategory = await db.subCategories.findMany({});
-
-        for (item of subCategory) {
-            let newGross = parseInt(item.grossMoney) / parseInt(item.paymentFactor)
-            grossMoney += parseInt(newGross)
-        }
-
-        let overHeadFactor = parseInt(grossMoney)
-
-        let runningCost = await db.runningCost.findMany({})
-        for (item of runningCost) {
-            cost += parseInt(item.amount)
-        }
-
-        let overHeadConstant = (cost / overHeadFactor)
-
-        // update gross money for this category
-        let subCategories = await db.subCategories.findFirst({
-            where: {
-                id: parseInt(subcategry_id)
-            }
-        })
-
-        let NetAfterOverHead = parseInt(amount) - parseInt(overHeadConstant)
-        let xFactor = parseInt(NetAfterOverHead) / parseInt(paymentFactor)
-        let fourtyNineGain = parseInt(xFactor) * parseInt(portion)
-        let ProviderCashBack = parseInt(xFactor) * parseInt(providerPortion)
-        let NetAfterAllPortion = NetAfterOverHead - fourtyNineGain - `ProviderCashBack`
-        let requestPortion = NetAfterAllPortion * (fetchCashBackRules.requestPortion / 100)
-        let requestCall = NetAfterAllPortion * (fetchCashBackRules.callPortion / 100)
-        let requestLike = NetAfterAllPortion * (fetchCashBackRules.likePortion / 100)
-        let requestShare = NetAfterAllPortion * (fetchCashBackRules.sharePortion / 100)
-        let requestView = NetAfterAllPortion * (fetchCashBackRules.viewPortion / 100)
-        let requestAny = NetAfterAllPortion * (fetchCashBackRules.anyPortion / 100)
-        let newFourtyNineGain = parseInt(fetchCashBackStorage.fourtyNineGain) + parseInt(fourtyNineGain)
-        let newProviderCashBack = parseInt(ProviderCashBack) + parseInt(fetchCashBackStorage.providerCashBack)
-        let newRequestCash = parseInt(requestPortion) + parseInt(fetchCashBackStorage.requestCashBack)
-        let newCallCash = parseInt(requestCall) + parseInt(fetchCashBackStorage.callCashBack)
-        let newLikeCash = parseInt(requestLike) + parseInt(fetchCashBackStorage.likeCashBack)
-        let newShareCash = parseInt(requestShare) + parseInt(fetchCashBackStorage.shareCashBack)
-        let newViewCash = parseInt(requestView) + parseInt(fetchCashBackStorage.viewCashBack)
-        let newAnyCash = parseInt(requestAny) + parseInt(fetchCashBackStorage.anyCashBack)
-
-        await db.cashBackStorage.update({
-            where: {
-                id: 1
-            },
-            data: {
-                fourtyNineGain: "" + newFourtyNineGain + "",
-                providerCashBack: "" + newProviderCashBack + "",
-                requestCashBack: "" + newRequestCash + "",
-                callCashBack: "" + newCallCash + "",
-                likeCashBack: "" + newLikeCash + "",
-                shareCashBack: "" + newShareCash + "",
-                viewCashBack: "" + newViewCash + "",
-                anyCashBack: "" + newAnyCash + "",
-            }
-        })
-
-    }
-
-    if (createSubscription) {
-        if (isWithdrawing == 0) {
-            // create payment for this user
-            let createPayment = await db.payment.create({
-                data: {
-                    paymentIn: amount,
-                    paymentOut: "0",
-                    transNum: "0",
-                    paymentMethod: paymentMethod,
+        if (req.user.Wallet.refundStorage > 0) {
+            await db.wallet.update({
+                where: {
                     user_id: req.user.id
+                },
+                data: {
+                    balance: "" + newBalance + "",
+                    //total: "" + total + "",
+                    //startBalance: "" + parseInt(req.user.Wallet.startBalance) - parseInt(amount) + ""
+                    //generatedBal: "" + total + "",
                 }
             })
-
-            if (createPayment) {
-                await db.walletActivity.create({
-                    data: {
-                        wallet_id: req.user.Wallet.id,
-                        activityType: 1,
-                        activityText: ''
-                    }
-                })
-            }
+        } else {
+            await db.wallet.update({
+                where: {
+                    user_id: req.user.id
+                },
+                data: {
+                    balance: "" + newBalance + "",
+                    total: "" + total + "",
+                    startBalance: "" + parseInt(req.user.Wallet.startBalance) - parseInt(amount) + ""
+                }
+            })
         }
 
-        return res.status(200).json('OK')
+        let grossMoney = 0;
+        let cost = 0;
+
+        let fetchCashBackRules = await db.cashBackRules.findFirst({})
+        let fetchCashBackStorage = await db.cashBackStorage.findFirst({})
+        let subCategory = await db.subCategories.findMany({});
+
+        for (item of subCategory) {
+            let newGross = parseInt(item.grossMoney) / parseInt(item.paymentFactor)
+            grossMoney += parseInt(newGross)
+        }
+
+        let overHeadFactor = parseInt(grossMoney)
+
+        let runningCost = await db.runningCost.findMany({})
+        for (item of runningCost) {
+            cost += parseInt(item.amount)
+        }
+
+        let overHeadConstant = (cost / overHeadFactor)
+        let NetAfterOverHead = parseInt(amount) - parseInt(overHeadConstant)
+        let xFactor = parseInt(NetAfterOverHead) / parseInt(paymentFactor)
+        let fourtyNineGain = parseInt(xFactor) * parseInt(portion)
+        let ProviderCashBack = parseInt(xFactor) * parseInt(providerPortion)
+        let NetAfterAllPortion = NetAfterOverHead - fourtyNineGain - ProviderCashBack
+        let requestPortion = NetAfterAllPortion * (fetchCashBackRules.requestPortion / 100)
+        let requestCall = NetAfterAllPortion * (fetchCashBackRules.callPortion / 100)
+        let requestLike = NetAfterAllPortion * (fetchCashBackRules.likePortion / 100)
+        let requestShare = NetAfterAllPortion * (fetchCashBackRules.sharePortion / 100)
+        let requestView = NetAfterAllPortion * (fetchCashBackRules.viewPortion / 100)
+        let requestAny = NetAfterAllPortion * (fetchCashBackRules.anyPortion / 100)
+        let newFourtyNineGain = parseInt(fetchCashBackStorage.fourtyNineGain) + parseInt(fourtyNineGain)
+        let newProviderCashBack = parseInt(ProviderCashBack) + parseInt(fetchCashBackStorage.providerCashBack)
+        let newRequestCash = parseInt(requestPortion) + parseInt(fetchCashBackStorage.requestCashBack)
+        let newCallCash = parseInt(requestCall) + parseInt(fetchCashBackStorage.callCashBack)
+        let newLikeCash = parseInt(requestLike) + parseInt(fetchCashBackStorage.likeCashBack)
+        let newShareCash = parseInt(requestShare) + parseInt(fetchCashBackStorage.shareCashBack)
+        let newViewCash = parseInt(requestView) + parseInt(fetchCashBackStorage.viewCashBack)
+        let newAnyCash = parseInt(requestAny) + parseInt(fetchCashBackStorage.anyCashBack)
+
+        await db.cashBackStorage.update({
+            where: {
+                id: 1
+            },
+            data: {
+                fourtyNineGain: "" + newFourtyNineGain + "",
+                //providerCashBack: "" + newProviderCashBack + "",
+                requestCashBack: "" + newRequestCash + "",
+                callCashBack: "" + newCallCash + "",
+                likeCashBack: "" + newLikeCash + "",
+                shareCashBack: "" + newShareCash + "",
+                viewCashBack: "" + newViewCash + "",
+                anyCashBack: "" + newAnyCash + "",
+            }
+        })
+
+        await db.users.update({
+            where: {
+                id: req.user.id
+            },
+            data: {
+                providerCashBack: newProviderCashBack
+            }
+        })
+
+        // update my profit every 30 days
+        /* let intrest = 6;
+         let profit = total * (intrest / 100) / 12
+ 
+         // update total = oldtotal + profit
+        */
+    } else {
+        return res.status(403).json({
+            error: {
+                error_en: 'There is no enough balance in your wallet.',
+                error_ar: 'لا يوجد رصيد كافي في المحفظه.'
+            }
+        })
     }
+    //} 
+    //else if (paymentMethod == 1) {
+    //     // PayMob   
+    //     let newAmount = parseInt(amount) - (parseInt(amount) * (methods[0].gatewayPercentage / 100)) - methods[0].gatewayConstant
+    //     let TaxAndVat = parseInt(newAmount) - (parseInt(amount) * (tax.VAT / 100)) - (parseInt(amount) * (tax.Tax / 100))
+    //     let totalGovCuts = parseInt(newAmount) - parseInt(TaxAndVat)
+    //     let newtotalGovCuts = parseInt(cashBackRules.totalGovCut) + parseInt(totalGovCuts)
+    //     await db.cashBackRules.update({
+    //         where: {
+    //             id: 1
+    //         },
+    //         data: {
+    //             totalGovCut: '' + newtotalGovCuts + ''
+    //         }
+    //     })
+    //     // total fees for paymob
+    //     let fees = (parseInt(amount) * (methods[0].gatewayPercentage / 100)) + parseInt(methods[0].gatewayConstant)
+
+    //     let perviousFees = await db.paymentGateWayFees.findFirst({
+    //         where: {
+    //             id: 2
+    //         }
+    //     })
+
+    //     await db.paymentGateWayFees.update({
+    //         where: {
+    //             id: 2,
+    //         },
+    //         data: {
+    //             totalFees: parseInt(perviousFees.totalFees) + fees
+    //         }
+    //     })
+
+    //     // gross Money
+    //     let getSubCatGross = await db.subCategories.findFirst({
+    //         where: {
+    //             id: parseInt(subcategory_id)
+    //         }
+    //     })
+
+    //     let gross = parseInt(getSubCatGross.grossMoney) + parseInt(newAmount)
+
+    //     await db.subCategories.update({
+    //         where: {
+    //             id: parseInt(subcategory_id)
+    //         },
+    //         data: {
+    //             grossMoney: "" + gross + ""
+    //         }
+    //     })
+
+    //     // Number of transaction
+
+    //     let NumOfTransaction = parseInt(cashBackRules.transNum) + 1
+
+    //     await db.cashBackRules.update({
+    //         where: {
+    //             id: 1
+    //         },
+    //         data: {
+    //             transNum: "" + NumOfTransaction + ""
+    //         }
+    //     })
+
+    //     // Start Balance , Total
+
+    //     /*let newBalance = parseInt(req.user.Wallet.balance) - parseInt(amount)
+    //     let total = parseInt(req.user.Wallet.total) - parseInt(amount)
+
+    //     await db.wallet.update({
+    //         where: {
+    //             user_id: req.user.id
+    //         },
+    //         data: {
+    //             balance: "" + newBalance + "",
+    //             total: "" + total + "",
+    //             startBalance: "" + parseInt(req.user.Wallet.startBalance) - parseInt(amount) + ""
+    //             //generatedBal: "" + total + "",
+    //         }
+    //     })*/
+
+    //     // Profit
+
+    //     let grossMoney = 0;
+    //     let cost = 0;
+
+    //     let fetchCashBackRules = await db.cashBackRules.findFirst({})
+    //     let fetchCashBackStorage = await db.cashBackStorage.findFirst({})
+    //     let subCategory = await db.subCategories.findMany({});
+
+    //     for (item of subCategory) {
+    //         let newGross = parseInt(item.grossMoney) / parseInt(item.paymentFactor)
+    //         grossMoney += parseInt(newGross)
+    //     }
+
+    //     let overHeadFactor = parseInt(grossMoney)
+
+    //     let runningCost = await db.runningCost.findMany({})
+    //     for (item of runningCost) {
+    //         cost += parseInt(item.amount)
+    //     }
+
+    //     let overHeadConstant = (cost / overHeadFactor)
+
+    //     // update gross money for this category
+    //     let subCategories = await db.subCategories.findFirst({
+    //         where: {
+    //             id: parseInt(subcategory_id)
+    //         }
+    //     })
+
+    //     let NetAfterOverHead = parseInt(amount) - parseInt(overHeadConstant)
+    //     let xFactor = parseInt(NetAfterOverHead) / parseInt(paymentFactor)
+    //     let fourtyNineGain = parseInt(xFactor) * parseInt(portion)
+    //     let ProviderCashBack = parseInt(xFactor) * parseInt(providerPortion)
+    //     let NetAfterAllPortion = NetAfterOverHead - fourtyNineGain - `ProviderCashBack`
+    //     let requestPortion = NetAfterAllPortion * (fetchCashBackRules.requestPortion / 100)
+    //     let requestCall = NetAfterAllPortion * (fetchCashBackRules.callPortion / 100)
+    //     let requestLike = NetAfterAllPortion * (fetchCashBackRules.likePortion / 100)
+    //     let requestShare = NetAfterAllPortion * (fetchCashBackRules.sharePortion / 100)
+    //     let requestView = NetAfterAllPortion * (fetchCashBackRules.viewPortion / 100)
+    //     let requestAny = NetAfterAllPortion * (fetchCashBackRules.anyPortion / 100)
+    //     let newFourtyNineGain = parseInt(fetchCashBackStorage.fourtyNineGain) + parseInt(fourtyNineGain)
+    //     let newProviderCashBack = parseInt(ProviderCashBack) + parseInt(fetchCashBackStorage.providerCashBack)
+    //     let newRequestCash = parseInt(requestPortion) + parseInt(fetchCashBackStorage.requestCashBack)
+    //     let newCallCash = parseInt(requestCall) + parseInt(fetchCashBackStorage.callCashBack)
+    //     let newLikeCash = parseInt(requestLike) + parseInt(fetchCashBackStorage.likeCashBack)
+    //     let newShareCash = parseInt(requestShare) + parseInt(fetchCashBackStorage.shareCashBack)
+    //     let newViewCash = parseInt(requestView) + parseInt(fetchCashBackStorage.viewCashBack)
+    //     let newAnyCash = parseInt(requestAny) + parseInt(fetchCashBackStorage.anyCashBack)
+
+    //     await db.cashBackStorage.update({
+    //         where: {
+    //             id: 1
+    //         },
+    //         data: {
+    //             fourtyNineGain: "" + newFourtyNineGain + "",
+    //             providerCashBack: "" + newProviderCashBack + "",
+    //             requestCashBack: "" + newRequestCash + "",
+    //             callCashBack: "" + newCallCash + "",
+    //             likeCashBack: "" + newLikeCash + "",
+    //             shareCashBack: "" + newShareCash + "",
+    //             viewCashBack: "" + newViewCash + "",
+    //             anyCashBack: "" + newAnyCash + "",
+    //         }
+    //     })
+
+    // } 
+    // else if (paymentMethod == 3) {
+    //     // Paypal
+    //     let newAmount = parseInt(amount) - (parseInt(amount) * (methods[2].gatewayPercentage / 100)) - methods[2].gatewayConstant
+    //     let TaxAndVat = parseInt(newAmount) - (parseInt(amount) * (tax.VAT / 100)) - (parseInt(amount) * (tax.Tax / 100))
+    //     let totalGovCuts = parseInt(newAmount) - parseInt(TaxAndVat)
+    //     let newtotalGovCuts = parseInt(cashBackRules.totalGovCut) + parseInt(totalGovCuts)
+    //     await db.cashBackRules.update({
+    //         where: {
+    //             id: 1
+    //         },
+    //         data: {
+    //             totalGovCut: '' + newtotalGovCuts + ''
+    //         }
+    //     })
+
+    //     // total fees for Paypal
+
+    //     let fees = (parseInt(amount) * (methods[2].gatewayPercentage / 100)) + parseInt(methods[2].gatewayConstant)
+
+    //     let perviousFees = await db.paymentGateWayFees.findFirst({
+    //         where: {
+    //             id: 3
+    //         }
+    //     })
+
+    //     await db.paymentGateWayFees.update({
+    //         where: {
+    //             id: 3,
+    //         },
+    //         data: {
+    //             totalFees: parseInt(perviousFees.totalFees) + fees
+    //         }
+    //     })
+
+    //     // gross Money
+    //     let getSubCatGross = await db.subCategories.findFirst({
+    //         where: {
+    //             id: parseInt(subcategory_id)
+    //         }
+    //     })
+
+    //     let gross = parseInt(getSubCatGross.grossMoney) + parseInt(newAmount)
+
+    //     await db.subCategories.update({
+    //         where: {
+    //             id: parseInt(subcategory_id)
+    //         },
+    //         data: {
+    //             grossMoney: "" + gross + ""
+    //         }
+    //     })
+
+
+    //     // Number of transaction
+
+    //     let NumOfTransaction = parseInt(cashBackRules.transNum) + 1
+
+    //     await db.cashBackRules.update({
+    //         where: {
+    //             id: 1
+    //         },
+    //         data: {
+    //             transNum: "" + NumOfTransaction + ""
+    //         }
+    //     })
+
+    //     // Start Balance , Total
+
+    //     // Profit
+
+    //     let grossMoney = 0;
+    //     let cost = 0;
+
+    //     let fetchCashBackRules = await db.cashBackRules.findFirst({})
+    //     let fetchCashBackStorage = await db.cashBackStorage.findFirst({})
+    //     let subCategory = await db.subCategories.findMany({});
+
+    //     for (item of subCategory) {
+    //         let newGross = parseInt(item.grossMoney) / parseInt(item.paymentFactor)
+    //         grossMoney += parseInt(newGross)
+    //     }
+
+    //     let overHeadFactor = parseInt(grossMoney)
+
+    //     let runningCost = await db.runningCost.findMany({})
+    //     for (item of runningCost) {
+    //         cost += parseInt(item.amount)
+    //     }
+
+    //     let overHeadConstant = (cost / overHeadFactor)
+
+    //     // update gross money for this category
+    //     let subCategories = await db.subCategories.findFirst({
+    //         where: {
+    //             id: parseInt(subcategry_id)
+    //         }
+    //     })
+
+    //     let NetAfterOverHead = parseInt(amount) - parseInt(overHeadConstant)
+    //     let xFactor = parseInt(NetAfterOverHead) / parseInt(paymentFactor)
+    //     let fourtyNineGain = parseInt(xFactor) * parseInt(portion)
+    //     let ProviderCashBack = parseInt(xFactor) * parseInt(providerPortion)
+    //     let NetAfterAllPortion = NetAfterOverHead - fourtyNineGain - `ProviderCashBack`
+    //     let requestPortion = NetAfterAllPortion * (fetchCashBackRules.requestPortion / 100)
+    //     let requestCall = NetAfterAllPortion * (fetchCashBackRules.callPortion / 100)
+    //     let requestLike = NetAfterAllPortion * (fetchCashBackRules.likePortion / 100)
+    //     let requestShare = NetAfterAllPortion * (fetchCashBackRules.sharePortion / 100)
+    //     let requestView = NetAfterAllPortion * (fetchCashBackRules.viewPortion / 100)
+    //     let requestAny = NetAfterAllPortion * (fetchCashBackRules.anyPortion / 100)
+    //     let newFourtyNineGain = parseInt(fetchCashBackStorage.fourtyNineGain) + parseInt(fourtyNineGain)
+    //     let newProviderCashBack = parseInt(ProviderCashBack) + parseInt(fetchCashBackStorage.providerCashBack)
+    //     let newRequestCash = parseInt(requestPortion) + parseInt(fetchCashBackStorage.requestCashBack)
+    //     let newCallCash = parseInt(requestCall) + parseInt(fetchCashBackStorage.callCashBack)
+    //     let newLikeCash = parseInt(requestLike) + parseInt(fetchCashBackStorage.likeCashBack)
+    //     let newShareCash = parseInt(requestShare) + parseInt(fetchCashBackStorage.shareCashBack)
+    //     let newViewCash = parseInt(requestView) + parseInt(fetchCashBackStorage.viewCashBack)
+    //     let newAnyCash = parseInt(requestAny) + parseInt(fetchCashBackStorage.anyCashBack)
+
+    //     await db.cashBackStorage.update({
+    //         where: {
+    //             id: 1
+    //         },
+    //         data: {
+    //             fourtyNineGain: "" + newFourtyNineGain + "",
+    //             providerCashBack: "" + newProviderCashBack + "",
+    //             requestCashBack: "" + newRequestCash + "",
+    //             callCashBack: "" + newCallCash + "",
+    //             likeCashBack: "" + newLikeCash + "",
+    //             shareCashBack: "" + newShareCash + "",
+    //             viewCashBack: "" + newViewCash + "",
+    //             anyCashBack: "" + newAnyCash + "",
+    //         }
+    //     })
+
+
+    // } else if (paymentMethod == 4) {
+    //     // Vodafone Cash
+    //     let newAmount = parseInt(amount) - (parseInt(amount) * (methods[3].gatewayPercentage / 100))
+    //     let TaxAndVat = parseInt(newAmount) - (parseInt(amount) * (tax.VAT / 100)) - (parseInt(amount) * (tax.Tax / 100))
+    //     let totalGovCuts = parseInt(newAmount) - parseInt(TaxAndVat)
+    //     let newtotalGovCuts = parseInt(cashBackRules.totalGovCut) + parseInt(totalGovCuts)
+    //     await db.cashBackRules.update({
+    //         where: {
+    //             id: 1
+    //         },
+    //         data: {
+    //             totalGovCut: '' + newtotalGovCuts + ''
+    //         }
+    //     })
+
+    //     let fees = (parseInt(amount) * (methods[3].gatewayPercentage / 100))
+
+    //     let perviousFees = await db.paymentGateWayFees.findFirst({
+    //         where: {
+    //             id: 4
+    //         }
+    //     })
+
+    //     await db.paymentGateWayFees.update({
+    //         where: {
+    //             id: 4,
+    //         },
+    //         data: {
+    //             totalFees: parseInt(perviousFees.totalFees) + fees
+    //         }
+    //     })
+
+    //     // gross Money
+    //     let getSubCatGross = await db.subCategories.findFirst({
+    //         where: {
+    //             id: parseInt(subcategory_id)
+    //         }
+    //     })
+
+    //     let gross = parseInt(getSubCatGross.grossMoney) + parseInt(newAmount)
+
+    //     await db.subCategories.update({
+    //         where: {
+    //             id: parseInt(subcategory_id)
+    //         },
+    //         data: {
+    //             grossMoney: "" + gross + ""
+    //         }
+    //     })
+
+
+    //     // Number of transaction
+
+    //     let NumOfTransaction = parseInt(cashBackRules.transNum) + 1
+
+    //     await db.cashBackRules.update({
+    //         where: {
+    //             id: 1
+    //         },
+    //         data: {
+    //             transNum: "" + NumOfTransaction + ""
+    //         }
+    //     })
+
+    //     // Start Balance , Total
+
+    //     let grossMoney = 0;
+    //     let cost = 0;
+
+    //     let fetchCashBackRules = await db.cashBackRules.findFirst({})
+    //     let fetchCashBackStorage = await db.cashBackStorage.findFirst({})
+    //     let subCategory = await db.subCategories.findMany({});
+
+    //     for (item of subCategory) {
+    //         let newGross = parseInt(item.grossMoney) / parseInt(item.paymentFactor)
+    //         grossMoney += parseInt(newGross)
+    //     }
+
+    //     let overHeadFactor = parseInt(grossMoney)
+
+    //     let runningCost = await db.runningCost.findMany({})
+    //     for (item of runningCost) {
+    //         cost += parseInt(item.amount)
+    //     }
+
+    //     let overHeadConstant = (cost / overHeadFactor)
+
+    //     // update gross money for this category
+    //     let subCategories = await db.subCategories.findFirst({
+    //         where: {
+    //             id: parseInt(subcategry_id)
+    //         }
+    //     })
+
+    //     let NetAfterOverHead = parseInt(amount) - parseInt(overHeadConstant)
+    //     let xFactor = parseInt(NetAfterOverHead) / parseInt(paymentFactor)
+    //     let fourtyNineGain = parseInt(xFactor) * parseInt(portion)
+    //     let ProviderCashBack = parseInt(xFactor) * parseInt(providerPortion)
+    //     let NetAfterAllPortion = NetAfterOverHead - fourtyNineGain - `ProviderCashBack`
+    //     let requestPortion = NetAfterAllPortion * (fetchCashBackRules.requestPortion / 100)
+    //     let requestCall = NetAfterAllPortion * (fetchCashBackRules.callPortion / 100)
+    //     let requestLike = NetAfterAllPortion * (fetchCashBackRules.likePortion / 100)
+    //     let requestShare = NetAfterAllPortion * (fetchCashBackRules.sharePortion / 100)
+    //     let requestView = NetAfterAllPortion * (fetchCashBackRules.viewPortion / 100)
+    //     let requestAny = NetAfterAllPortion * (fetchCashBackRules.anyPortion / 100)
+    //     let newFourtyNineGain = parseInt(fetchCashBackStorage.fourtyNineGain) + parseInt(fourtyNineGain)
+    //     let newProviderCashBack = parseInt(ProviderCashBack) + parseInt(fetchCashBackStorage.providerCashBack)
+    //     let newRequestCash = parseInt(requestPortion) + parseInt(fetchCashBackStorage.requestCashBack)
+    //     let newCallCash = parseInt(requestCall) + parseInt(fetchCashBackStorage.callCashBack)
+    //     let newLikeCash = parseInt(requestLike) + parseInt(fetchCashBackStorage.likeCashBack)
+    //     let newShareCash = parseInt(requestShare) + parseInt(fetchCashBackStorage.shareCashBack)
+    //     let newViewCash = parseInt(requestView) + parseInt(fetchCashBackStorage.viewCashBack)
+    //     let newAnyCash = parseInt(requestAny) + parseInt(fetchCashBackStorage.anyCashBack)
+
+    //     await db.cashBackStorage.update({
+    //         where: {
+    //             id: 1
+    //         },
+    //         data: {
+    //             fourtyNineGain: "" + newFourtyNineGain + "",
+    //             providerCashBack: "" + newProviderCashBack + "",
+    //             requestCashBack: "" + newRequestCash + "",
+    //             callCashBack: "" + newCallCash + "",
+    //             likeCashBack: "" + newLikeCash + "",
+    //             shareCashBack: "" + newShareCash + "",
+    //             viewCashBack: "" + newViewCash + "",
+    //             anyCashBack: "" + newAnyCash + "",
+    //         }
+    //     })
+
+    // }
+
+    // if (createSubscription) {
+    //     if (isWithdrawing == 0) {
+    //         // create payment for this user
+    //         let createPayment = await db.payment.create({
+    //             data: {
+    //                 paymentIn: amount,
+    //                 paymentOut: "0",
+    //                 transNum: "0",
+    //                 paymentMethod: paymentMethod,
+    //                 user_id: req.user.id
+    //             }
+    //         })
+
+    //         if (createPayment) {
+    //             await db.walletActivity.create({
+    //                 data: {
+    //                     wallet_id: req.user.Wallet.id,
+    //                     activityType: 1,
+    //                     activityText: ''
+    //                 }
+    //             })
+    //         }
+    //     }
+
+        //return res.status(200).json('OK')
+    // }
 }
 
 /* This method is for charging balance for a specific user */
@@ -1154,7 +1165,7 @@ let makeRequest = async (req, res) => {
         });
 
         var counter = 0;
-        
+
         for (item of totalStepsOfToday) {
             console.log(dayjs(item.created_at, '"MM-DD-YYYY"').$d > dayjs().startOf('day').$d, dayjs().endOf('day').$d > dayjs(item.created_at, '"MM-DD-YYYY"').$d)
             if (dayjs().startOf('day').$d < dayjs(item.created_at, '"MM-DD-YYYY"').$d && dayjs().endOf('day').$d > dayjs(item.created_at, '"MM-DD-YYYY"').$d) {
@@ -2332,7 +2343,7 @@ let makeRequest = async (req, res) => {
                     } else {
                         console.log(3)
                         let getStorage = await db.cashBackStorage.findFirst({});
-                        let getStep = await db.cashBackStep.findFirst({}) 
+                        let getStep = await db.cashBackStep.findFirst({})
                         if (request == 2) {
                             let call = getStorage.callCashBack
                             if (parseInt(call) <= 0) {
@@ -2353,7 +2364,7 @@ let makeRequest = async (req, res) => {
                                         amount: getStep.step
                                     }
                                 })
-            
+
                                 let notify = {
                                     userFirstName: req.user.firstName,
                                     reciever: req.user.id,
@@ -2365,9 +2376,9 @@ let makeRequest = async (req, res) => {
                                     notification_en: `You have got ${getStep.step} as cashback from 49.`,
                                     notification_ar: `لقد حصلت علي كاش باك من ٤٩.${getStep.step} `
                                 }
-            
+
                                 sendNotification(notify, req.user.id)
-            
+
                                 cashBackNotification(notify)
 
                                 return res.status(200).send('45454');
@@ -2478,7 +2489,7 @@ let makeRequest = async (req, res) => {
                                         amount: getStep.step
                                     }
                                 })
-            
+
                                 let notify = {
                                     userFirstName: req.user.firstName,
                                     reciever: req.user.id,
@@ -2490,9 +2501,9 @@ let makeRequest = async (req, res) => {
                                     notification_en: `You have got ${getStep.step} as cashback from 49.`,
                                     notification_ar: `لقد حصلت علي كاش باك من ٤٩.${getStep.step} `
                                 }
-            
+
                                 sendNotification(notify, req.user.id)
-            
+
                                 cashBackNotification(notify)
 
                                 return res.status(200).send('454232354');
@@ -2603,7 +2614,7 @@ let makeRequest = async (req, res) => {
                                         amount: getStep.step
                                     }
                                 })
-            
+
                                 let notify = {
                                     userFirstName: req.user.firstName,
                                     reciever: req.user.id,
@@ -2615,9 +2626,9 @@ let makeRequest = async (req, res) => {
                                     notification_en: `You have got ${getStep.step} as cashback from 49.`,
                                     notification_ar: `لقد حصلت علي كاش باك من ٤٩.${getStep.step} `
                                 }
-            
+
                                 sendNotification(notify, req.user.id)
-            
+
                                 cashBackNotification(notify)
 
                                 return res.status(200).send('4542332323254');

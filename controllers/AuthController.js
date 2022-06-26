@@ -713,9 +713,15 @@ let forgetPassword = async (req, res) => {
         })
     }
 
-    await db.users.update({
+    let getUser = await db.users.findFirst({
         where: {
             uid: uid
+        }
+    })
+
+    await db.users.update({
+        where: {
+            id: getUser.id 
         },
         data: {
             password: hash.hashSync(newPassword, 10)
