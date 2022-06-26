@@ -26,7 +26,7 @@ let register = async (req, res) => {
         hashCode,
         countryCode,
         lang,
-        uid,
+        idToken,
         referralId
     } = req.body
 
@@ -123,10 +123,10 @@ let register = async (req, res) => {
             is_locked: 0,
             //gender: gender ?? 0,
             ref_number: refNumber ?? '',
-            countryCode: country,
+            //countryCode: country,
             fcm: fcm,
             device_id: device_id,
-            uid: uid,
+            uid: idToken ?? '',
             hashCode: Math.floor(Math.random() * 9000000000000).toString(),
             countryCode: countryCode ?? '0',
             profilePicture: gender == 1 ? 'user-profile%20MAN.png' : 'user-profile%20GIRL.png'
@@ -694,7 +694,7 @@ let resetPassword = async (req, res) => {
 
 
 let forgetPassword = async (req, res) => {
-    const {newPassword, passwordConfirmation, uid } = req.body
+    const {newPassword, passwordConfirmation, phone } = req.body
 
     if (!newPassword || !passwordConfirmation) {
         return res.status(403).json({
@@ -716,11 +716,11 @@ let forgetPassword = async (req, res) => {
 
     let getUser = await db.users.findFirst({
         where: {
-            uid: uid
+            phone: phone
         }
     })
 
-    console.log(uid, getUser)
+    console.log(phone, getUser)
 
     if (!getUser) {
         return res.status(403).send('Something went wrong, Unknown UID')
