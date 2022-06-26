@@ -865,7 +865,7 @@ let searchForResult = async (req, res) => {
 let updatePostPrivacy = async (req, res) => {
     const { postId, privacy } = req.body
 
-    if (!postId || !privacy) {
+    if (!postId) {
         return res.status(403).send('Post id and privacy type id are required');
     }
 
@@ -886,7 +886,7 @@ let updatePostPrivacy = async (req, res) => {
             id: parseInt(postId),
         },
         data: {
-            privacy: parseInt(privacy)
+            privacy: parseInt(privacy) ?? 0 
         }
     })
 
