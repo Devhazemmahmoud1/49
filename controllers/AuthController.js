@@ -26,7 +26,8 @@ let register = async (req, res) => {
         hashCode,
         countryCode,
         lang,
-        uid
+        uid,
+        referralId
     } = req.body
 
     // check if the body is empty for username and password otherwise procced 
@@ -185,13 +186,13 @@ let register = async (req, res) => {
         }); */
 
         // check if there is a hash code sent with registeration
-        if (hashCode) {
+        if (referralId) {
             // there is a hashCode provided
 
             // get the user provided id 
             let checkHashCode = await db.users.findFirst({
                 where: {
-                    hashCode: hashCode
+                    hashCode: referralId
                 }
             })
 

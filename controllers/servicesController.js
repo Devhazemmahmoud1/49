@@ -62,7 +62,7 @@ let makeSubscriptionPayments = async (req, res) => {
         data: {
             user_id: req.user.id,
             subCat_id: parseInt(subcategory_id),
-            period: period.toString(),
+            period: period.toString() ?? 1,
             isPermium: parseInt(isPermium) ?? 0,
             isPersonalAccount: parseInt(isPersonal) ?? 0,
             packageCounter: 0,
