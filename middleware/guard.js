@@ -13,7 +13,10 @@ module.exports = ((req, res, next) => {
             } else {
                 authorization =authorization.split('Bearer ')[1]
                 let checkToken = Jwt.verify(authorization, secretKey, async (err, data) => {
-                    if (err) throw err;
+                    if (err) {
+                        req.user = null ;
+                        next();
+                    }
                     let user = await db.users.findFirst({
                         where: {
                             id: parseInt(data.id)
