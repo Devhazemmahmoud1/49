@@ -127,7 +127,8 @@ let register = async (req, res) => {
             device_id: device_id,
             uid: uid,
             hashCode: Math.floor(Math.random() * 9000000000000).toString(),
-            countryCode: countryCode ?? '0'
+            countryCode: countryCode ?? '0',
+            profilePicture: gender == 1 ? 'user-profile%20MAN.png' : 'user-profile%20GIRL.png'
         }
     });
 
