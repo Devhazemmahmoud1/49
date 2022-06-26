@@ -107,6 +107,8 @@ let makeSubscriptionPayments = async (req, res) => {
                     //generatedBal: "" + total + "",
                 }
             })
+
+            return res.send('ok')
         } else {
             await db.wallet.update({
                 where: {
@@ -126,24 +128,30 @@ let makeSubscriptionPayments = async (req, res) => {
         let fetchCashBackRules = await db.cashBackRules.findFirst({})
         let fetchCashBackStorage = await db.cashBackStorage.findFirst({})
         let subCategory = await db.subCategories.findMany({});
+        // update gross money for this category
+        let subCat = await db.subCategories.findFirst({
+            where: {
+                id: parseInt(subcategory_id)
+            }
+        })
 
         for (item of subCategory) {
-            let newGross = parseInt(item.grossMoney) / parseInt(item.paymentFactor)
-            grossMoney += parseInt(newGross)
+            let newGross = parseFloat(item.grossMoney) / parseFloat(item.paymentFactor)
+            grossMoney += parseFloat(newGross)
         }
 
         let overHeadFactor = parseInt(grossMoney)
 
         let runningCost = await db.runningCost.findMany({})
         for (item of runningCost) {
-            cost += parseInt(item.amount)
+            cost += parseFloat(item.amount)
         }
 
         let overHeadConstant = (cost / overHeadFactor)
-        let NetAfterOverHead = parseInt(amount) - parseInt(overHeadConstant)
-        let xFactor = parseInt(NetAfterOverHead) / parseInt(paymentFactor)
-        let fourtyNineGain = parseInt(xFactor) * parseInt(portion)
-        let ProviderCashBack = parseInt(xFactor) * parseInt(providerPortion)
+        let NetAfterOverHead = parseFloat(amount) - parseFloat(overHeadConstant)
+        let xFactor = parseFloat(NetAfterOverHead) / parseFloat(parseFloat(subCat.paymentFactor))
+        let fourtyNineGain = parseFloat(xFactor) * parseFloat(portion)
+        let ProviderCashBack = parseFloat(xFactor) * parseFloat(providerPortion)
         let NetAfterAllPortion = NetAfterOverHead - fourtyNineGain - ProviderCashBack
         let requestPortion = NetAfterAllPortion * (fetchCashBackRules.requestPortion / 100)
         let requestCall = NetAfterAllPortion * (fetchCashBackRules.callPortion / 100)
@@ -151,14 +159,14 @@ let makeSubscriptionPayments = async (req, res) => {
         let requestShare = NetAfterAllPortion * (fetchCashBackRules.sharePortion / 100)
         let requestView = NetAfterAllPortion * (fetchCashBackRules.viewPortion / 100)
         let requestAny = NetAfterAllPortion * (fetchCashBackRules.anyPortion / 100)
-        let newFourtyNineGain = parseInt(fetchCashBackStorage.fourtyNineGain) + parseInt(fourtyNineGain)
-        let newProviderCashBack = parseInt(ProviderCashBack) + parseInt(fetchCashBackStorage.providerCashBack)
-        let newRequestCash = parseInt(requestPortion) + parseInt(fetchCashBackStorage.requestCashBack)
-        let newCallCash = parseInt(requestCall) + parseInt(fetchCashBackStorage.callCashBack)
-        let newLikeCash = parseInt(requestLike) + parseInt(fetchCashBackStorage.likeCashBack)
-        let newShareCash = parseInt(requestShare) + parseInt(fetchCashBackStorage.shareCashBack)
-        let newViewCash = parseInt(requestView) + parseInt(fetchCashBackStorage.viewCashBack)
-        let newAnyCash = parseInt(requestAny) + parseInt(fetchCashBackStorage.anyCashBack)
+        let newFourtyNineGain = parseFloat(fetchCashBackStorage.fourtyNineGain) + parseFloat(fourtyNineGain)
+        let newProviderCashBack = parseFloat(ProviderCashBack) + parseFloat(fetchCashBackStorage.providerCashBack)
+        let newRequestCash = parseFloat(requestPortion) + parseFloat(fetchCashBackStorage.requestCashBack)
+        let newCallCash = parseFloat(requestCall) + parseFloat(fetchCashBackStorage.callCashBack)
+        let newLikeCash = parseFloat(requestLike) + parseFloat(fetchCashBackStorage.likeCashBack)
+        let newShareCash = parseFloat(requestShare) + parseFloat(fetchCashBackStorage.shareCashBack)
+        let newViewCash = parseFloat(requestView) + parseFloat(fetchCashBackStorage.viewCashBack)
+        let newAnyCash = parseFloat(requestAny) + parseFloat(fetchCashBackStorage.anyCashBack)
 
         await db.cashBackStorage.update({
             where: {

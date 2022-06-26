@@ -4,7 +4,7 @@ const {PrismaClient} = require('@prisma/client');
 const secretKey = "fourtyninehub495051fourtynine";
 const db = new PrismaClient();
 const hash = require('bcrypt')
-
+const notification = require('../controllers/notificationsController/notifications')
 const admin = require('firebase-admin')
 
 
@@ -196,7 +196,7 @@ let register = async (req, res) => {
             })
 
             if (checkHashCode) {
-                await db.ref.create({
+                let ref =await db.ref.create({
                     data: {
                         inviter: checkHashCode.id,
                         invited: create.id,
@@ -205,6 +205,27 @@ let register = async (req, res) => {
                 })
 
                 // do action with cashBack
+
+                let notify = {
+                    user: ref.inviter,
+                    type: 1000,
+                    message_en: 'Conratulations, Someone has registered using your code and you got 10 Units.',
+                    message_ar: 'مبروك ، قام احدهم التسجيل باستخدام الكود الخاص بك و حصلت علي ١٠ وحدات.'
+                }
+
+                notification.cashBackNotificationForRef(notify)
+
+                let notification = await db.notifications.create({
+                    data: {
+                        sender_id: 0,
+                        reciever_id: ref.inviter,
+                        message_en: notify.message_en,
+                        message_ar: notify.message_ar,
+                        is_read: 0,
+                        type: 10,
+                    }
+                })
+
             }
 
         }

@@ -847,7 +847,13 @@ let getMyAbout = async (req, res) => {
     let refInfo = await db.users.findFirst({
         where: {
             id: parseInt(ref.inviter)
+        },
+        select: {
+            firstName: true,
+            lastName: true,
+            id: true,
         }
+
     })
 
     return res.status(200).json({
