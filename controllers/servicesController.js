@@ -1145,9 +1145,9 @@ let makeRequest = async (req, res) => {
             }
         })
 
-        let getStep = await db.cashBackStep.findFirst();
+        var getStep = await db.cashBackStep.findFirst();
 
-        let totalStepsOfToday = await db.dailyCashBack.findMany({
+        var totalStepsOfToday = await db.dailyCashBack.findMany({
             where: {
                 user_id: req.user.id,
             },
@@ -1157,7 +1157,7 @@ let makeRequest = async (req, res) => {
 
         for (item of totalStepsOfToday) {
             console.log(dayjs(item.created_at, '"MM-DD-YYYY"').$d > dayjs().startOf('day').$d, dayjs().endOf('day').$d > dayjs(item.created_at, '"MM-DD-YYYY"').$d)
-            if (dayjs().startOf('day').$d <  dayjs(item.created_at, '"MM-DD-YYYY"').$d && dayjs().endOf('day').$d > dayjs(item.created_at, '"MM-DD-YYYY"').$d) {
+            if (dayjs().startOf('day').$d < dayjs(item.created_at, '"MM-DD-YYYY"').$d && dayjs().endOf('day').$d > dayjs(item.created_at, '"MM-DD-YYYY"').$d) {
                 console.log('still going on steps')
                 counter = parseInt(counter + parseInt(item.amount))
             }
@@ -1222,7 +1222,7 @@ let makeRequest = async (req, res) => {
                                 user_id: req.user.id,
                                 amount: getStep.step
                             }
-                        })  
+                        })
 
                         let notify = {
                             userFirstName: req.user.firstName,
@@ -1319,7 +1319,7 @@ let makeRequest = async (req, res) => {
                                         notification_en: `You have got ${getStep.step} as cashback from 49.`,
                                         notification_ar: `لقد حصلت علي كاش باك من ٤٩.${getStep.step} `
                                     }
-            
+
                                     sendNotification(notify, req.user.id)
                                     cashBackNotification(notify)
 
@@ -1359,7 +1359,7 @@ let makeRequest = async (req, res) => {
                                         notification_en: `You have got ${getStep.step} as cashback from 49.`,
                                         notification_ar: `لقد حصلت علي كاش باك من ٤٩.${getStep.step} `
                                     }
-            
+
                                     sendNotification(notify, req.user.id)
 
                                     return res.status(200).send('No CashBack found but provider effected')
@@ -1424,9 +1424,9 @@ let makeRequest = async (req, res) => {
                                         notification_en: `You have got ${getStep.step} as cashback from 49.`,
                                         notification_ar: `لقد حصلت علي كاش باك من ٤٩.${getStep.step} `
                                     }
-            
+
                                     sendNotification(notify, req.user.id)
-            
+
                                     cashBackNotification(notify)
 
                                     return res.status(200).send('Cashback and provider effected')
@@ -1465,9 +1465,9 @@ let makeRequest = async (req, res) => {
                                         notification_en: `You have got ${getStep.step} as cashback from 49.`,
                                         notification_ar: `لقد حصلت علي كاش باك من ٤٩.${getStep.step} `
                                     }
-            
+
                                     sendNotification(notify, req.user.id)
-            
+
                                     cashBackNotification(notify)
 
                                     return res.status(200).send('No CashBack found but provider effected')
@@ -1532,9 +1532,9 @@ let makeRequest = async (req, res) => {
                                         notification_en: `You have got ${getStep.step} as cashback from 49.`,
                                         notification_ar: `لقد حصلت علي كاش باك من ٤٩.${getStep.step} `
                                     }
-            
+
                                     sendNotification(notify, req.user.id)
-            
+
                                     cashBackNotification(notify)
 
                                     return res.status(200).send('Cashback and provider effected')
@@ -1573,9 +1573,9 @@ let makeRequest = async (req, res) => {
                                         notification_en: `You have got ${getStep.step} as cashback from 49.`,
                                         notification_ar: `لقد حصلت علي كاش باك من ٤٩.${getStep.step} `
                                     }
-            
+
                                     sendNotification(notify, req.user.id)
-            
+
                                     cashBackNotification(notify)
 
                                     return res.status(200).send('No CashBack found but provider effected')
@@ -1647,9 +1647,9 @@ let makeRequest = async (req, res) => {
                                     notification_en: `You have got ${getStep.step} as cashback from 49.`,
                                     notification_ar: `لقد حصلت علي كاش باك من ٤٩.${getStep.step} `
                                 }
-        
+
                                 sendNotification(notify, req.user.id)
-        
+
                                 cashBackNotification(notify)
 
                                 return res.status(200).send('only cashBack effected  ,Thanks.')
@@ -1689,9 +1689,9 @@ let makeRequest = async (req, res) => {
                                     notification_en: `You have got ${getStep.step} as cashback from 49.`,
                                     notification_ar: `لقد حصلت علي كاش باك من ٤٩.${getStep.step} `
                                 }
-        
+
                                 sendNotification(notify, req.user.id)
-        
+
                                 cashBackNotification(notify)
 
                                 return res.status(200).send('call cashStorage effected with lower value')
@@ -1756,9 +1756,9 @@ let makeRequest = async (req, res) => {
                                     notification_en: `You have got ${getStep.step} as cashback from 49.`,
                                     notification_ar: `لقد حصلت علي كاش باك من ٤٩.${getStep.step} `
                                 }
-        
+
                                 sendNotification(notify, req.user.id)
-        
+
                                 cashBackNotification(notify)
 
                                 return res.status(200).send('only cashBack effected  ,Thanks.')
@@ -1798,9 +1798,9 @@ let makeRequest = async (req, res) => {
                                     notification_en: `You have got ${getStep.step} as cashback from 49.`,
                                     notification_ar: `لقد حصلت علي كاش باك من ٤٩.${getStep.step} `
                                 }
-        
+
                                 sendNotification(notify, req.user.id)
-        
+
                                 cashBackNotification(notify)
 
                                 return res.status(200).send('call cashStorage effected with lower value')
@@ -1865,9 +1865,9 @@ let makeRequest = async (req, res) => {
                                     notification_en: `You have got ${getStep.step} as cashback from 49.`,
                                     notification_ar: `لقد حصلت علي كاش باك من ٤٩.${getStep.step} `
                                 }
-        
+
                                 sendNotification(notify, req.user.id)
-        
+
                                 cashBackNotification(notify)
 
                                 return res.status(200).send('only cashBack effected  ,Thanks.')
@@ -1907,11 +1907,11 @@ let makeRequest = async (req, res) => {
                                     notification_en: `You have got ${getStep.step} as cashback from 49.`,
                                     notification_ar: `لقد حصلت علي كاش باك من ٤٩.${getStep.step} `
                                 }
-        
+
                                 sendNotification(notify, req.user.id)
-        
+
                                 cashBackNotification(notify)
-                                
+
                                 return res.status(200).send('call cashStorage effected with lower value')
                             }
                         }
@@ -1942,7 +1942,8 @@ let makeRequest = async (req, res) => {
                     var isNewest = false
                 }
 
-                if (isNewest == false) {
+                if (isNewest == true) {
+
                     console.log('its a brand new request today')
                     console.log('yes', req.user.providerCashBack)
                     if (parseInt(req.user.providerCashBack) > 0) {
@@ -2055,9 +2056,9 @@ let makeRequest = async (req, res) => {
                                             notification_en: `You have got ${getStep.step} as cashback from 49.`,
                                             notification_ar: `لقد حصلت علي كاش باك من ٤٩.${getStep.step} `
                                         }
-                
+
                                         sendNotification(notify, req.user.id)
-                
+
                                         cashBackNotification(notify)
 
                                         return res.send('5565')
@@ -2085,7 +2086,7 @@ let makeRequest = async (req, res) => {
                                                 amount: getStep.step
                                             }
                                         })
-                                        
+
                                         let notify = {
                                             userFirstName: req.user.firstName,
                                             reciever: req.user.id,
@@ -2097,9 +2098,9 @@ let makeRequest = async (req, res) => {
                                             notification_en: `You have got ${getStep.step} as cashback from 49.`,
                                             notification_ar: `لقد حصلت علي كاش باك من ٤٩.${getStep.step} `
                                         }
-                
+
                                         sendNotification(notify, req.user.id)
-                
+
                                         cashBackNotification(notify)
                                     }
                                 }
@@ -2125,7 +2126,7 @@ let makeRequest = async (req, res) => {
                                         }
                                     })
 
-                                    
+
 
                                     return res.status(200).send('NO CashBack found');
                                 } else {
@@ -2165,9 +2166,9 @@ let makeRequest = async (req, res) => {
                                             notification_en: `You have got ${getStep.step} as cashback from 49.`,
                                             notification_ar: `لقد حصلت علي كاش باك من ٤٩.${getStep.step} `
                                         }
-                
+
                                         sendNotification(notify, req.user.id)
-                
+
                                         cashBackNotification(notify)
 
                                         return res.send('4434322')
@@ -2207,9 +2208,9 @@ let makeRequest = async (req, res) => {
                                             notification_en: `You have got ${getStep.step} as cashback from 49.`,
                                             notification_ar: `لقد حصلت علي كاش باك من ٤٩.${getStep.step} `
                                         }
-                
+
                                         sendNotification(notify, req.user.id)
-                
+
                                         cashBackNotification(notify)
 
                                         return res.send('1122112')
@@ -2275,9 +2276,9 @@ let makeRequest = async (req, res) => {
                                             notification_en: `You have got ${getStep.step} as cashback from 49.`,
                                             notification_ar: `لقد حصلت علي كاش باك من ٤٩.${getStep.step} `
                                         }
-                
+
                                         sendNotification(notify, req.user.id)
-                
+
                                         cashBackNotification(notify)
 
                                         return res.send('443312')
@@ -2318,9 +2319,9 @@ let makeRequest = async (req, res) => {
                                             notification_en: `You have got ${getStep.step} as cashback from 49.`,
                                             notification_ar: `لقد حصلت علي كاش باك من ٤٩.${getStep.step} `
                                         }
-                
+
                                         sendNotification(notify, req.user.id)
-                
+
                                         cashBackNotification(notify)
 
                                         return res.send('99000')
@@ -2328,14 +2329,48 @@ let makeRequest = async (req, res) => {
                                 }
                             }
                         }
-                        } else {
+                    } else {
                         console.log(3)
                         let getStorage = await db.cashBackStorage.findFirst({});
-
+                        let getStep = await db.cashBackStep.findFirst({}) 
                         if (request == 2) {
                             let call = getStorage.callCashBack
                             if (parseInt(call) <= 0) {
-                                return res.status(200).send('cash back is empty 1');
+
+                                await db.wallet.update({
+                                    where: {
+                                        user_id: req.user.id
+                                    },
+                                    data: {
+                                        refundStorage: newRefundSumBalance,
+                                        balance: "" + newBalanceSum + "",
+                                        FreeClicksStorage: parseInt(req.user.Wallet.FreeClicksStorage) + parseInt(getStep.step)
+                                    }
+                                })
+                                await db.dailyCashBack.create({
+                                    data: {
+                                        user_id: req.user.id,
+                                        amount: getStep.step
+                                    }
+                                })
+            
+                                let notify = {
+                                    userFirstName: req.user.firstName,
+                                    reciever: req.user.id,
+                                    sender: 0,
+                                    postId: 0,
+                                    user: req.user.id,
+                                    amount: getStep.step,
+                                    type: 1000,
+                                    notification_en: `You have got ${getStep.step} as cashback from 49.`,
+                                    notification_ar: `لقد حصلت علي كاش باك من ٤٩.${getStep.step} `
+                                }
+            
+                                sendNotification(notify, req.user.id)
+            
+                                cashBackNotification(notify)
+
+                                return res.status(200).send('45454');
                             } else {
                                 if (parseInt(call) - parseInt(getStep.step) >= 0) {
                                     await db.cashBackStorage.update({
@@ -2372,9 +2407,9 @@ let makeRequest = async (req, res) => {
                                         notification_en: `You have got ${getStep.step} as cashback from 49.`,
                                         notification_ar: `لقد حصلت علي كاش باك من ٤٩.${getStep.step} `
                                     }
-            
+
                                     sendNotification(notify, req.user.id)
-            
+
                                     cashBackNotification(notify)
 
                                     return res.send('1212')
@@ -2414,9 +2449,9 @@ let makeRequest = async (req, res) => {
                                         notification_en: `You have got ${getStep.step} as cashback from 49.`,
                                         notification_ar: `لقد حصلت علي كاش باك من ٤٩.${getStep.step} `
                                     }
-            
+
                                     sendNotification(notify, req.user.id)
-            
+
                                     cashBackNotification(notify)
 
                                     return res.send('2321')
@@ -2424,8 +2459,44 @@ let makeRequest = async (req, res) => {
                             }
                         } else if (request == 1) {
                             let requestcb = getStorage.requestCashBack
+                            let getStep = await db.cashBackStep.findFirst({})
                             if (parseInt(requestcb) <= 0) {
-                                return res.status(200).send('cash back is empty 2');
+
+                                await db.wallet.update({
+                                    where: {
+                                        user_id: req.user.id
+                                    },
+                                    data: {
+                                        refundStorage: newRefundSumBalance,
+                                        balance: "" + newBalanceSum + "",
+                                        FreeClicksStorage: parseInt(req.user.Wallet.FreeClicksStorage) + parseInt(getStep.step)
+                                    }
+                                })
+                                await db.dailyCashBack.create({
+                                    data: {
+                                        user_id: req.user.id,
+                                        amount: getStep.step
+                                    }
+                                })
+            
+                                let notify = {
+                                    userFirstName: req.user.firstName,
+                                    reciever: req.user.id,
+                                    sender: 0,
+                                    postId: 0,
+                                    user: req.user.id,
+                                    amount: getStep.step,
+                                    type: 1000,
+                                    notification_en: `You have got ${getStep.step} as cashback from 49.`,
+                                    notification_ar: `لقد حصلت علي كاش باك من ٤٩.${getStep.step} `
+                                }
+            
+                                sendNotification(notify, req.user.id)
+            
+                                cashBackNotification(notify)
+
+                                return res.status(200).send('454232354');
+
                             } else {
                                 if (parseInt(requestcb) - parseInt(getStep.step) >= 0) {
                                     await db.cashBackStorage.update({
@@ -2462,9 +2533,9 @@ let makeRequest = async (req, res) => {
                                         notification_en: `You have got ${getStep.step} as cashback from 49.`,
                                         notification_ar: `لقد حصلت علي كاش باك من ٤٩.${getStep.step} `
                                     }
-            
+
                                     sendNotification(notify, req.user.id)
-            
+
                                     cashBackNotification(notify)
 
                                     return res.send('23313')
@@ -2504,9 +2575,9 @@ let makeRequest = async (req, res) => {
                                         notification_en: `You have got ${getStep.step} as cashback from 49.`,
                                         notification_ar: `لقد حصلت علي كاش باك من ٤٩.${getStep.step} `
                                     }
-            
+
                                     sendNotification(notify, req.user.id)
-            
+
                                     cashBackNotification(notify)
 
                                     return res.send('22223332')
@@ -2514,8 +2585,42 @@ let makeRequest = async (req, res) => {
                             }
                         } else if (request == 3) {
                             let any = getStorage.anyCashBack
+                            let getStep = await db.cashBackStep.findFirst({})
                             if (parseInt(any) <= 0) {
-                                return res.status(200).send('cash back is empty 3');
+                                await db.wallet.update({
+                                    where: {
+                                        user_id: req.user.id
+                                    },
+                                    data: {
+                                        refundStorage: newRefundSumBalance,
+                                        balance: "" + newBalanceSum + "",
+                                        FreeClicksStorage: parseInt(req.user.Wallet.FreeClicksStorage) + parseInt(getStep.step)
+                                    }
+                                })
+                                await db.dailyCashBack.create({
+                                    data: {
+                                        user_id: req.user.id,
+                                        amount: getStep.step
+                                    }
+                                })
+            
+                                let notify = {
+                                    userFirstName: req.user.firstName,
+                                    reciever: req.user.id,
+                                    sender: 0,
+                                    postId: 0,
+                                    user: req.user.id,
+                                    amount: getStep.step,
+                                    type: 1000,
+                                    notification_en: `You have got ${getStep.step} as cashback from 49.`,
+                                    notification_ar: `لقد حصلت علي كاش باك من ٤٩.${getStep.step} `
+                                }
+            
+                                sendNotification(notify, req.user.id)
+            
+                                cashBackNotification(notify)
+
+                                return res.status(200).send('4542332323254');
                             } else {
                                 if (parseInt(requestcb) - parseInt(getStep.step) >= 0) {
                                     await db.cashBackStorage.update({
@@ -2552,9 +2657,9 @@ let makeRequest = async (req, res) => {
                                         notification_en: `You have got ${getStep.step} as cashback from 49.`,
                                         notification_ar: `لقد حصلت علي كاش باك من ٤٩.${getStep.step} `
                                     }
-            
+
                                     sendNotification(notify, req.user.id)
-            
+
                                     cashBackNotification(notify)
 
                                     return res.send('8888')
@@ -2594,9 +2699,9 @@ let makeRequest = async (req, res) => {
                                         notification_en: `You have got ${getStep.step} as cashback from 49.`,
                                         notification_ar: `لقد حصلت علي كاش باك من ٤٩.${getStep.step} `
                                     }
-            
+
                                     sendNotification(notify, req.user.id)
-            
+
                                     cashBackNotification(notify)
 
                                     return res.send('556655')
@@ -2706,7 +2811,7 @@ let makeRequest = async (req, res) => {
                         data: {
                             balance: (parseInt(getRefUser.Wallet.balance) + 10).toString()
                         }
-                    }) 
+                    })
 
                     let notify = {
                         userFirstName: req.user.firstName,
@@ -2820,9 +2925,9 @@ let makeRequest = async (req, res) => {
                             notification_en: `You have got ${getStep.step} as cashback from 49.`,
                             notification_ar: `لقد حصلت علي كاش باك من ٤٩.${getStep.step} `
                         }
-    
+
                         sendNotification(notify, req.user.id)
-    
+
                         cashBackNotification(notify)
 
                         return res.status(200).send('You got some money from provider cashback')
@@ -2876,9 +2981,9 @@ let makeRequest = async (req, res) => {
                                 notification_en: `You have got ${getStep.step} as cashback from 49.`,
                                 notification_ar: `لقد حصلت علي كاش باك من ٤٩.${getStep.step} `
                             }
-        
+
                             sendNotification(notify, req.user.id)
-        
+
                             cashBackNotification(notify)
 
                             return res.status(200).send('ok');
@@ -2931,11 +3036,11 @@ let makeRequest = async (req, res) => {
                                 notification_en: `You have got ${parseInt(finalAmount) + parseInt(remainCallCashBack)} as cashback from 49.`,
                                 notification_ar: `لقد حصلت علي كاش باك من ٤٩.${parseInt(finalAmount) + parseInt(remainCallCashBack)} `
                             }
-        
+
                             sendNotification(notify, req.user.id)
-        
+
                             cashBackNotification(notify)
-                            
+
                             return res.status(200).send('Money has been taken out from storage and provider')
                         }
                     }
@@ -2993,9 +3098,9 @@ let makeRequest = async (req, res) => {
                             notification_en: `You have got ${getStep.step} as cashback from 49.`,
                             notification_ar: `لقد حصلت علي كاش باك من ٤٩.${getStep.step} `
                         }
-    
+
                         sendNotification(notify, req.user.id)
-    
+
                         cashBackNotification(notify)
 
                         return res.status(200).send('Cash back Storage has been totally effected')
@@ -3038,9 +3143,9 @@ let makeRequest = async (req, res) => {
                             notification_en: `You have got ${getStep.step} as cashback from 49.`,
                             notification_ar: `لقد حصلت علي كاش باك من ٤٩.${getStep.step} `
                         }
-    
+
                         sendNotification(notify, req.user.id)
-    
+
                         cashBackNotification(notify)
 
                         return res.status(200).send('Cash back Storage has been not-totally effected')
@@ -3162,9 +3267,9 @@ let makeRequest = async (req, res) => {
                             notification_en: `You have got ${getStep.step} as cashback from 49.`,
                             notification_ar: `لقد حصلت علي كاش باك من ٤٩.${getStep.step} `
                         }
-    
+
                         sendNotification(notify, req.user.id)
-    
+
                         cashBackNotification(notify)
 
                         return res.send('1111111')
@@ -3205,9 +3310,9 @@ let makeRequest = async (req, res) => {
                             notification_en: `You have got ${getStep.step} as cashback from 49.`,
                             notification_ar: `لقد حصلت علي كاش باك من ٤٩.${getStep.step} `
                         }
-    
+
                         sendNotification(notify, req.user.id)
-    
+
                         cashBackNotification(notify)
 
                         return res.send('778668')

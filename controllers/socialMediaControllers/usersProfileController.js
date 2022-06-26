@@ -105,7 +105,7 @@ let getUserFriends = async (req, res) => {
         skip: page == 1 ? 0 : (page * maxAds) - maxAds,
         take: maxAds,
         include: {
-            user: true
+            user: true,
         }
     })
 
