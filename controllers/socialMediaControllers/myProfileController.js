@@ -196,7 +196,7 @@ let getMyPosts = async (req, res) => {
             where: {
                 id: item.activity_id
             }
-        })) 
+        }))
 
         // get reacted or not.
         item.isReacted = (await db.reactions.findFirst({
@@ -208,7 +208,7 @@ let getMyPosts = async (req, res) => {
             select: {
                 type: true,
             }
-        }))  
+        }))
 
         newPosts.push(item)
     }
@@ -594,8 +594,13 @@ let getCommentReactions = async (req, res) => {
 // get reactions of post 
 let getPostsReactions = async (req, res) => {
     const { id } = req.params
+    let { page, type } = req.query
 
-    if (!id) return false;
+    if (!page) page = 1
+
+    var maxresult = 20;
+
+    if (!id || !type) return res.send('id and type are required');
 
     // check on the comment
     let checkOnPost = await db.posts.findFirst({ where: { id: parseInt(id) } })
@@ -604,11 +609,14 @@ let getPostsReactions = async (req, res) => {
 
     let getPostReacts = await db.reactions.findMany({
         where: {
-            post_id: parseInt(id)
-        }
+            post_id: parseInt(id),
+            type: parseInt(type)
+        },
+        skip: page == 1 ? 0 : (page * maxresult) - maxresult,
+        take: maxresult,
     })
 
-    let getPostTotallike = await db.reactions.aggregate({
+    var getPostTotallike = await db.reactions.aggregate({
         where: {
             post_id: parseInt(id),
             type: 1,
@@ -618,7 +626,7 @@ let getPostsReactions = async (req, res) => {
         }
     })
 
-    let getPostTotallove = await db.reactions.aggregate({
+    var getPostTotallove = await db.reactions.aggregate({
         where: {
             post_id: parseInt(id),
             type: 2,
@@ -628,7 +636,7 @@ let getPostsReactions = async (req, res) => {
         }
     })
 
-    let getPostTotalwow = await db.reactions.aggregate({
+    var getPostTotalwow = await db.reactions.aggregate({
         where: {
             post_id: parseInt(id),
             type: 3,
@@ -638,7 +646,7 @@ let getPostsReactions = async (req, res) => {
         }
     })
 
-    let getPostTotalsad = await db.reactions.aggregate({
+    var getPostTotalsad = await db.reactions.aggregate({
         where: {
             post_id: parseInt(id),
             type: 4,
@@ -648,7 +656,7 @@ let getPostsReactions = async (req, res) => {
         }
     })
 
-    let getPostTotalangry = await db.reactions.aggregate({
+    var getPostTotalangry = await db.reactions.aggregate({
         where: {
             post_id: parseInt(id),
             type: 5,
@@ -709,7 +717,7 @@ let getPostsReactions = async (req, res) => {
         totalLove: totalLoveWithPeople,
         totalWow: totalWowWithPeople,
         totalSad: totalSadWithPeople,
-        totalAngryCounter: totalAngryWithPeople,
+        totalAngry: totalAngryWithPeople,
         totalLikesCounter: getPostTotallike,
         totalLoveCounter: getPostTotallove,
         totalWowCounter: getPostTotalwow,
@@ -842,7 +850,7 @@ let getMyAbout = async (req, res) => {
         }
     })
 
-    return res.status(200).json({    
+    return res.status(200).json({
         userAbout: checkUser,
         ref: refInfo
     })
@@ -1059,9 +1067,9 @@ let changeProfileFromGal = async (req, res) => {
 }
 
 let deleteFromMygalary = async (req, res) => {
-    const {galId} = req.body
+    const { galId } = req.body
 
-    if (! galId) {
+    if (!galId) {
         return res.send('No gallary ID was provided')
     }
 
@@ -1103,10 +1111,10 @@ let deleteAccount = async (req, res) => {
 
             try {
 
-            await db.$queryRaw`SET FOREIGN_KEY_CHECKS=0;`    
-            await db.$queryRaw`DELETE FROM Users WHERE id = ${req.user.id}`
-            await db.$queryRaw`SET FOREIGN_KEY_CHECKS=1;`    
-            return res.send('You account has been deleted')
+                await db.$queryRaw`SET FOREIGN_KEY_CHECKS=0;`
+                await db.$queryRaw`DELETE FROM Users WHERE id = ${req.user.id}`
+                await db.$queryRaw`SET FOREIGN_KEY_CHECKS=1;`
+                return res.send('You account has been deleted')
 
             } catch (e) {
                 console.log(e)
