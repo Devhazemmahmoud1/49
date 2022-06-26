@@ -694,7 +694,7 @@ let resetPassword = async (req, res) => {
 
 
 let forgetPassword = async (req, res) => {
-    const {newPassword, passwordConfirmation, phone } = req.body
+    const {newPassword, passwordConfirmation, idToken } = req.body
 
     if (!newPassword || !passwordConfirmation) {
         return res.status(403).json({
@@ -714,16 +714,16 @@ let forgetPassword = async (req, res) => {
         })
     }
 
+    const firebase = await admin.auth().verifyIdToken(idToken)
+
     let getUser = await db.users.findFirst({
         where: {
-            phone: phone
+            phone: firebase.phone_number
         }
     })
 
-    console.log(phone, getUser)
-
     if (!getUser) {
-        return res.status(403).send('Something went wrong, Unknown UID')
+        return res.status(403).send('Something went wrong, Unknown Token')
     }
 
     await db.users.update({
