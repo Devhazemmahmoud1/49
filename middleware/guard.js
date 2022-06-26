@@ -44,7 +44,7 @@ module.exports = ((req, res, next) => {
                     next()
                 });
                 if (!checkToken) {
-                    return res.status(401).send('unauthorized');
+                    req.user = null
                 }
             }
         } catch (e) {
