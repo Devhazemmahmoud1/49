@@ -1,5 +1,7 @@
-var router = require('express').Router()
+const express = require('express')
+const { PrismaClient } = require('@prisma/client')
+const db = new PrismaClient();
 
+let getWallet = 
 
-
-module.exports = router
+module.exports = { getWallet }

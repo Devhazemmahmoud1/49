@@ -720,6 +720,8 @@ let forgetPassword = async (req, res) => {
         }
     })
 
+    console.log(uid, getUser)
+
     await db.users.update({
         where: {
             id: getUser.id 
