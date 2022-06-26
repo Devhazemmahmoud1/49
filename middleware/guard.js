@@ -14,6 +14,7 @@ module.exports = ((req, res, next) => {
                 authorization =authorization.split('Bearer ')[1]
                 let checkToken = Jwt.verify(authorization, secretKey, async (err, data) => {
                     if (err) {
+                        console.log(err)
                         req.user = null ;
                         next();
                     }
