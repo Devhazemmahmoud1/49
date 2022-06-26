@@ -25,13 +25,14 @@ let editSettings = async (req, res) => {
 
         console.log(getUserSetting)
 
-        getUserSetting.shift();
+        //getUserSetting.shift();
         //getUserSetting.shift();
         //getUserSetting.shift();
 
         // update userSettings
 
         let values = [
+            { value: country.value, status: country.status},
             { value: email.value, status: email.status},
             { value: phone.value, status: phone.status},
             { value: birthDate.value, status: birthDate.status},

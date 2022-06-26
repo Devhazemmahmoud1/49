@@ -225,9 +225,7 @@ let register = async (req, res) => {
                         type: 10,
                     }
                 })
-
             }
-
         }
 
         // add new Settings to this user
@@ -238,7 +236,7 @@ let register = async (req, res) => {
                     user_id: create.id,
                     settingName_ar: ' البلد',
                     settingName_en: 'Country',
-                    value: country,
+                    value: country ?? '',
                     status: 1,
                 },
                 {

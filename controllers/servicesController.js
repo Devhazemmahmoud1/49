@@ -150,8 +150,8 @@ let makeSubscriptionPayments = async (req, res) => {
         let overHeadConstant = (cost / overHeadFactor)
         let NetAfterOverHead = parseFloat(amount) - parseFloat(overHeadConstant)
         let xFactor = parseFloat(NetAfterOverHead) / parseFloat(parseFloat(subCat.paymentFactor))
-        let fourtyNineGain = parseFloat(xFactor) * parseFloat(portion)
-        let ProviderCashBack = parseFloat(xFactor) * parseFloat(providerPortion)
+        let fourtyNineGain = parseFloat(xFactor) * parseFloat(subCat.portion)
+        let ProviderCashBack = parseFloat(xFactor) * parseFloat(subCat.providerPortion)
         let NetAfterAllPortion = NetAfterOverHead - fourtyNineGain - ProviderCashBack
         let requestPortion = NetAfterAllPortion * (fetchCashBackRules.requestPortion / 100)
         let requestCall = NetAfterAllPortion * (fetchCashBackRules.callPortion / 100)

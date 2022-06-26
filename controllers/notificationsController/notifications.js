@@ -11,7 +11,7 @@ let userNotification = async (req, res) => {
         return res.status(403).send('No user token provided')
     }
 
-    let { page } = req.query
+    let { page , type } = req.query
 
     if (!page) {
         page = 1
