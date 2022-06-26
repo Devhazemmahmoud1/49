@@ -1154,7 +1154,7 @@ let makeRequest = async (req, res) => {
         });
 
         var counter = 0;
-
+        
         for (item of totalStepsOfToday) {
             console.log(dayjs(item.created_at, '"MM-DD-YYYY"').$d > dayjs().startOf('day').$d, dayjs().endOf('day').$d > dayjs(item.created_at, '"MM-DD-YYYY"').$d)
             if (dayjs().startOf('day').$d < dayjs(item.created_at, '"MM-DD-YYYY"').$d && dayjs().endOf('day').$d > dayjs(item.created_at, '"MM-DD-YYYY"').$d) {

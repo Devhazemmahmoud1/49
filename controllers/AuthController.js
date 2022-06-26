@@ -652,7 +652,47 @@ let changePassword = async (req, res, next) => {
 }
 
 let resetPassword = async (req, res) => {
-    const {newPassword, passwordConfirmation, uid} = req.body
+    const {newPassword, passwordConfirmation } = req.body
+
+    if (!newPassword || !passwordConfirmation) {
+        return res.status(403).json({
+            error: {
+                error_ar: 'كلمه السر مطلوبه.',
+                error_en: 'Passwords are required.'
+            }
+        });
+    }
+
+    if (newPassword !== passwordConfirmation) {
+        return res.status(403).json({
+            error: {
+                error_en: 'Passwords do not match.',
+                error_ar: 'كلمه السر غير صحيحه',
+            }
+        })
+    }
+
+    await db.users.update({
+        where: {
+            id: req.user.id
+        },
+        data: {
+            password: hash.hashSync(newPassword, 10)
+        }
+    })
+
+    return res.status(200).json({
+        success: {
+            success_ar: 'تم استعاده كلمه السر.',
+            success_en: 'Password has been updated.'
+        }
+    });
+
+}
+
+
+let forgetPassword = async (req, res) => {
+    const {newPassword, passwordConfirmation, uid } = req.body
 
     if (!newPassword || !passwordConfirmation) {
         return res.status(403).json({
@@ -690,4 +730,4 @@ let resetPassword = async (req, res) => {
 
 }
 
-module.exports = {register, login, changePassword, resetPassword}
+module.exports = {register, login, changePassword, resetPassword, forgetPassword}

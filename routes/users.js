@@ -25,6 +25,11 @@ router.post('/change-password', guard, autoCatch(auth.changePassword));
 /*  Reset password Route  */
 router.post('/password-reset', guard, autoCatch(auth.resetPassword));
 
+/*  Reset password Route  */
+router.post('/forget-password' , autoCatch(auth.forgetPassword));
+
+
+
 router.delete('/delete-user', async (req, res) => {
     const {phone} = req.body
 
