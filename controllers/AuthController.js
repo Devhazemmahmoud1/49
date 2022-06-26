@@ -722,6 +722,10 @@ let forgetPassword = async (req, res) => {
 
     console.log(uid, getUser)
 
+    if (!getUser) {
+        return res.status(403).send('Something went wrong, Unknown UID')
+    }
+
     await db.users.update({
         where: {
             id: getUser.id 
