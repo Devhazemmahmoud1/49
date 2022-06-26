@@ -30,7 +30,7 @@ model Users {
   phone            String               @db.VarChar(255)
   password         String               @db.VarChar(255)
   is_locked        Int                  @default(0)
-  ref_number       String               @db.VarChar(255)
+  ref_number       String?               @db.VarChar(255)
   device_id        String?              @db.VarChar(100)
   fcm              String?              @db.VarChar(300)
   countryCode      String?

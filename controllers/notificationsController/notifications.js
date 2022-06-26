@@ -11,37 +11,125 @@ let userNotification = async (req, res) => {
         return res.status(403).send('No user token provided')
     }
 
-    let { page , type } = req.query
+    var { page , type } = req.query
 
     if (!page) {
         page = 1
     }
 
-    let maxNotifications = 20;
-
-    let notifications = await db.notifications.findMany({
-        where: {
-            reciever_id: req.user.id
-        },
-        skip: page == 1 ? 0 : (page * maxNotifications) - maxNotifications,
-        take: maxNotifications,
-    })
-
-    for (item of notifications) {
-        item.senderInfo = await db.users.findFirst({
-            where: {
-                id: parseInt(item.sender_id)
-            },
-            select: {
-                id: true,
-                firstName: true,
-                lastName: true,
-                profilePicture: true,
-            }
-        })
+    if (!type) {
+        type = 1
     }
 
-    return res.status(200).json(notifications)
+    let maxNotifications = 20;
+
+    if (type == 1) {
+        let notifications = await db.notifications.findMany({
+            where: {
+                reciever_id: req.user.id,
+                type: 1000
+            },
+            skip: page == 1 ? 0 : (page * maxNotifications) - maxNotifications,
+            take: maxNotifications,
+        })
+    
+        for (item of notifications) {
+            item.senderInfo = await db.users.findFirst({
+                where: {
+                    id: parseInt(item.sender_id)
+                },
+                select: {
+                    id: true,
+                    firstName: true,
+                    lastName: true,
+                    profilePicture: true,
+                }
+            })
+        }
+    }
+
+    // 49 Services
+    if (type == 2) {
+        let notifications = await db.notifications.findMany({
+            where: {
+                reciever_id: req.user.id
+            },
+            skip: page == 1 ? 0 : (page * maxNotifications) - maxNotifications,
+            take: maxNotifications,
+        })
+    
+        for (item of notifications) {
+            item.senderInfo = await db.users.findFirst({
+                where: {
+                    id: parseInt(item.sender_id)
+                },
+                select: {
+                    id: true,
+                    firstName: true,
+                    lastName: true,
+                    profilePicture: true,
+                }
+            })
+        }
+    }
+
+    //social
+    if (type == 3) {
+        let notifications = await db.notifications.findMany({
+            where: {
+                OR: [
+                    {
+                        reciever_id: req.user.id,
+                        type: 2
+                    },
+                    {
+                        reciever_id: req.user.id,
+                        type: 3
+                    },
+                    {
+                        reciever_id: req.user.id,
+                        type: 4
+                    },
+                    {
+                        reciever_id: req.user.id,
+                        type: 5
+                    }
+                ]
+            },
+            orderBy: {
+                created_at: 'desc'
+            },
+            skip: page == 1 ? 0 : (page * maxNotifications) - maxNotifications,
+            take: maxNotifications,
+        })
+    
+        for (item of notifications) {
+            item.senderInfo = await db.users.findFirst({
+                where: {
+                    id: parseInt(item.sender_id)
+                },
+                select: {
+                    id: true,
+                    firstName: true,
+                    lastName: true,
+                    profilePicture: true,
+                }
+            })
+        }
+    }
+
+    return res.status(200).json({
+        notifications: notifications,
+        unReadNotifications: await db.notifications.aggregate({
+            where: {
+                reciever_id: req.user.id,
+                is_read: 0,
+            },
+            _count: {
+                is_read: true,
+            }
+        }),
+    })
 }
 
 /* Update the unread notif.. */
