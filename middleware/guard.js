@@ -45,6 +45,7 @@ module.exports = ((req, res, next) => {
                 });
                 if (!checkToken) {
                     req.user = null
+                    next()
                 }
             }
         } catch (e) {
