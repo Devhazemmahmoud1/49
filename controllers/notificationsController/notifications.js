@@ -84,20 +84,9 @@ let userNotification = async (req, res) => {
         let notifications = await db.notifications.findMany({
             where: {
                 reciever_id: req.user.id,
-                AND: [
-                    {
-                        type: 2
-                    },
-                    {
-                        type: 3
-                    },
-                    {
-                        type: 4
-                    },
-                    {
-                        type: 5
-                    }
-                ]
+                type: {
+                    in: [1,2,3,4,5]
+                },
             },
             orderBy: {
                 created_at: 'desc'
