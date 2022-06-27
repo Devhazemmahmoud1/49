@@ -280,7 +280,8 @@ io.on('connection', async (socket) => {
         var driver = {
           totalTrips: riderTotalTrips,
           totalRate: driverRate,
-          riderPhotoAndName: userInfo.profilePicture
+          riderPhoto: userInfo.profilePicture,
+          riderName: userInfo.firstName,
         }
       }
     }
@@ -294,7 +295,7 @@ io.on('connection', async (socket) => {
       riderId: riderId,
       user_id: userId,
       price: price,
-      distance: distance ? distance + ' KiloMeters' : 'Unknown',
+      distance: distance,
       userType: userType,
       destinationFrom: From,
       destinationTo: To,
