@@ -473,7 +473,7 @@ let register = async (req, res) => {
                     sender_id: 0,
                     reciever_id: create.id,
                     message_en: 'Thank you for registering with us.',
-                    message_ar: 'شكرا جزيلا للتسجيل معنا.',
+                    messgae_ar: 'شكرا جزيلا للتسجيل معنا.',
                     is_read: 0,
                     type: 10,
                 }
