@@ -69,6 +69,15 @@ let makeSubscriptionPayments = async (req, res) => {
         }
     });
 
+    let updateUser = await db.users.update({
+        where: {
+            id: req.user.id
+        },
+        data: {
+            accountType: parseInt(subcategory_id)
+        }
+    })
+
     for (socket in sockets) {
         if (sockets[socket].user_id == req.user.id) {
             sockets[socket].subscription = {
