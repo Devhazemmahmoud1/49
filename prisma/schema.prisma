@@ -23,7 +23,6 @@ model Admins {
 
 model Users {
   id               Int                  @id @default(autoincrement())
-  uid              String?  
   firstName        String               @db.VarChar(255)
   lastName         String               @db.VarChar(255)
   email            String               @db.VarChar(5000)
