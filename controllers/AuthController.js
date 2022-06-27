@@ -125,7 +125,6 @@ let register = async (req, res) => {
             //countryCode: country,
             fcm: fcm,
             device_id: device_id,
-            uid: idToken ?? '',
             hashCode: Math.floor(Math.random() * 9000000000000).toString(),
             countryCode: countryCode ?? '0',
             profilePicture: gender == 1 ? 'user-profile%20MAN.png' : 'user-profile%20GIRL.png'
@@ -196,7 +195,7 @@ let register = async (req, res) => {
             })
 
             if (checkHashCode) {
-                let ref =await db.ref.create({
+                var ref =await db.ref.create({
                     data: {
                         inviter: checkHashCode.id,
                         invited: create.id,
