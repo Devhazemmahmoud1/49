@@ -83,21 +83,18 @@ let userNotification = async (req, res) => {
     if (type == 3) {
         let notifications = await db.notifications.findMany({
             where: {
+                reciever_id: req.user.id,
                 AND: [
                     {
-                        reciever_id: req.user.id,
                         type: 2
                     },
                     {
-                        reciever_id: req.user.id,
                         type: 3
                     },
                     {
-                        reciever_id: req.user.id,
                         type: 4
                     },
                     {
-                        reciever_id: req.user.id,
                         type: 5
                     }
                 ]
