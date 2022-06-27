@@ -201,32 +201,32 @@ let findRiders = async (req, res) => {
             } else {
                 console.log('i am a noraml user')
 
-                for (rider in sockets) {
-                    if (sockets[rider].userType == userType
-                        && sockets[rider].isReady == true
-                        && sockets[rider].currentLocation.lat != ''
-                        && sockets[rider].currentLocation.lng != ''
-                        && sockets[rider].isApproved != 0
-                        && sockets[rider].status != 2) {
+                for (rider1 in sockets) {
+                    if (sockets[rider1].userType == userType
+                        && sockets[rider1].isReady == true
+                        && sockets[rider1].currentLocation.lat != ''
+                        && sockets[rider1].currentLocation.lng != ''
+                        && sockets[rider1].isApproved != 0
+                        && sockets[rider1].status != 2) {
 
-                        console.log(sockets[rider].user_id)
+                        console.log(sockets[rider1].user_id)
                         console.log('passed here')
 
-                        if (drivers.includes(sockets[rider].user_id)) continue;
+                        if (drivers.includes(sockets[rider1].user_id)) continue;
 
-                        if (sockets[rider].subscription != null) {
+                        if (sockets[rider1].subscription != null) {
 
                             console.log('a normal user is looking for riders')
                             if (userType == 897 || userType == 891 || userType == 898) {
-                                let calculateDistance = calcCrow(lat, lng, sockets[rider].currentLocation.lat, sockets[rider].currentLocation.lng).toFixed(1)
+                                let calculateDistance = calcCrow(lat, lng, sockets[rider1].currentLocation.lat, sockets[rider1].currentLocation.lng).toFixed(1)
                                 console.log(222)
                                 console.log("Perium distance1 =" + calculateDistance)
                                 if (calculateDistance > 5) continue;
                             }
 
-                            if (sockets[rider].user_id == req.user.id) continue;
+                            if (sockets[rider1].user_id == req.user.id) continue;
 
-                            global.io.to(sockets[rider].socket_id).emit('request', JSON.stringify({
+                            global.io.to(sockets[rider1].socket_id).emit('request', JSON.stringify({
                                 user_id: req.user.id,
                                 user_id: req.user.id,
                                 price: price ?? 0,
@@ -241,16 +241,16 @@ let findRiders = async (req, res) => {
                                 destinationLat: destinationLat,
                                 destinationLng: destinationLng,
                                 tripTime: tripTime,
-                                driverInfo: this.getMyDriverInfo(sockets[rider].user_id),
+                                driverInfo: this.getMyDriverInfo(sockets[rider1].user_id),
                                 freeRide: null
                             }));
 
-                            drivers.push(sockets[rider].user_id)
+                            drivers.push(sockets[rider1].user_id)
 
                             let notify = {
                                 message_ar: `New ride request from ${req.firstName}.`,
                                 message_en: `${req.firstName} ليك طلب توصيله جديد من.`,
-                                user: sockets[rider].user_id,
+                                user: sockets[rider1].user_id,
                                 userFirstName: 0,
                                 rideId: 0,
                                 type: 510,
@@ -262,17 +262,17 @@ let findRiders = async (req, res) => {
                             console.log('passed there')
                             console.log('a normal user for non sub is looking for riders')
                             if (userType == 897 || userType == 891 || userType == 898) {
-                                let calculateDistance = calcCrow(lat, lng, sockets[rider].currentLocation.lat, sockets[rider].currentLocation.lng).toFixed(1)
+                                let calculateDistance = calcCrow(lat, lng, sockets[rider1].currentLocation.lat, sockets[rider1].currentLocation.lng).toFixed(1)
                                 console.log(222)
                                 console.log("Perium distance1 =" + calculateDistance)
                                 if (calculateDistance > 5) continue;
                             }
 
-                            if (drivers.includes(sockets[rider].user_id)) continue;
+                            if (drivers.includes(sockets[rider1].user_id)) continue;
 
                             let checkIfHadFreeRideBefore = await db.freeRides.findFirst({
                                 where: {
-                                    rider_id: parseInt(sockets[rider].user_id)
+                                    rider_id: parseInt(sockets[rider1].user_id)
                                 },
                                 orderBy: {
                                     created_at: 'desc'
@@ -281,24 +281,24 @@ let findRiders = async (req, res) => {
 
                             if (checkIfHadFreeRideBefore) {
                                 if (moment(checkIfHadFreeRideBefore.created_at).add('1', 'days').format('YYYY/MM/DD HH:mm:ss') >= moment().format('YYYY/MM/DD HH:mm:ss')) {
-                                    drivers.push(sockets[rider].user_id)
+                                    drivers.push(sockets[rider1].user_id)
                                     continue
                                 }
                             }
 
-                            if (sockets[rider].user_id == req.user.id) continue;
+                            if (sockets[rider1].user_id == req.user.id) continue;
 
-                            if (sockets[rider].lastTrip.lat != null && sockets[rider].lastTrip.lng != null && destinationLng && destinationLat) {
+                            if (sockets[rider1].lastTrip.lat != null && sockets[rider1].lastTrip.lng != null && destinationLng && destinationLat) {
                                 console.log('final destination')
-                                let calculateDistance = calcCrow(sockets[rider].lastTrip.lat, sockets[rider].lastTrip.lng, destinationLat, destinationLng).toFixed(1)
+                                let calculateDistance = calcCrow(sockets[rider1].lastTrip.lat, sockets[rider1].lastTrip.lng, destinationLat, destinationLng).toFixed(1)
                                 console.log("distance =" + calculateDistance)
                                 if (calculateDistance > 5) {
-                                    drivers.push(sockets[rider].user_id)
+                                    drivers.push(sockets[rider1].user_id)
                                     continue;
                                 }
                             }
 
-                            global.io.to(sockets[rider].socket_id).emit('request', JSON.stringify({
+                            global.io.to(sockets[rider1].socket_id).emit('request', JSON.stringify({
                                 user_id: req.user.id,
                                 user_id: req.user.id,
                                 price: (parseInt(price) + 20) ?? 0,
@@ -313,20 +313,20 @@ let findRiders = async (req, res) => {
                                 destinationLat: destinationLat,
                                 destinationLng: destinationLng,
                                 tripTime: tripTime,
-                                driverInfo: this.getMyDriverInfo(sockets[rider].user_id),
+                                driverInfo: this.getMyDriverInfo(sockets[rider1].user_id),
                                 freeRide: 1
                             }));
 
                             let notify = {
                                 message_ar: 'Congratulations, You have a free ride from 49, 20 L.E will be paid extra from the client to us.',
                                 message_en: 'تهانينا لقد حصلت علي رحله مجانيه من تطبيق ٤٩ ، ٢٠ جنيهات سوف يتم تحصيلها من العميل ك رسوم اضافيه.',
-                                user: sockets[rider].user_id,
+                                user: sockets[rider1].user_id,
                                 userFirstName: 0,
                                 rideId: 0,
                                 type: 510,
                             }
 
-                            drivers.push(sockets[rider].user_id)
+                            drivers.push(sockets[rider1].user_id)
 
                             pleasePayNotification(notify)
                             continue;
@@ -446,6 +446,7 @@ let findRiders = async (req, res) => {
             // }
             continue;
         }
+        drivers = [];
         res.send('Waiting for our drivers to connect')
     } else {
         return res.send('No socket users was found')
