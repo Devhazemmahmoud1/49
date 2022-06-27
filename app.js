@@ -277,11 +277,18 @@ io.on('connection', async (socket) => {
           }
         })
 
+        let info = await db.ride.findFirst({
+          where: {
+            user_id: parseInt(riderId)
+          }
+        })
+
         var driver = {
           totalTrips: riderTotalTrips,
           totalRate: driverRate,
           riderPhoto: userInfo.profilePicture,
           riderName: userInfo.firstName,
+          carInfo: info 
         }
       }
     }
