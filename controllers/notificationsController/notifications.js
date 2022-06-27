@@ -82,7 +82,7 @@ let userNotification = async (req, res) => {
 
     //social
     if (type == 3) {
-        let notifications = await db.notifications.findMany({
+        var notifications = await db.notifications.findMany({
             where: {
                 reciever_id: req.user.id,
                 taps: 3
