@@ -139,6 +139,16 @@ let findRiders = async (req, res) => {
 
                         if (sockets[rider].user_id == req.user.id) continue;
 
+                        if (sockets[rider].lastTrip.lat != null && sockets[rider].lastTrip.lng != null && destinationLng && destinationLat) {
+                            console.log('final destination')
+                            let calculateDistance = calcCrow(sockets[rider].lastTrip.lat, sockets[rider].lastTrip.lng, destinationLat, destinationLng).toFixed(1)
+                            console.log("distance =" + calculateDistance)
+                            if (calculateDistance > 5) {
+                                drivers.push(sockets[rider].user_id)
+                                continue;
+                            }
+                        }
+
                         global.io.to(sockets[rider].socket_id).emit('request', JSON.stringify({
                             user_id: req.user.id,
                             price: price ?? 0,
@@ -271,14 +281,22 @@ let findRiders = async (req, res) => {
 
                             if (checkIfHadFreeRideBefore) {
                                 if (moment(checkIfHadFreeRideBefore.created_at).add('1', 'days').format('YYYY/MM/DD HH:mm:ss') >= moment().format('YYYY/MM/DD HH:mm:ss')) {
-
                                     drivers.push(sockets[rider].user_id)
                                     continue
-
                                 }
                             }
 
                             if (sockets[rider].user_id == req.user.id) continue;
+
+                            if (sockets[rider].lastTrip.lat != null && sockets[rider].lastTrip.lng != null && destinationLng && destinationLat) {
+                                console.log('final destination')
+                                let calculateDistance = calcCrow(sockets[rider].lastTrip.lat, sockets[rider].lastTrip.lng, destinationLat, destinationLng).toFixed(1)
+                                console.log("distance =" + calculateDistance)
+                                if (calculateDistance > 5) {
+                                    drivers.push(sockets[rider].user_id)
+                                    continue;
+                                }
+                            }
 
                             global.io.to(sockets[rider].socket_id).emit('request', JSON.stringify({
                                 user_id: req.user.id,
@@ -1026,8 +1044,8 @@ let ridersDashBoard = async (req, res) => {
 
 let modifyPriceRange = async (req, res) => {
     const { newPrice } = req.body
-    
-    if (! newPrice ||  isNaN(newPrice)) {
+
+    if (!newPrice || isNaN(newPrice)) {
         return res.send('No price range was provided')
     }
 
@@ -1065,7 +1083,7 @@ let getMyDriverInfo = async (id) => {
             isDone: 1,
         },
         _count: {
-            id: true 
+            id: true
         }
     })
 
