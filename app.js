@@ -160,7 +160,7 @@ io.on('connection', async (socket) => {
         lastTrip: {
           destinationAddress: null,
           lat: null,
-          lng: null          
+          lng: null
         },
         currentLocation: {
           lat: socket.handshake.headers.lat ?? null,
@@ -177,12 +177,12 @@ io.on('connection', async (socket) => {
             sockets[socket.id] = userInfo
           } else {
             console.log('passed')
-            sockets[socket.id] = userInfo 
+            sockets[socket.id] = userInfo
           }
           break;
         }
       } else {
-        sockets[socket.id] = userInfo 
+        sockets[socket.id] = userInfo
         console.log('passed Here Please')
         console.log(sockets)
       }
@@ -203,7 +203,6 @@ io.on('connection', async (socket) => {
     var destinationLat = JSON.parse(data).destinationLat
     var destinationLng = JSON.parse(data).destinationLng
     var tripTime = JSON.parse(data).tripTime
-    var driverInfo = JSON.parse(data).driverInfo
 
     for (socket in sockets) {
       if (sockets[socket].user_id == JSON.parse(data).userId) {
@@ -214,16 +213,81 @@ io.on('connection', async (socket) => {
       if (sockets[socket].user_id == JSON.parse(data).riderId) {
         var requestFrom = sockets[socket].user_id
         var riderId = sockets[socket].user_id
+
+
+        let riderTotalTrips = await db.ridesRequested.aggregate({
+          where: {
+            rider_id: sockets[socket].user_id,
+            isDone: 1,
+          },
+          _count: {
+            id: true
+          }
+        })
+
+        let riders5StarRating = await db.ridesRatesAndComments.count({
+          where: {
+            rideId: sockets[socket].user_id,
+            rideRate: 5
+          }
+        })
+
+        let riders4StarRating = await db.ridesRatesAndComments.count({
+          where: {
+            rideId: sockets[socket].user_id,
+            rideRate: 4
+          }
+        })
+
+        let riders3StarRating = await db.ridesRatesAndComments.count({
+          where: {
+            rideId: sockets[socket].user_id,
+            rideRate: 3
+          }
+        })
+
+        let riders2StarRating = await db.ridesRatesAndComments.count({
+          where: {
+            rideId: sockets[socket].user_id,
+            rideRate: 2
+          }
+        })
+
+        let riders1StarRating = await db.ridesRatesAndComments.count({
+          where: {
+            rideId: sockets[socket].user_id,
+            rideRate: 1
+          }
+        })
+
+        let driverRate = calculateRate(riders5StarRating ?? 0,
+          riders4StarRating ?? 0,
+          riders3StarRating ?? 0,
+          riders2StarRating ?? 0,
+          riders1StarRating ?? 0
+        )
+
         var userInfo = await db.users.findFirst({
           where: {
             id: parseInt(riderId)
           },
           select: {
-            profilePicture: true
+            profilePicture: true,
+            firstName: true,
           }
         })
 
+        var driver = {
+          totalTrips: riderTotalTrips,
+          totalRate: driverRate,
+          riderPhotoAndName: userInfo.profilePicture
+        }
       }
+    }
+
+    function calculateRate(total5Stars, total4Stars, total3Stars, total2Stars, total1Star) {
+      return (5 * total5Stars + 4 * total4Stars + 3 * total3Stars + 2 * total2Stars + 1 * total1Star)
+        / (total5Stars + total4Stars + total3Stars + total2Stars + total1Star)
     }
 
     io.to(requestTo).emit('agent-new-changed-price', JSON.stringify({
@@ -240,8 +304,7 @@ io.on('connection', async (socket) => {
       destinationLng: destinationLng,
       tripTime: tripTime,
       freeRide: JSON.parse(data).freeRide,
-      driverInfo: driverInfo,
-      riderPhoto: userInfo.profilePicture
+      driverInfo: driver,
     }));
 
     console.log('event emitted')
@@ -294,98 +357,98 @@ io.on('connection', async (socket) => {
   })
 })
 
-  io.use(async (socket, next) => {
-    try {
+io.use(async (socket, next) => {
+  try {
 
-      let token = socket.handshake.headers.authorization
-      if (!token) {
-        console.log("socket auth be provided !")
-        throw new Error("auth must be provided !")
+    let token = socket.handshake.headers.authorization
+    if (!token) {
+      console.log("socket auth be provided !")
+      throw new Error("auth must be provided !")
+    }
+
+    let authorization = token.split('Bearer ')[1]
+    Jwt.verify(authorization, secretKey, async (err, data) => {
+      if (err) throw err;
+
+      let user = await db.users.findFirst({
+        where: {
+          id: parseInt(data.id) ?? undefined
+        },
+        select: {
+          firstName: true,
+          lastName: true,
+          email: true,
+          id: true,
+          isApproved: true,
+          accountType: true,
+        }
+      });
+      if (!user) {
+        socket.user = null
+        socket.token = null
+        socket.subscription = null
+        next();
       }
 
-      let authorization = token.split('Bearer ')[1]
-      Jwt.verify(authorization, secretKey, async (err, data) => {
-        if (err) throw err;
+      let userSubscription = await db.subscriptions.findFirst({
+        where: {
+          user_id: parseInt(data.id)
+        },
+        orderBy: {
+          'created_at': 'desc'
+        }
+      })
 
-        let user = await db.users.findFirst({
-          where: {
-            id: parseInt(data.id) ?? undefined
-          },
-          select: {
-            firstName: true,
-            lastName: true,
-            email: true,
-            id: true,
-            isApproved: true,
-            accountType: true,
+      if (userSubscription) {
+        if (moment(userSubscription.updated_at).add(userSubscription.period, 'days').format('YYYY/MM/DD HH:mm:ss') >= moment().format('YYYY/MM/DD HH:mm:ss')) {
+
+          console.log('passed')
+          // subscription still on
+          socket.subscription = {
+            categoryId: userSubscription.subCat_id,
+            permium: userSubscription.isPermium,
+            stauts: 1,
+            isPersonalAccount: userSubscription.isPersonalAccount,
+            CounterStaterd: userSubscription.packageCounter != null,
+            startDate: userSubscription.updated_at,
           }
-        });
-        if (!user) {
-          socket.user = null
-          socket.token = null
-          socket.subscription = null
-          next();
         }
+      } else {
+        socket.subscription = null
+      }
 
-        let userSubscription = await db.subscriptions.findFirst({
-            where: {
-              user_id: parseInt(data.id)
-            },
-            orderBy: {
-              'created_at': 'desc'
-            }
-        })
-
-        if (userSubscription) {
-          if (moment(userSubscription.updated_at).add(userSubscription.period, 'days').format('YYYY/MM/DD HH:mm:ss') >= moment().format('YYYY/MM/DD HH:mm:ss')) {
-
-            console.log('passed')
-            // subscription still on
-            socket.subscription = {
-              categoryId: userSubscription.subCat_id,
-              permium: userSubscription.isPermium,
-              stauts: 1,
-              isPersonalAccount: userSubscription.isPersonalAccount,
-              CounterStaterd: userSubscription.packageCounter != null,
-              startDate: userSubscription.updated_at,
-            }
-          }
-        } else {
-          socket.subscription = null
+      // check if he has any trips going on 
+      let checkTrip = await db.ridesRequested.findFirst({
+        where: {
+          rider_id: data.id,
+        },
+        orderBy: {
+          created_at: 'desc'
         }
+      })
 
-        // check if he has any trips going on 
-        let checkTrip = await db.ridesRequested.findFirst({
-          where: {
-            rider_id: data.id,
-          },
-          orderBy: {
-            created_at: 'desc'
-          }
-        })
+      if (checkTrip && checkTrip.isDone == 0 && checkTrip.isPendding != 1) {
+        socket.status = 1
+      }
 
-        if (checkTrip && checkTrip.isDone == 0 && checkTrip.isPendding != 1) {
-          socket.status = 1
-        }
+      if (checkTrip && checkTrip.isDone == 0 && checkTrip.isPendding == 1) {
+        socket.status = 2
+      }
 
-        if (checkTrip && checkTrip.isDone == 0 && checkTrip.isPendding == 1) {
-          socket.status = 2
-        }
+      if (!checkTrip || checkTrip.isDone == 1 && checkTrip.isPendding == 0) {
+        socket.status = null
+      }
 
-        if (!checkTrip || checkTrip.isDone == 1 && checkTrip.isPendding == 0) {
-          socket.status = null
-        }
+      socket.user = user;
+      socket.token = authorization
+      next();
+    });
 
-        socket.user = user;
-        socket.token = authorization
-        next();
-      });
-
-    } catch (e) {
-      console.log("socket cant connect because => " + e.toString())
-      next(Error(e.toString()))
-    }
-  });
+  } catch (e) {
+    console.log("socket cant connect because => " + e.toString())
+    next(Error(e.toString()))
+  }
+});
 
 module.exports = { app, server }
 

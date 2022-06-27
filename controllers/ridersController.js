@@ -153,9 +153,7 @@ let findRiders = async (req, res) => {
                             user_id: req.user.id,
                             price: price ?? 0,
                             user_name: req.user.firstName,
-                            message_ar: `قام ${req.user.firstName} بطلب رحله من ... الي ... بسعر 50 جنيه`,
-                            message_en: req.user.firstName + ' Has requested a ride from ' + From + ' to' + To + ' ' + ' for 50 L.E',
-                            distance: distance ? distance + ' KiloMeters' : 'Unknown',
+                            distance: distance ,
                             userType: userType,
                             destinationFrom: From,
                             destinationTo: To,
@@ -164,7 +162,6 @@ let findRiders = async (req, res) => {
                             destinationLat: destinationLat,
                             destinationLng: destinationLng,
                             tripTime: tripTime,
-                            driverInfo: getMyDriverInfo(sockets[rider].user_id),
                             freeRide: null
                         }));
 
@@ -184,8 +181,8 @@ let findRiders = async (req, res) => {
 
                         } else {
                             let notify = {
-                                message_ar: `New ride request from ${req.firstName}.`,
-                                message_en: `${req.firstName} ليك طلب توصيله جديد.`,
+                                message_ar: `New ride request from ${req.user.firstName}.`,
+                                message_en: `${req.user.firstName} ليك طلب توصيله جديد.`,
                                 user: sockets[rider].user_id,
                                 userFirstName: 0,
                                 rideId: 0,
@@ -230,9 +227,8 @@ let findRiders = async (req, res) => {
                                 user_id: req.user.id,
                                 user_id: req.user.id,
                                 price: price ?? 0,
-                                message_ar: `قام ${req.user.firstName} بطلب رحله من ... الي ... بسعر 50 جنيه`,
-                                message_en: req.user.firstName + ' Has requested a ride from ' + From + ' to' + To + ' ' + ' for 50 L.E',
-                                distance: distance ? distance + ' KiloMeters' : 'Unknown',
+                
+                                distance: distance,
                                 userType: userType,
                                 destinationFrom: From,
                                 destinationTo: To,
@@ -241,15 +237,15 @@ let findRiders = async (req, res) => {
                                 destinationLat: destinationLat,
                                 destinationLng: destinationLng,
                                 tripTime: tripTime,
-                                driverInfo: getMyDriverInfo(sockets[rider1].user_id),
+                                driverInfo: null,
                                 freeRide: null
                             }));
 
                             drivers.push(sockets[rider1].user_id)
 
                             let notify = {
-                                message_ar: `New ride request from ${req.firstName}.`,
-                                message_en: `${req.firstName} ليك طلب توصيله جديد من.`,
+                                message_ar: `New ride request from ${req.user.firstName}.`,
+                                message_en: `${req.user.firstName} ليك طلب توصيله جديد من.`,
                                 user: sockets[rider1].user_id,
                                 userFirstName: 0,
                                 rideId: 0,
@@ -302,9 +298,7 @@ let findRiders = async (req, res) => {
                                 user_id: req.user.id,
                                 user_id: req.user.id,
                                 price: (parseInt(price) + 20) ?? 0,
-                                message_ar: `قام ${req.user.firstName} بطلب رحله من ... الي ... بسعر ${parseInt(price) + 20} جنيه`,
-                                message_en: req.user.firstName + ' Has requested a ride from ' + From + ' to' + To + ' ' + ' for ' + parseInt(price + 20) + ' L.E',
-                                distance: distance ? distance + ' KiloMeters' : 'Unknown',
+                                distance: distance,
                                 userType: userType,
                                 destinationFrom: From,
                                 destinationTo: To,
@@ -313,7 +307,7 @@ let findRiders = async (req, res) => {
                                 destinationLat: destinationLat,
                                 destinationLng: destinationLng,
                                 tripTime: tripTime,
-                                driverInfo: getMyDriverInfo(sockets[rider1].user_id),
+                                driverInfo: null,
                                 freeRide: 1
                             }));
 
@@ -1077,71 +1071,6 @@ let modifyPriceRange = async (req, res) => {
     })
 }
 
-let getMyDriverInfo = async (id) => {
-    let riderTotalTrips = await db.ridesRequested.aggregate({
-        where: {
-            rider_id: id,
-            isDone: 1,
-        },
-        _count: {
-            id: true
-        }
-    })
-
-    let riders5StarRating = await db.ridesRatesAndComments.count({
-        where: {
-            rideId: id,
-            rideRate: 5
-        }
-    })
-
-    let riders4StarRating = await db.ridesRatesAndComments.count({
-        where: {
-            rideId: id,
-            rideRate: 4
-        }
-    })
-
-    let riders3StarRating = await db.ridesRatesAndComments.count({
-        where: {
-            rideId: id,
-            rideRate: 3
-        }
-    })
-
-    let riders2StarRating = await db.ridesRatesAndComments.count({
-        where: {
-            rideId: id,
-            rideRate: 2
-        }
-    })
-
-    let riders1StarRating = await db.ridesRatesAndComments.count({
-        where: {
-            rideId: id,
-            rideRate: 1
-        }
-    })
-
-
-    let driverRate = calculateRate(riders5StarRating ?? 0,
-        riders4StarRating ?? 0,
-        riders3StarRating ?? 0,
-        riders2StarRating ?? 0,
-        riders1StarRating ?? 0
-    )
-
-    return res.json({
-        name: (await db.users.findFirst({ where: { id: id } })).firstName,
-        totalTrips: riderTotalTrips,
-        totalRate: driverRate,
-        riderMoreInfo: await db.ride.findFirst({
-            where: {
-                user_id: id
-            }
-        })
-    })
-}
 
 module.exports = {
     addRider,
@@ -1160,5 +1089,4 @@ module.exports = {
     deleteRider,
     ridersDashBoard,
     modifyPriceRange,
-    getMyDriverInfo
 }
