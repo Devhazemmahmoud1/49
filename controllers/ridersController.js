@@ -154,6 +154,7 @@ let findRiders = async (req, res) => {
                             destinationLat: destinationLat,
                             destinationLng: destinationLng,
                             tripTime: tripTime,
+                            driverInfo: this.getMyDriverInfo(sockets[rider].user_id),
                             freeRide: null
                         }));
 
@@ -230,6 +231,7 @@ let findRiders = async (req, res) => {
                                 destinationLat: destinationLat,
                                 destinationLng: destinationLng,
                                 tripTime: tripTime,
+                                driverInfo: this.getMyDriverInfo(sockets[rider].user_id),
                                 freeRide: null
                             }));
 
@@ -277,7 +279,7 @@ let findRiders = async (req, res) => {
                             }
 
                             if (sockets[rider].user_id == req.user.id) continue;
-                            
+
                             global.io.to(sockets[rider].socket_id).emit('request', JSON.stringify({
                                 user_id: req.user.id,
                                 user_id: req.user.id,
@@ -293,6 +295,7 @@ let findRiders = async (req, res) => {
                                 destinationLat: destinationLat,
                                 destinationLng: destinationLng,
                                 tripTime: tripTime,
+                                driverInfo: this.getMyDriverInfo(sockets[rider].user_id),
                                 freeRide: 1
                             }));
 
@@ -1055,6 +1058,72 @@ let modifyPriceRange = async (req, res) => {
     })
 }
 
+let getMyDriverInfo = async (id) => {
+    let riderTotalTrips = await db.ridesRequested.aggregate({
+        where: {
+            rider_id: id,
+            isDone: 1,
+        },
+        _count: {
+            id: true 
+        }
+    })
+
+    let riders5StarRating = await db.ridesRatesAndComments.count({
+        where: {
+            rideId: id,
+            rideRate: 5
+        }
+    })
+
+    let riders4StarRating = await db.ridesRatesAndComments.count({
+        where: {
+            rideId: id,
+            rideRate: 4
+        }
+    })
+
+    let riders3StarRating = await db.ridesRatesAndComments.count({
+        where: {
+            rideId: id,
+            rideRate: 3
+        }
+    })
+
+    let riders2StarRating = await db.ridesRatesAndComments.count({
+        where: {
+            rideId: id,
+            rideRate: 2
+        }
+    })
+
+    let riders1StarRating = await db.ridesRatesAndComments.count({
+        where: {
+            rideId: id,
+            rideRate: 1
+        }
+    })
+
+
+    let driverRate = calculateRate(riders5StarRating ?? 0,
+        riders4StarRating ?? 0,
+        riders3StarRating ?? 0,
+        riders2StarRating ?? 0,
+        riders1StarRating ?? 0
+    )
+
+    return res.json({
+        name: (await db.users.findFirst({ where: { id: id } })).firstName,
+        totalTrips: riderTotalTrips,
+        totalRate: driverRate,
+        riderMoreInfo: await db.ride.findFirst({
+            where: {
+                user_id: id
+            }
+        })
+    })
+}
+
 module.exports = {
     addRider,
     acceptRide,
@@ -1071,5 +1140,6 @@ module.exports = {
     endRide,
     deleteRider,
     ridersDashBoard,
-    modifyPriceRange
+    modifyPriceRange,
+    getMyDriverInfo
 }
