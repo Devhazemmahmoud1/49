@@ -471,10 +471,15 @@ let register = async (req, res) => {
             let notification = await db.notifications.create({
                 data: {
                     sender_id: 0,
-                    reciever_id: create.id,
+                    user: {
+                        connect: {
+                            id: create.id
+                        }
+                    },
                     message_en: 'Thank you for registering with us.',
                     messgae_ar: 'شكرا جزيلا للتسجيل معنا.',
                     is_read: 0,
+                    direction: 0,
                     type: 10,
                 }
             })
