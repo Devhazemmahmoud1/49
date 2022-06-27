@@ -128,8 +128,7 @@ let userNotification = async (req, res) => {
 
 /* Update the unread notif.. */
 let recentUnreadNotifications = async (req, res) => {
-
-    if (req.user = null) {
+    if (req.user == null) {
         return res.status(403).send('No user token provided')
     }
 
@@ -144,7 +143,6 @@ let recentUnreadNotifications = async (req, res) => {
     })
 
     return res.status(200).json(count)
-
 }
 
 /* Set a specific as read */

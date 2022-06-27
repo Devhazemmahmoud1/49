@@ -4,7 +4,7 @@ const { autoCatch } = require("../utils/auto_catch");
 const { userNotification,
     setNotificationAsRead,
     deleteNotification,
-    recentUnreadNotifications
+    recentUnreadNotifications,
 } = require('../controllers/notificationsController/notifications')
 
 /*  Get all the available notifications */
@@ -18,5 +18,6 @@ router.get('/recent/notifications', guard, autoCatch(recentUnreadNotifications))
 
 /* Delete a specific notification */
 router.delete('/recent/notification/delete', guard, autoCatch(deleteNotification))
+
 
 module.exports = router
