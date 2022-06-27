@@ -58,42 +58,6 @@ let makeSubscriptionPayments = async (req, res) => {
         })
     }
 
-    let createSubscription = await db.subscriptions.create({
-        data: {
-            user_id: req.user.id,
-            subCat_id: parseInt(subcategory_id),
-            period: period.toString() ?? 1,
-            isPermium: parseInt(isPermium) ?? 0,
-            isPersonalAccount: parseInt(isPersonal) ?? 0,
-            packageCounter: 0,
-        }
-    });
-
-    let updateUser = await db.users.update({
-        where: {
-            id: req.user.id
-        },
-        data: {
-            accountType: parseInt(subcategory_id)
-        }
-    })
-
-    for (socket in sockets) {
-        if (sockets[socket].user_id == req.user.id) {
-            sockets[socket].subscription = {
-                categoryId: createSubscription.subCat_id,
-                permium: createSubscription.isPermium,
-                stauts: 1,
-                startDate: createSubscription.updated_at,
-                isPersonalAccount: parseInt(isPersonal) ?? 0
-            }
-
-            sockets[socket].isPersonalAccount = parseInt(isPersonal) ?? 0;
-
-            break;
-        }
-    }
-
     // var methods = await db.paymentMethods.findMany({});
     // var tax = await db.govFees.findFirst({});
     // var cashBackRules = await db.cashBackRules.findFirst({})
@@ -101,6 +65,44 @@ let makeSubscriptionPayments = async (req, res) => {
     // if (paymentMethod == 2) {
     // Wallet
     if (parseInt(req.user.Wallet.balance) >= parseInt(amount)) {
+
+        let createSubscription = await db.subscriptions.create({
+            data: {
+                user_id: req.user.id,
+                subCat_id: parseInt(subcategory_id),
+                period: period.toString() ?? 1,
+                isPermium: parseInt(isPermium) ?? 0,
+                isPersonalAccount: parseInt(isPersonal) ?? 0,
+                packageCounter: 0,
+            }
+        });
+
+
+        for (socket in sockets) {
+            if (sockets[socket].user_id == req.user.id) {
+                sockets[socket].subscription = {
+                    categoryId: createSubscription.subCat_id,
+                    permium: createSubscription.isPermium,
+                    stauts: 1,
+                    startDate: createSubscription.updated_at,
+                    isPersonalAccount: parseInt(isPersonal) ?? 0
+                }
+    
+                sockets[socket].isPersonalAccount = parseInt(isPersonal) ?? 0;
+    
+                break;
+            }
+        }
+    
+        let updateUser = await db.users.update({
+            where: {
+                id: req.user.id
+            },
+            data: {
+                accountType: parseInt(subcategory_id)
+            }
+        })
+
         let newBalance = parseInt(req.user.Wallet.balance) - parseInt(amount)
         let total = parseInt(req.user.Wallet.total) - parseInt(amount)
 

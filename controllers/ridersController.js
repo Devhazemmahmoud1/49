@@ -164,7 +164,7 @@ let findRiders = async (req, res) => {
                             destinationLat: destinationLat,
                             destinationLng: destinationLng,
                             tripTime: tripTime,
-                            driverInfo: this.getMyDriverInfo(sockets[rider].user_id),
+                            driverInfo: getMyDriverInfo(sockets[rider].user_id),
                             freeRide: null
                         }));
 
@@ -241,7 +241,7 @@ let findRiders = async (req, res) => {
                                 destinationLat: destinationLat,
                                 destinationLng: destinationLng,
                                 tripTime: tripTime,
-                                driverInfo: this.getMyDriverInfo(sockets[rider1].user_id),
+                                driverInfo: getMyDriverInfo(sockets[rider1].user_id),
                                 freeRide: null
                             }));
 
@@ -313,7 +313,7 @@ let findRiders = async (req, res) => {
                                 destinationLat: destinationLat,
                                 destinationLng: destinationLng,
                                 tripTime: tripTime,
-                                driverInfo: this.getMyDriverInfo(sockets[rider1].user_id),
+                                driverInfo: getMyDriverInfo(sockets[rider1].user_id),
                                 freeRide: 1
                             }));
 
