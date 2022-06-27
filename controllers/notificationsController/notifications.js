@@ -31,6 +31,9 @@ let userNotification = async (req, res) => {
             },
             skip: page == 1 ? 0 : (page * maxNotifications) - maxNotifications,
             take: maxNotifications,
+            orderBy: {
+                created_at: 'desc'
+            }
         })
     
         for (item of notifications) {
@@ -43,6 +46,9 @@ let userNotification = async (req, res) => {
                     firstName: true,
                     lastName: true,
                     profilePicture: true,
+                },
+                orderBy: {
+                    created_at: 'desc'
                 }
             })
         }
@@ -77,7 +83,7 @@ let userNotification = async (req, res) => {
     if (type == 3) {
         let notifications = await db.notifications.findMany({
             where: {
-                OR: [
+                AND: [
                     {
                         reciever_id: req.user.id,
                         type: 2
@@ -113,6 +119,9 @@ let userNotification = async (req, res) => {
                     firstName: true,
                     lastName: true,
                     profilePicture: true,
+                },
+                orderBy: {
+                    created_at: 'desc'
                 }
             })
         }
