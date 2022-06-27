@@ -25,6 +25,4 @@ let getWallet = async (req, res) => {
     }
 }
 
-module.exports = {
-    wallet: getWallet,
-}
+module.exports = {getWallet,}
