@@ -24,7 +24,7 @@ let userNotification = async (req, res) => {
     let maxNotifications = 20;
 
     if (type == 1) {
-        let notifications = await db.notifications.findMany({
+        var notifications = await db.notifications.findMany({
             where: {
                 reciever_id: req.user.id,
                 type: 1000
@@ -50,7 +50,7 @@ let userNotification = async (req, res) => {
 
     // 49 Services
     if (type == 2) {
-        let notifications = await db.notifications.findMany({
+        var notifications = await db.notifications.findMany({
             where: {
                 reciever_id: req.user.id
             },
