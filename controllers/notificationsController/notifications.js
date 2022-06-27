@@ -27,7 +27,7 @@ let userNotification = async (req, res) => {
         var notifications = await db.notifications.findMany({
             where: {
                 reciever_id: req.user.id,
-                taps: 2
+                taps: 1
             },
             skip: page == 1 ? 0 : (page * maxNotifications) - maxNotifications,
             take: maxNotifications,
