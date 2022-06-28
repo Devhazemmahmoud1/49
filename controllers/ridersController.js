@@ -692,7 +692,7 @@ let acceptRide = async (req, res) => {
                 distance: distance,
                 tripTime: tripTime,
                 customerLng: customerLng,
-                customerlat: customerlat,
+                customerlat: customerLat,
                 destinationLng: destinationLng,
                 destinationLat: destinationLat,
                 streetFrom: streetFrom,
