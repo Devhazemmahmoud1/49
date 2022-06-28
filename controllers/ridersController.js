@@ -710,7 +710,8 @@ let acceptRide = async (req, res) => {
         return res.send('ok')
 
     } catch (e) {
-        throw new e
+        console.log(e)
+        return false
     }
 }
 
