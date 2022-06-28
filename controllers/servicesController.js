@@ -2638,7 +2638,7 @@ let makeRequest = async (req, res) => {
                             }
                         } else if (request == 3) {
                             let any = getStorage.anyCashBack
-                            var getStep = await db.cashBackStep.findFirst({})
+                            let getStep = await db.cashBackStep.findFirst({})
                             if (parseInt(any) <= 0) {
                                 await db.wallet.update({
                                     where: {
