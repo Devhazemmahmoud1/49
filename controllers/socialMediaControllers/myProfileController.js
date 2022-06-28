@@ -53,7 +53,9 @@ let getMyProfile = async (req, res) => {
     })
 
     let MainCategory = await db.mainCategories.findFirst({
-        id: parseInt(subCategory.parent)
+        where: {
+            id: parseInt(subCategory.parent)
+        }
     })
 
 
