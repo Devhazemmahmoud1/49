@@ -46,17 +46,22 @@ let getMyProfile = async (req, res) => {
         }
     })
 
-    let subCategory = await db.subCategories.findFirst({
-        where: {
-            id: parseInt(driverRegister.category_id)
-        }
-    })
+    if (driverRegister) {
+        let subCategory = await db.subCategories.findFirst({
+            where: {
+                id: parseInt(driverRegister.category_id)
+            }
+        })
+    
+        let MainCategory = await db.mainCategories.findFirst({
+            where: {
+                id: parseInt(subCategory.parent)
+            }
+        })
+    } else {
+        let MainCategory = null
+    }
 
-    let MainCategory = await db.mainCategories.findFirst({
-        where: {
-            id: parseInt(subCategory.parent)
-        }
-    })
 
 
     return res.status(200).json({
