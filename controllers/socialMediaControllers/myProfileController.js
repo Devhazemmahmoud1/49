@@ -39,31 +39,22 @@ let getMyProfile = async (req, res) => {
         }
     })
 
-    if (getSubscriptions) {
-        for (final of getSubscriptions) {
-
-            let subCategories = await db.subCategories.findFirst({
-                where: {
-                    id: parseInt(final.subCat_id)
-                }
-            })
-
-            final.subCategory = await db.subCategories.findFirst({
-                where: {
-                    id: parseInt(final.subCat_id)
-                },
-                include: {
-                    photo: true,
-                }
-            })
-
-            final.mainCatSubScription = await db.mainCategories.findFirst({
-                where: {
-                    id: parseInt(subCategories.parent)
-                }
-            })
+    let driverRegister = await db.ride.findFirst({
+        where: {
+            user_id: req.user.id,
+            isApproved: 1
         }
-    }
+    })
+
+    let subCategory = await db.subCategories.findFirst({
+        where: {
+            id: parseInt(driverRegister.category_id)
+        }
+    })
+
+    let MainCategory = await db.mainCategories.findFirst({
+        id: parseInt(subCategory.parent)
+    })
 
 
     return res.status(200).json({
@@ -118,7 +109,8 @@ let getMyProfile = async (req, res) => {
         //         riderPhoto: true
         //     }
         // }),
-        subscriptions: getSubscriptions
+        subscriptions: getSubscriptions,
+        businessProvider: MainCategory
     })
 }
 
