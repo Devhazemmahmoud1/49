@@ -654,10 +654,10 @@ let acceptRide = async (req, res) => {
         !total
     )
 
-        return res.status(403).send('Something went wrong');
+        return res.status(403).send('Something went wrong'); 
 
     for (socket in sockets) {
-        if (sockets[socket].user_id == ride.rider_id && sockets[socket].status == 1) {
+        if (sockets[socket].user_id == rider_id && sockets[socket].status == 1) {
 
             let ride = await db.ridesRequested.create({
                 data: {
@@ -702,7 +702,7 @@ let acceptRide = async (req, res) => {
         })
 
         for (socket in sockets) {
-            if (sockets[socket].user_id == ride.rider_id) {
+            if (sockets[socket].user_id == rider_id) {
                 sockets[socket].status = 1
             }
         }
