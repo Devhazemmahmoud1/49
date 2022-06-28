@@ -404,7 +404,7 @@ io.use(async (socket, next) => {
 
 
       if (checkTrip && checkTrip.isDone == 0 && checkTrip.isPendding != 1) {
-        global.io.to(socket.socket_id).emit('current-trip', JSON.stringify({
+        socket.to(socket.socket_id).emit('current-trip', JSON.stringify({
           user_id: parseInt(getUserInfo.id),
           rideId: checkTrip.id,
           rider_id: parseInt(checkTrip.rider_id),
@@ -418,12 +418,11 @@ io.use(async (socket, next) => {
           streetTo: checkTrip.streetTo.toString(),
           total: parseInt(checkTrip.total),
         }))
-
         socket.status = 1
       }
 
       if (checkTrip && checkTrip.isDone == 0 && checkTrip.isPendding == 1) {
-        global.io.to(socket.socket_id).emit('current-trip', JSON.stringify({
+        socket.to(socket.socket_id).emit('current-trip', JSON.stringify({
           user_id: parseInt(getUserInfo.id),
           rideId: checkTrip.id,
           rider_id: parseInt(checkTrip.rider_id),
@@ -442,7 +441,7 @@ io.use(async (socket, next) => {
 
       if (!checkTrip || checkTrip.isDone == 1 && checkTrip.isPendding == 0) {
 
-        global.io.to(socket.socket_id).emit('current-trip', JSON.stringify({
+        socket.io.to(socket.socket_id).emit('current-trip', JSON.stringify({
             test: "test"
         }))
 
