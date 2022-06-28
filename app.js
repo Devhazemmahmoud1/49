@@ -204,7 +204,7 @@ io.on('connection', async (socket) => {
     var destinationLng = JSON.parse(data).destinationLng
     var tripTime = JSON.parse(data).tripTime
 
-    console.log(From, total1Star)
+    console.log(From, To)
 
     for (socket in sockets) {
       if (sockets[socket].user_id == JSON.parse(data).user_id) {
