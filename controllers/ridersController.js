@@ -463,6 +463,7 @@ let updateDriversLocation = async (req, res) => {
         if (sockets[socket].userType != '0' && sockets[socket].user_id == req.user.id) {
             sockets[socket].currentLocation.lat = driver.lat ?? null
             sockets[socket].currentLocation.lng = driver.lng ?? null
+            return res.send(sockets[socket])
             break;
         }
     }
