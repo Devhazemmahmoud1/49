@@ -702,6 +702,21 @@ let acceptRide = async (req, res) => {
                 }))                
             }
 
+            global.io.to(sockets[socket].socket_id).emit('current-trip', JSON.stringify({
+                user_id: parseInt(user_id),
+                rideId: ride.id,
+                rider_id: parseInt(rider_id),
+                distance: distance.toString(),
+                tripTime: tripTime.toString(),
+                customerLng: customerLng.toString(),
+                customerlat: customerLat.toString(),
+                destinationLng: destinationLng.toString(),
+                destinationLat: destinationLat.toString(),
+                streetFrom: streetFrom.toString(),
+                streetTo: streetTo.toString(),
+                total: parseInt(total),
+            }))
+
             return res.send('You already in a trip , finish this to take the other.')
         } 
         break;
@@ -746,6 +761,23 @@ let acceptRide = async (req, res) => {
                 global.io.to(sockets[socket].socket_id).emit('hide-ride', JSON.stringify({
                     user_id: parseInt(user_id)
                 }))
+            }
+
+            if (sockets[socket].user_id == req.user.id) {
+                global.io.to(sockets[socket].socket_id).emit('current-trip', JSON.stringify({
+                    user_id: parseInt(user_id),
+                    rideId: ride.id,
+                    rider_id: parseInt(rider_id),
+                    distance: distance.toString(),
+                    tripTime: tripTime.toString(),
+                    customerLng: customerLng.toString(),
+                    customerlat: customerLat.toString(),
+                    destinationLng: destinationLng.toString(),
+                    destinationLat: destinationLat.toString(),
+                    streetFrom: streetFrom.toString(),
+                    streetTo: streetTo.toString(),
+                    total: parseInt(total),
+                }))               
             }
         }
 
