@@ -73,7 +73,8 @@ router.post('/create-reel', upload.array('reel', 12), async (req, res, next) => 
             sender: user.id,
             reciever: 0,
             postId: parseInt(createReel.id),
-            type: 9,            
+            type: 9,          
+            taps: 3,  
         }
 
         sendBulkNotification(notify, parseInt(userId))
@@ -137,7 +138,8 @@ router.post('/create-story', upload.array('reel', 12), async (req, res, next) =>
             sender: user.id,
             reciever: 0,
             postId: parseInt(createStory.id),
-            type: 10,            
+            type: 10,   
+            taps: 3,         
         }
 
         sendBulkNotification(notify, parseInt(userId))

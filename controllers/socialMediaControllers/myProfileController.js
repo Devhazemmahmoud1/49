@@ -347,6 +347,7 @@ let createPost = async (req, res) => {
             reciever: 0,
             postId: createPost.id,
             type: 1,
+            taps: 3
         }
 
         await sendBulkNotification(notify, req.user);

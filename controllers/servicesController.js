@@ -1262,6 +1262,7 @@ let makeRequest = async (req, res) => {
                             user: req.user.id,
                             amount: getStep.step,
                             type: 1000,
+                            taps: 1,
                             notification_en: `You have got ${getStep.step} as cashback from 49.`,
                             notification_ar: `لقد حصلت علي كاش باك من ٤٩.${getStep.step} `
                         }
@@ -1346,6 +1347,7 @@ let makeRequest = async (req, res) => {
                                         user: req.user.id,
                                         amount: getStep.step,
                                         type: 1000,
+                                        taps: 1,
                                         notification_en: `You have got ${getStep.step} as cashback from 49.`,
                                         notification_ar: `لقد حصلت علي كاش باك من ٤٩.${getStep.step} `
                                     }
@@ -1386,6 +1388,7 @@ let makeRequest = async (req, res) => {
                                         user: req.user.id,
                                         amount: getStep.step,
                                         type: 1000,
+                                        taps: 1,
                                         notification_en: `You have got ${getStep.step} as cashback from 49.`,
                                         notification_ar: `لقد حصلت علي كاش باك من ٤٩.${getStep.step} `
                                     }
@@ -1451,6 +1454,7 @@ let makeRequest = async (req, res) => {
                                         user: req.user.id,
                                         amount: getStep.step,
                                         type: 1000,
+                                        taps: 1,
                                         notification_en: `You have got ${getStep.step} as cashback from 49.`,
                                         notification_ar: `لقد حصلت علي كاش باك من ٤٩.${getStep.step} `
                                     }
@@ -1492,6 +1496,7 @@ let makeRequest = async (req, res) => {
                                         user: req.user.id,
                                         amount: getStep.step,
                                         type: 1000,
+                                        taps: 1,
                                         notification_en: `You have got ${getStep.step} as cashback from 49.`,
                                         notification_ar: `لقد حصلت علي كاش باك من ٤٩.${getStep.step} `
                                     }
@@ -1559,6 +1564,7 @@ let makeRequest = async (req, res) => {
                                         user: req.user.id,
                                         amount: getStep.step,
                                         type: 1000,
+                                        taps: 1,
                                         notification_en: `You have got ${getStep.step} as cashback from 49.`,
                                         notification_ar: `لقد حصلت علي كاش باك من ٤٩.${getStep.step} `
                                     }
@@ -1600,6 +1606,7 @@ let makeRequest = async (req, res) => {
                                         user: req.user.id,
                                         amount: getStep.step,
                                         type: 1000,
+                                        taps: 1,
                                         notification_en: `You have got ${getStep.step} as cashback from 49.`,
                                         notification_ar: `لقد حصلت علي كاش باك من ٤٩.${getStep.step} `
                                     }
@@ -1674,6 +1681,7 @@ let makeRequest = async (req, res) => {
                                     user: req.user.id,
                                     amount: getStep.step,
                                     type: 1000,
+                                    taps: 1,
                                     notification_en: `You have got ${getStep.step} as cashback from 49.`,
                                     notification_ar: `لقد حصلت علي كاش باك من ٤٩.${getStep.step} `
                                 }
@@ -1716,6 +1724,7 @@ let makeRequest = async (req, res) => {
                                     user: req.user.id,
                                     amount: getStep.step,
                                     type: 1000,
+                                    taps: 1,
                                     notification_en: `You have got ${getStep.step} as cashback from 49.`,
                                     notification_ar: `لقد حصلت علي كاش باك من ٤٩.${getStep.step} `
                                 }
@@ -1783,6 +1792,7 @@ let makeRequest = async (req, res) => {
                                     user: req.user.id,
                                     amount: getStep.step,
                                     type: 1000,
+                                    taps: 1,
                                     notification_en: `You have got ${getStep.step} as cashback from 49.`,
                                     notification_ar: `لقد حصلت علي كاش باك من ٤٩.${getStep.step} `
                                 }
@@ -1825,6 +1835,7 @@ let makeRequest = async (req, res) => {
                                     user: req.user.id,
                                     amount: getStep.step,
                                     type: 1000,
+                                    taps: 1,
                                     notification_en: `You have got ${getStep.step} as cashback from 49.`,
                                     notification_ar: `لقد حصلت علي كاش باك من ٤٩.${getStep.step} `
                                 }
@@ -1892,6 +1903,7 @@ let makeRequest = async (req, res) => {
                                     user: req.user.id,
                                     amount: getStep.step,
                                     type: 1000,
+                                    taps: 1,
                                     notification_en: `You have got ${getStep.step} as cashback from 49.`,
                                     notification_ar: `لقد حصلت علي كاش باك من ٤٩.${getStep.step} `
                                 }
@@ -1934,6 +1946,7 @@ let makeRequest = async (req, res) => {
                                     user: req.user.id,
                                     amount: getStep.step,
                                     type: 1000,
+                                    taps: 1,
                                     notification_en: `You have got ${getStep.step} as cashback from 49.`,
                                     notification_ar: `لقد حصلت علي كاش باك من ٤٩.${getStep.step} `
                                 }
@@ -2083,6 +2096,7 @@ let makeRequest = async (req, res) => {
                                             user: req.user.id,
                                             amount: getStep.step,
                                             type: 1000,
+                                            taps: 1,
                                             notification_en: `You have got ${getStep.step} as cashback from 49.`,
                                             notification_ar: `لقد حصلت علي كاش باك من ٤٩.${getStep.step} `
                                         }
@@ -2125,6 +2139,7 @@ let makeRequest = async (req, res) => {
                                             user: req.user.id,
                                             amount: getStep.step,
                                             type: 1000,
+                                            taps: 1,
                                             notification_en: `You have got ${getStep.step} as cashback from 49.`,
                                             notification_ar: `لقد حصلت علي كاش باك من ٤٩.${getStep.step} `
                                         }
@@ -2193,6 +2208,7 @@ let makeRequest = async (req, res) => {
                                             user: req.user.id,
                                             amount: getStep.step,
                                             type: 1000,
+                                            taps: 1,
                                             notification_en: `You have got ${getStep.step} as cashback from 49.`,
                                             notification_ar: `لقد حصلت علي كاش باك من ٤٩.${getStep.step} `
                                         }
@@ -2235,6 +2251,7 @@ let makeRequest = async (req, res) => {
                                             user: req.user.id,
                                             amount: getStep.step,
                                             type: 1000,
+                                            taps: 1,
                                             notification_en: `You have got ${getStep.step} as cashback from 49.`,
                                             notification_ar: `لقد حصلت علي كاش باك من ٤٩.${getStep.step} `
                                         }
@@ -2303,6 +2320,7 @@ let makeRequest = async (req, res) => {
                                             user: req.user.id,
                                             amount: getStep.step,
                                             type: 1000,
+                                            taps: 1,
                                             notification_en: `You have got ${getStep.step} as cashback from 49.`,
                                             notification_ar: `لقد حصلت علي كاش باك من ٤٩.${getStep.step} `
                                         }
@@ -2346,6 +2364,7 @@ let makeRequest = async (req, res) => {
                                             user: req.user.id,
                                             amount: getStep.step,
                                             type: 1000,
+                                            taps: 1,
                                             notification_en: `You have got ${getStep.step} as cashback from 49.`,
                                             notification_ar: `لقد حصلت علي كاش باك من ٤٩.${getStep.step} `
                                         }
@@ -2392,6 +2411,7 @@ let makeRequest = async (req, res) => {
                                     user: req.user.id,
                                     amount: getStep.step,
                                     type: 1000,
+                                    taps: 1,
                                     notification_en: `You have got ${getStep.step} as cashback from 49.`,
                                     notification_ar: `لقد حصلت علي كاش باك من ٤٩.${getStep.step} `
                                 }
@@ -2434,6 +2454,7 @@ let makeRequest = async (req, res) => {
                                         user: req.user.id,
                                         amount: getStep.step,
                                         type: 1000,
+                                        taps: 1,
                                         notification_en: `You have got ${getStep.step} as cashback from 49.`,
                                         notification_ar: `لقد حصلت علي كاش باك من ٤٩.${getStep.step} `
                                     }
@@ -2476,6 +2497,7 @@ let makeRequest = async (req, res) => {
                                         user: req.user.id,
                                         amount: getStep.step,
                                         type: 1000,
+                                        taps: 1,
                                         notification_en: `You have got ${getStep.step} as cashback from 49.`,
                                         notification_ar: `لقد حصلت علي كاش باك من ٤٩.${getStep.step} `
                                     }
@@ -2517,6 +2539,7 @@ let makeRequest = async (req, res) => {
                                     user: req.user.id,
                                     amount: getStep.step,
                                     type: 1000,
+                                    taps: 1,
                                     notification_en: `You have got ${getStep.step} as cashback from 49.`,
                                     notification_ar: `لقد حصلت علي كاش باك من ٤٩.${getStep.step} `
                                 }
@@ -2560,6 +2583,7 @@ let makeRequest = async (req, res) => {
                                         user: req.user.id,
                                         amount: getStep.step,
                                         type: 1000,
+                                        taps: 1,
                                         notification_en: `You have got ${getStep.step} as cashback from 49.`,
                                         notification_ar: `لقد حصلت علي كاش باك من ٤٩.${getStep.step} `
                                     }
@@ -2602,6 +2626,7 @@ let makeRequest = async (req, res) => {
                                         user: req.user.id,
                                         amount: getStep.step,
                                         type: 1000,
+                                        taps: 1,
                                         notification_en: `You have got ${getStep.step} as cashback from 49.`,
                                         notification_ar: `لقد حصلت علي كاش باك من ٤٩.${getStep.step} `
                                     }
@@ -2642,6 +2667,7 @@ let makeRequest = async (req, res) => {
                                     user: req.user.id,
                                     amount: getStep.step,
                                     type: 1000,
+                                    taps: 1,
                                     notification_en: `You have got ${getStep.step} as cashback from 49.`,
                                     notification_ar: `لقد حصلت علي كاش باك من ٤٩.${getStep.step} `
                                 }
@@ -2684,6 +2710,7 @@ let makeRequest = async (req, res) => {
                                         user: req.user.id,
                                         amount: getStep.step,
                                         type: 1000,
+                                        taps: 1,
                                         notification_en: `You have got ${getStep.step} as cashback from 49.`,
                                         notification_ar: `لقد حصلت علي كاش باك من ٤٩.${getStep.step} `
                                     }
@@ -2726,6 +2753,7 @@ let makeRequest = async (req, res) => {
                                         user: req.user.id,
                                         amount: getStep.step,
                                         type: 1000,
+                                        taps: 1,
                                         notification_en: `You have got ${getStep.step} as cashback from 49.`,
                                         notification_ar: `لقد حصلت علي كاش باك من ٤٩.${getStep.step} `
                                     }
@@ -2765,6 +2793,7 @@ let makeRequest = async (req, res) => {
                         user: req.user.id,
                         amount: getStep.step,
                         type: 1000,
+                        taps: 1,
                         notification_en: `You have got ${getStep.step} as cashback from 49.`,
                         notification_ar: `لقد حصلت علي كاش باك من ٤٩.${getStep.step} `
                     }
@@ -2823,6 +2852,7 @@ let makeRequest = async (req, res) => {
                         user: req.user.id,
                         amount: getStep.step,
                         type: 1000,
+                        taps: 1,
                         notification_en: `You have got ${getStep.step} as cashback for sharing from 49.`,
                         notification_ar: `لقد حصلت علي كاش باك من ٤٩.${getStep.step} `
                     }
@@ -2851,6 +2881,7 @@ let makeRequest = async (req, res) => {
                         user: req.user.id,
                         amount: getStep.step,
                         type: 1000,
+                        taps: 1,
                         notification_en: `You have got ${getStep.step} as cashback from 49.`,
                         notification_ar: `لقد حصلت علي كاش باك من ٤٩.${getStep.step} `
                     }
@@ -2900,6 +2931,7 @@ let makeRequest = async (req, res) => {
                         user: req.user.id,
                         amount: getStep.step,
                         type: 1000,
+                        taps: 1,
                         notification_en: `You have got ${getStep.step} as cashback from 49.`,
                         notification_ar: `لقد حصلت علي كاش باك من ٤٩.${getStep.step} `
                     }
@@ -2952,6 +2984,7 @@ let makeRequest = async (req, res) => {
                             user: req.user.id,
                             amount: finalAmount,
                             type: 1000,
+                            taps: 1,
                             notification_en: `You have got ${getStep.step} as cashback from 49.`,
                             notification_ar: `لقد حصلت علي كاش باك من ٤٩.${getStep.step} `
                         }
@@ -3008,6 +3041,7 @@ let makeRequest = async (req, res) => {
                                 user: req.user.id,
                                 amount: finalAmount,
                                 type: 1000,
+                                taps: 1,
                                 notification_en: `You have got ${getStep.step} as cashback from 49.`,
                                 notification_ar: `لقد حصلت علي كاش باك من ٤٩.${getStep.step} `
                             }
@@ -3063,6 +3097,7 @@ let makeRequest = async (req, res) => {
                                 user: req.user.id,
                                 amount: finalAmount,
                                 type: 1000,
+                                taps: 1,
                                 notification_en: `You have got ${parseInt(finalAmount) + parseInt(remainCallCashBack)} as cashback from 49.`,
                                 notification_ar: `لقد حصلت علي كاش باك من ٤٩.${parseInt(finalAmount) + parseInt(remainCallCashBack)} `
                             }
@@ -3125,6 +3160,7 @@ let makeRequest = async (req, res) => {
                             user: req.user.id,
                             amount: getStep.step,
                             type: 1000,
+                            taps: 1,
                             notification_en: `You have got ${getStep.step} as cashback from 49.`,
                             notification_ar: `لقد حصلت علي كاش باك من ٤٩.${getStep.step} `
                         }
@@ -3170,6 +3206,7 @@ let makeRequest = async (req, res) => {
                             user: req.user.id,
                             amount: getStep.step,
                             type: 1000,
+                            taps: 1,
                             notification_en: `You have got ${getStep.step} as cashback from 49.`,
                             notification_ar: `لقد حصلت علي كاش باك من ٤٩.${getStep.step} `
                         }
@@ -3221,6 +3258,7 @@ let makeRequest = async (req, res) => {
                     user: req.user.id,
                     amount: getStep.step,
                     type: 1000,
+                    taps: 1,
                     notification_en: `You have got ${getStep.step} as cashback from 49.`,
                     notification_ar: `لقد حصلت علي كاش باك من ٤٩.${getStep.step} `
                 }
@@ -3294,6 +3332,7 @@ let makeRequest = async (req, res) => {
                             user: req.user.id,
                             amount: getStep.step,
                             type: 1000,
+                            taps: 1,
                             notification_en: `You have got ${getStep.step} as cashback from 49.`,
                             notification_ar: `لقد حصلت علي كاش باك من ٤٩.${getStep.step} `
                         }
@@ -3337,6 +3376,7 @@ let makeRequest = async (req, res) => {
                             user: req.user.id,
                             amount: getStep.step,
                             type: 1000,
+                            taps: 1,
                             notification_en: `You have got ${getStep.step} as cashback from 49.`,
                             notification_ar: `لقد حصلت علي كاش باك من ٤٩.${getStep.step} `
                         }
@@ -3396,6 +3436,7 @@ let makeRequest = async (req, res) => {
                         user: req.user.id,
                         amount: getStep.step,
                         type: 1000,
+                        taps: 1,
                         notification_en: `You have got ${getStep.step} as cashback from 49.`,
                         notification_ar: `لقد حصلت علي كاش باك من ٤٩.${getStep.step} `
                     }
@@ -3440,6 +3481,7 @@ let makeRequest = async (req, res) => {
                         user: req.user.id,
                         amount: getStep.step,
                         type: 1000,
+                        taps: 1,
                         notification_en: `You have got ${getStep.step} as cashback from 49.`,
                         notification_ar: `لقد حصلت علي كاش باك من ٤٩.${getStep.step} `
                     }

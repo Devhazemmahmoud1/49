@@ -222,6 +222,7 @@ let register = async (req, res) => {
                         message_ar: notify.message_ar,
                         is_read: 0,
                         type: 10,
+                        taps: 1,
                     }
                 })
             }
@@ -481,6 +482,8 @@ let register = async (req, res) => {
                     is_read: 0,
                     direction: 0,
                     type: 10,
+                    taps: 1,
+                    taps: 1,
                 }
             })
 

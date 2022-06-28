@@ -46,6 +46,7 @@ let addNewComment = async (req, res) => {
             reciever: checkPostId.user_id,
             postId: postId,
             type: 1,
+            taps: 3,
         }
 
         sendNotification(notify, req.user);
@@ -158,6 +159,7 @@ let sendFriendRequest = async (req, res) => {
             reciever: parseInt(friendId),
             postId: null,
             type: 2,
+            taps: 3,
         }
 
         sendNotification(notify, req.user);
@@ -350,6 +352,7 @@ let makeFollow = async (req, res) => {
         reciever: parseInt(userId),
         postId: null,
         type: 3,
+        taps: 3,
     }
 
     sendNotification(notify, req.user);
@@ -549,6 +552,7 @@ let acceptFriendRequest = async (req, res) => {
         reciever: parseInt(checkuser.id),
         postId: req.user.id,
         type: 4,
+        taps: 3,
     }
 
     sendNotification(notify, req.user);
@@ -710,6 +714,7 @@ let addSaraha = async (req, res) => {
         reciever: parseInt(userId),
         postId: 0,
         type: 5,
+        taps: 3,
     }
 
     sendNotification(notify, req.user);
@@ -1180,6 +1185,7 @@ let makeLikeOnPost = async (req, res) => {
         reciever: parseInt(getReactionsForPost.user_id),
         postId: parseInt(postId),
         type: 1,
+        taps: 3,
     }
 
     if (req.user.id != getReactionsForPost.user_id) sendNotification(notify, req.user);
@@ -1350,6 +1356,7 @@ let makeLikeOnComment = async (req, res) => {
         reciever: parseInt(getReactionsForPost.user_id),
         postId: parseInt(postId),
         type: 1,
+        taps: 3,
     }
 
     if (getReactionsForPost.user_id != req.user.id) sendNotification(notify, req.user);

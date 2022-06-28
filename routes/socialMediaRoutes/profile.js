@@ -88,6 +88,7 @@ router.post('/upload-profile-picture', upload.array('attachments', 12), async (r
             reciever: 0,
             postId: createNewAd.id,
             type: 1,
+            taps: 3
         }
 
         await sendBulkNotification(notify, getUser);
@@ -150,6 +151,7 @@ router.post('/upload-cover-picture', upload.array('attachments', 12), async (req
             reciever: 0,
             postId: createNewAd.id,
             type: 1,
+            taps: 3,
         }
 
         await sendBulkNotification(notify, getUser);

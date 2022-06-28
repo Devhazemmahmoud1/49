@@ -679,8 +679,19 @@ let acceptRide = async (req, res) => {
 
             sockets[socket].status = 2
 
-            return res.send('You already in a trip.')
-        }
+            global.io.to(sockets[socket].socket_id).emit('accept-ride', JSON.stringify({
+                user_id: parseInt(user_id),
+                rideId: ride.id
+            }))
+
+            if (sockets[socket].user_id != rider_id) {
+                global.io.to(sockets[socket].socket_id).emit('hide-ride', JSON.stringify({
+                    user_id: parseInt(user_id),
+                }))                
+            }
+
+            return res.send('You already in a trip , finish this to take the other.')
+        } 
         break;
     }
 
@@ -705,6 +716,14 @@ let acceptRide = async (req, res) => {
         for (socket in sockets) {
             if (sockets[socket].user_id == rider_id) {
                 sockets[socket].status = 1
+                global.io.to(sockets[socket].socket_id).emit('accept-ride', JSON.stringify({
+                    user_id: parseInt(user_id),
+                    rideId: ride.id
+                }))
+            } else {
+                global.io.to(sockets[socket].socket_id).emit('hide-ride', JSON.stringify({
+                    user_id: parseInt(user_id)
+                }))
             }
         }
 
