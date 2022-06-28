@@ -663,16 +663,17 @@ let acceptRide = async (req, res) => {
                 data: {
                     client_id: parseInt(user_id),
                     rider_id: parseInt(rider_id),
-                    distance: distance,
-                    tripTime: tripTime,
-                    customerLng: customerLng,
-                    customerlat: customerLat,
-                    destinationLng: destinationLng,
-                    destinationLat: destinationLat,
-                    streetFrom: streetFrom,
-                    streetTo: streetTo,
-                    total: total,
+                    distance: distance.toString(),
+                    tripTime: tripTime.toString(),
+                    customerLng: customerLng.toString(),
+                    customerlat: customerLat.toString(),
+                    destinationLng: destinationLng.toString(),
+                    destinationLat: destinationLat.toString(),
+                    streetFrom: streetFrom.toString(),
+                    streetTo: streetTo.toString(),
+                    total: parseInt(total),
                     isPendding: 1,
+                    isDone: 0,
                 }
             })
 
@@ -689,15 +690,15 @@ let acceptRide = async (req, res) => {
             data: {
                 client_id: parseInt(user_id),
                 rider_id: parseInt(rider_id),
-                distance: distance,
-                tripTime: tripTime,
-                customerLng: customerLng,
-                customerlat: customerLat,
-                destinationLng: destinationLng,
-                destinationLat: destinationLat,
-                streetFrom: streetFrom,
-                streetTo: streetTo,
-                total: total,
+                distance: distance.toString(),
+                tripTime: tripTime.toString(),
+                customerLng: customerLng.toString(),
+                customerlat: customerLat.toString(),
+                destinationLng: destinationLng.toString(),
+                destinationLat: destinationLat.toString(),
+                streetFrom: streetFrom.toString(),
+                streetTo: streetTo.toString(),
+                total: parseInt(total),
             }
         })
 
