@@ -404,7 +404,7 @@ io.use(async (socket, next) => {
 
 
       if (checkTrip && checkTrip.isDone == 0 && checkTrip.isPendding != 1) {
-        socket.to(socket.socket_id).emit('current-trip', JSON.stringify({
+        io.to(socket.socket_id).emit('current-trip', JSON.stringify({
           user_id: parseInt(getUserInfo.id),
           rideId: checkTrip.id,
           rider_id: parseInt(checkTrip.rider_id),
@@ -422,7 +422,7 @@ io.use(async (socket, next) => {
       }
 
       if (checkTrip && checkTrip.isDone == 0 && checkTrip.isPendding == 1) {
-        socket.to(socket.socket_id).emit('current-trip', JSON.stringify({
+        io.to(socket.socket_id).emit('current-trip', JSON.stringify({
           user_id: parseInt(getUserInfo.id),
           rideId: checkTrip.id,
           rider_id: parseInt(checkTrip.rider_id),
@@ -441,7 +441,7 @@ io.use(async (socket, next) => {
 
       if (!checkTrip || checkTrip.isDone == 1 && checkTrip.isPendding == 0) {
 
-        socket.io.to(socket.socket_id).emit('current-trip', JSON.stringify({
+        io.io.to(socket.socket_id).emit('current-trip', JSON.stringify({
             test: "test"
         }))
 
