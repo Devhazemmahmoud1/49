@@ -441,7 +441,7 @@ io.use(async (socket, next) => {
 
       if (!checkTrip || checkTrip.isDone == 1 && checkTrip.isPendding == 0) {
 
-        io.io.to(socket.socket_id).emit('current-trip', JSON.stringify({
+        io.to(socket.socket_id).emit('current-trip', JSON.stringify({
             test: "test"
         }))
 
