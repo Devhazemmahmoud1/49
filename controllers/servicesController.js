@@ -2678,7 +2678,7 @@ let makeRequest = async (req, res) => {
 
                                 return res.status(200).send('4542332323254');
                             } else {
-                                if (parseInt(requestcb) - parseInt(getStep.step) >= 0) {
+                                if (parseInt(any) - parseInt(getStep.step) >= 0) {
                                     await db.cashBackStorage.update({
                                         where: {
                                             id: 1
