@@ -715,7 +715,7 @@ let acceptRide = async (req, res) => {
                 streetFrom: streetFrom.toString(),
                 streetTo: streetTo.toString(),
                 total: parseInt(total),
-                driverInfo: driverInformation(rider_id)
+                driverInfo: await driverInformation(rider_id)
             }))
 
             return res.send('You already in a trip , finish this to take the other.')
@@ -778,7 +778,7 @@ let acceptRide = async (req, res) => {
                     streetFrom: streetFrom.toString(),
                     streetTo: streetTo.toString(),
                     total: parseInt(total),
-                    driverInfo: driverInformation(rider_id)
+                    driverInfo: await driverInformation(rider_id)
                 }))               
             }
         }
@@ -1215,15 +1215,13 @@ let driverInformation = async (riderId) => {
         }
       })
 
-      var driver = {
+      return  {
         totalTrips: riderTotalTrips,
         totalRate: driverRate,
         riderPhoto: userInfo.profilePicture,
         riderName: userInfo.firstName,
         carInfo: info
       }
-
-      return driver
     }
 
 
@@ -1244,4 +1242,5 @@ module.exports = {
     deleteRider,
     ridersDashBoard,
     modifyPriceRange,
+    driverInformation
 }
