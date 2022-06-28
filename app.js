@@ -302,6 +302,7 @@ io.on('connection', async (socket) => {
       rider_id: riderId,
       user_id: userId,
       price: price,
+      userType: userType,
       distance: distance,
       userType: userType,
       streetFrom: From,
