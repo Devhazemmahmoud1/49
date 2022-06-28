@@ -120,7 +120,7 @@ let userNotification = async (req, res) => {
                 is_read: 0,
             },
             _count: {
-                is_read: true,
+                id: true,
             }
         }),
     })
@@ -138,7 +138,7 @@ let recentUnreadNotifications = async (req, res) => {
             is_read: 0,
         },
         _count: {
-            is_read: true,
+            id: true,
         }
     })
 
