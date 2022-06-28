@@ -237,7 +237,6 @@ let findRiders = async (req, res) => {
                                 destinationLat: destinationLat,
                                 destinationLng: destinationLng,
                                 tripTime: tripTime,
-                                driverInfo: null,
                                 freeRide: null
                             }));
 
@@ -307,7 +306,6 @@ let findRiders = async (req, res) => {
                                 destinationLat: destinationLat,
                                 destinationLng: destinationLng,
                                 tripTime: tripTime,
-                                driverInfo: null,
                                 freeRide: 1
                             }));
 
