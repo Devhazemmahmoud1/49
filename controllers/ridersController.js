@@ -646,7 +646,7 @@ let acceptRide = async (req, res) => {
         !distance ||
         !tripTime ||
         !customerLng ||
-        !customerlat ||
+        !customerLat ||
         !destinationLat ||
         !destinationLng ||
         !streetFrom ||
@@ -666,7 +666,7 @@ let acceptRide = async (req, res) => {
                     distance: distance,
                     tripTime: tripTime,
                     customerLng: customerLng,
-                    customerlat: customerlat,
+                    customerlat: customerLat,
                     destinationLng: destinationLng,
                     destinationLat: destinationLat,
                     streetFrom: streetFrom,
