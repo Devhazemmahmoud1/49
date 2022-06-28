@@ -53,16 +53,14 @@ let getMyProfile = async (req, res) => {
             }
         })
     
-        let MainCategory = await db.mainCategories.findFirst({
+        var MainCategory = await db.mainCategories.findFirst({
             where: {
                 id: parseInt(subCategory.parent)
             }
         })
     } else {
-        let MainCategory = null
+        var MainCategory = null
     }
-
-
 
     return res.status(200).json({
         userInfo: req.user,
