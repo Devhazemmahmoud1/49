@@ -196,13 +196,15 @@ io.on('connection', async (socket) => {
     var price = JSON.parse(data).price
     var distance = JSON.parse(data).distance
     var userType = JSON.parse(data).userType
-    var From = JSON.parse(data).destinationFrom
-    var To = JSON.parse(data).destinationTo
+    var From = JSON.parse(data).streetFrom
+    var To = JSON.parse(data).streetTo
     var lat = JSON.parse(data).customerLat
     var lng = JSON.parse(data).customerLng
     var destinationLat = JSON.parse(data).destinationLat
     var destinationLng = JSON.parse(data).destinationLng
     var tripTime = JSON.parse(data).tripTime
+
+    console.log(From, total1Star)
 
     for (socket in sockets) {
       if (sockets[socket].user_id == JSON.parse(data).user_id) {
@@ -302,7 +304,6 @@ io.on('connection', async (socket) => {
       rider_id: riderId,
       user_id: userId,
       price: price,
-      userType: userType,
       distance: distance,
       userType: userType,
       streetFrom: From,

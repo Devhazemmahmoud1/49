@@ -148,7 +148,7 @@ let findRiders = async (req, res) => {
                                 continue;
                             }
                         }
-
+                        
                         global.io.to(sockets[rider].socket_id).emit('request', JSON.stringify({
                             rider_id: sockets[rider].user_id,
                             user_id: req.user.id,
