@@ -1175,8 +1175,6 @@ let makeRequest = async (req, res) => {
             }
         })
 
-        var getStep = await db.cashBackStep.findFirst();
-
         var totalStepsOfToday = await db.dailyCashBack.findMany({
             where: {
                 user_id: req.user.id,
