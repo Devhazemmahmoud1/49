@@ -184,11 +184,9 @@ io.on('connection', async (socket) => {
       } else {
         sockets[socket.id] = userInfo
         console.log('passed Here Please')
-        console.log(sockets)
+        console.log(sockets[socket.id])
       }
-
-      console.log('this is the sockets info')
-      console.log(sockets)
+      console.log(sockets[socket.id])
     }
   }
 
@@ -203,8 +201,6 @@ io.on('connection', async (socket) => {
     var destinationLat = JSON.parse(data).destinationLat
     var destinationLng = JSON.parse(data).destinationLng
     var tripTime = JSON.parse(data).tripTime
-
-    console.log(From, To)
 
     for (socket in sockets) {
       if (sockets[socket].user_id == JSON.parse(data).user_id) {
@@ -321,45 +317,6 @@ io.on('connection', async (socket) => {
 
   })
 
-  // socket.on('userRequestAnotherPrice', (data) => {
-
-  //   var distance = JSON.parse(data).distance
-  //   var userType = JSON.parse(data).userType
-  //   var From = JSON.parse(data).destinationFrom
-  //   var To = JSON.parse(data).destinationTo
-  //   var lat = JSON.parse(data).customerLat
-  //   var lng = JSON.parse(data).customerLng
-  //   var destinationLat = JSON.parse(data).destinationLat
-  //   var destinationLng = JSON.parse(data).destinationLng
-  //   var tripTime = JSON.parse(data).tripTime
-
-  //   for (socket in sockets) {
-  //     if (sockets[socket].user_id == JSON.parse(data).riderId) {
-  //       var requestTo = sockets[socket].socket_id
-  //     }
-  //   }
-
-  //   io.to(requestTo).emit('request', JSON.stringify(
-  //     {
-  //       user_id: JSON.parse(data).user_id,
-  //       riderId: JSON.parse(data).riderId,
-  //       price: JSON.parse(data).price ?? 50,
-  //       message_ar: `قام test بطلب رحله من ... الي ... بسعر 50 جنيه`,
-  //       message_en: 'test  Has requested a ride from ' + From + ' to' + To  + ' for 50 L.E',
-  //       distance: distance ? distance + ' KiloMeters' : 'Unknown',
-  //       userType: userType,
-  //       destinationFrom: From,
-  //       destinationTo: To,
-  //       customerLng: lng,
-  //       customerLat: lat,
-  //       destinationLat: destinationLat,
-  //       destinationLng: destinationLng,
-  //       tripTime: tripTime,
-  //       freeRide: JSON.parse(data).freeRide
-  //     }
-  //   ))
-  // })
-
   socket.on('disconnect', () => {
     console.log(socket.id + ' is out from here')
     delete sockets[socket.id]
@@ -436,6 +393,15 @@ io.use(async (socket, next) => {
           created_at: 'desc'
         }
       })
+
+      if (checkTrip) {
+        let getUserInfo = await db.users.findFirst({
+          where: {
+            id: checkTrip.client_id
+          }
+        })
+      }
+
 
       if (checkTrip && checkTrip.isDone == 0 && checkTrip.isPendding != 1) {
         socket.status = 1

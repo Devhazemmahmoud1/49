@@ -681,7 +681,18 @@ let acceptRide = async (req, res) => {
 
             global.io.to(sockets[socket].socket_id).emit('accept-ride', JSON.stringify({
                 user_id: parseInt(user_id),
-                rideId: ride.id
+                rideId: ride.id,
+                rider_id: parseInt(rider_id),
+                distance: distance.toString(),
+                tripTime: tripTime.toString(),
+                customerLng: customerLng.toString(),
+                customerlat: customerLat.toString(),
+                destinationLng: destinationLng.toString(),
+                destinationLat: destinationLat.toString(),
+                streetFrom: streetFrom.toString(),
+                streetTo: streetTo.toString(),
+                total: parseInt(total),
+                
             }))
 
             if (sockets[socket].user_id != rider_id) {
@@ -718,7 +729,17 @@ let acceptRide = async (req, res) => {
                 sockets[socket].status = 1
                 global.io.to(sockets[socket].socket_id).emit('accept-ride', JSON.stringify({
                     user_id: parseInt(user_id),
-                    rideId: ride.id
+                    rideId: ride.id,
+                    rider_id: parseInt(rider_id),
+                    distance: distance.toString(),
+                    tripTime: tripTime.toString(),
+                    customerLng: customerLng.toString(),
+                    customerlat: customerLat.toString(),
+                    destinationLng: destinationLng.toString(),
+                    destinationLat: destinationLat.toString(),
+                    streetFrom: streetFrom.toString(),
+                    streetTo: streetTo.toString(),
+                    total: parseInt(total),
                 }))
             } else {
                 global.io.to(sockets[socket].socket_id).emit('hide-ride', JSON.stringify({
@@ -1089,6 +1110,7 @@ let modifyPriceRange = async (req, res) => {
         }
     })
 }
+
 
 
 module.exports = {

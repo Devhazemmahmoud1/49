@@ -17,6 +17,7 @@ let sendNotification = async (notify, user) => {
                 type: notify.type,
                 direction: notify.postId ?? 0,
                 is_read: 0,
+                taps: notify.taps
             }
         })
 
@@ -78,6 +79,7 @@ let sendBulkNotification = async (notify, user) => {
                     type: notify.type,
                     direction: notify.postId ?? 0,
                     is_read: 0,
+                    taps: notify.taps
                 }
             })
 
@@ -131,6 +133,7 @@ let sendBulkNotification = async (notify, user) => {
                     type: notify.type,
                     direction: notify.postId ?? 0,
                     is_read: 0,
+                    taps: notify.taps
                 }
             })
         }
