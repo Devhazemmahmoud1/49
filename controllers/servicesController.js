@@ -2485,7 +2485,7 @@ let makeRequest = async (req, res) => {
                                     await db.dailyCashBack.create({
                                         data: {
                                             user_id: req.user.id,
-                                            amount: getStep.amount
+                                            amount: getStep.step
                                         }
                                     })
 
@@ -2614,7 +2614,7 @@ let makeRequest = async (req, res) => {
                                     await db.dailyCashBack.create({
                                         data: {
                                             user_id: req.user.id,
-                                            amount: getStep.amount
+                                            amount: getStep.step
                                         }
                                     })
 
@@ -2640,7 +2640,7 @@ let makeRequest = async (req, res) => {
                             }
                         } else if (request == 3) {
                             let any = getStorage.anyCashBack
-                            let getStep = await db.cashBackStep.findFirst({})
+                            var getStep = await db.cashBackStep.findFirst({})
                             if (parseInt(any) <= 0) {
                                 await db.wallet.update({
                                     where: {
@@ -2741,7 +2741,7 @@ let makeRequest = async (req, res) => {
                                     await db.dailyCashBack.create({
                                         data: {
                                             user_id: req.user.id,
-                                            amount: getStep.amount
+                                            amount: getStep.step
                                         }
                                     })
 
