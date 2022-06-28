@@ -135,7 +135,7 @@ let recentUnreadNotifications = async (req, res) => {
     let count = await db.notifications.aggregate({
         where: {
             reciever_id: req.user.id,
-            is_read: 1,
+            is_read: 0,
         },
         _count: {
             is_read: true,
