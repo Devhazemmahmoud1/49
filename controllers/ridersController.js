@@ -104,7 +104,7 @@ let findRiders = async (req, res) => {
                         && sockets[rider].currentLocation.lng != ''
                         && sockets[rider].isApproved != 0
                         && sockets[rider].status != 2) {
-
+                        console.log(21212)
                         console.log('a preium user is looking for riders')
 
                         if (drivers.includes(sockets[rider].user_id)) continue;
@@ -206,7 +206,7 @@ let findRiders = async (req, res) => {
                         && sockets[rider1].currentLocation.lng != ''
                         && sockets[rider1].isApproved != 0
                         && sockets[rider1].status != 2) {
-
+                            console.log(21212)
                         console.log(sockets[rider1].user_id)
                         console.log('passed here')
 
