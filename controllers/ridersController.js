@@ -715,6 +715,7 @@ let acceptRide = async (req, res) => {
                 streetFrom: streetFrom.toString(),
                 streetTo: streetTo.toString(),
                 total: parseInt(total),
+                driverInfo: driverInformation(rider_id)
             }))
 
             return res.send('You already in a trip , finish this to take the other.')
@@ -777,6 +778,7 @@ let acceptRide = async (req, res) => {
                     streetFrom: streetFrom.toString(),
                     streetTo: streetTo.toString(),
                     total: parseInt(total),
+                    driverInfo: driverInformation(rider_id)
                 }))               
             }
         }
@@ -1144,6 +1146,85 @@ let modifyPriceRange = async (req, res) => {
     })
 }
 
+let driverInformation = async (riderId) => {
+    let riderTotalTrips = await db.ridesRequested.aggregate({
+        where: {
+          rider_id: riderId,
+          isDone: 1,
+        },
+        _count: {
+          id: true
+        }
+      })
+
+      let riders5StarRating = await db.ridesRatesAndComments.count({
+        where: {
+          rideId: riderId,
+          rideRate: 5
+        }
+      })
+
+      let riders4StarRating = await db.ridesRatesAndComments.count({
+        where: {
+          rideId: riderId,
+          rideRate: 4
+        }
+      })
+
+      let riders3StarRating = await db.ridesRatesAndComments.count({
+        where: {
+          rideId: riderId,
+          rideRate: 3
+        }
+      })
+
+      let riders2StarRating = await db.ridesRatesAndComments.count({
+        where: {
+          rideId: riderId,
+          rideRate: 2
+        }
+      })
+
+      let riders1StarRating = await db.ridesRatesAndComments.count({
+        where: {
+          rideId: riderId,
+          rideRate: 1
+        }
+      })
+
+      let driverRate = calculateRate(riders5StarRating ?? 0,
+        riders4StarRating ?? 0,
+        riders3StarRating ?? 0,
+        riders2StarRating ?? 0,
+        riders1StarRating ?? 0
+      )
+
+      var userInfo = await db.users.findFirst({
+        where: {
+          id: parseInt(riderId)
+        },
+        select: {
+          profilePicture: true,
+          firstName: true,
+        }
+      })
+
+      let info = await db.ride.findFirst({
+        where: {
+          user_id: parseInt(riderId)
+        }
+      })
+
+      var driver = {
+        totalTrips: riderTotalTrips,
+        totalRate: driverRate,
+        riderPhoto: userInfo.profilePicture,
+        riderName: userInfo.firstName,
+        carInfo: info
+      }
+
+      return driver
+    }
 
 
 module.exports = {
