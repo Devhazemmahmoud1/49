@@ -205,12 +205,12 @@ io.on('connection', async (socket) => {
     var tripTime = JSON.parse(data).tripTime
 
     for (socket in sockets) {
-      if (sockets[socket].user_id == JSON.parse(data).userId) {
+      if (sockets[socket].user_id == JSON.parse(data).user_id) {
         var requestTo = sockets[socket].socket_id
         var userId = sockets[socket].user_id
       }
 
-      if (sockets[socket].user_id == JSON.parse(data).riderId) {
+      if (sockets[socket].user_id == JSON.parse(data).rider_id) {
         var requestFrom = sockets[socket].user_id
         var riderId = sockets[socket].user_id
 
@@ -299,7 +299,7 @@ io.on('connection', async (socket) => {
     }
 
     io.to(requestTo).emit('agent-new-changed-price', JSON.stringify({
-      riderId: riderId,
+      rider_id: riderId,
       user_id: userId,
       price: price,
       distance: distance,
