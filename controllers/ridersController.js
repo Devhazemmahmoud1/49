@@ -150,6 +150,7 @@ let findRiders = async (req, res) => {
                         }
 
                         global.io.to(sockets[rider].socket_id).emit('request', JSON.stringify({
+                            rider_id: sockets[rider].user_id,
                             user_id: req.user.id,
                             price: price ?? 0,
                             user_name: req.user.firstName,
@@ -224,10 +225,9 @@ let findRiders = async (req, res) => {
                             if (sockets[rider1].user_id == req.user.id) continue;
 
                             global.io.to(sockets[rider1].socket_id).emit('request', JSON.stringify({
-                                user_id: req.user.id,
+                                rider_id: sockets[rider1].user_id,
                                 user_id: req.user.id,
                                 price: price ?? 0,
-                
                                 distance: distance,
                                 userType: userType,
                                 destinationFrom: From,
@@ -295,7 +295,7 @@ let findRiders = async (req, res) => {
                             }
 
                             global.io.to(sockets[rider1].socket_id).emit('request', JSON.stringify({
-                                user_id: req.user.id,
+                                rider_id: sockets[rider1].user_id,
                                 user_id: req.user.id,
                                 price: (parseInt(price) + 20) ?? 0,
                                 distance: distance,
