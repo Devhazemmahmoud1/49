@@ -315,6 +315,25 @@ io.on('connection', async (socket) => {
 
     console.log('event emitted')
 
+    socket.on('request-location', (data) => {
+      let sender = JSON.parse(data).sender_id
+      let receiver = JSON.parse(data).receiver_id
+      let lng = JSON.parse(data).lng
+      let lat = JSON.parse(data).lat 
+
+      for (rider in sockets) {
+        if (sockets[rider].user_id == receiver) {
+          io.to(sockets[rider].socket_id).emit('get-location', JSON.stringify({
+            lng: lng, 
+            lat: lat,
+            sender_id: sender,
+            receiver_id: receiver
+          }))
+        }
+      }
+
+    })
+
   })
 
   socket.on('disconnect', () => {

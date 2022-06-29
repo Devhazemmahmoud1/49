@@ -82,7 +82,7 @@ var addRider = async (request, response) => {
 
 /* Find drivers around 5 KMs */
 let findRiders = async (req, res) => {
-    const { userType, From, To, distance, price, lat, lng, destinationLng, destinationLat, tripTime, isFast } = req.query;
+    const { userType, From, To, distance, price, lat, lng, destinationLng, destinationLat, tripTime, isFast, } = req.query;
 
     var drivers = [];
 
@@ -154,7 +154,7 @@ let findRiders = async (req, res) => {
                             user_id: req.user.id,
                             price: price ?? 0,
                             user_name: req.user.firstName,
-                            distance: distance ,
+                            distance: distance,
                             userType: userType,
                             streetFrom: From,
                             streetTo: To,
@@ -206,7 +206,7 @@ let findRiders = async (req, res) => {
                         && sockets[rider1].currentLocation.lng != ''
                         && sockets[rider1].isApproved != 0
                         && sockets[rider1].status != 2) {
-                            console.log(21212)
+                        console.log(21212)
                         console.log(sockets[rider1].user_id)
                         console.log('passed here')
 
@@ -655,7 +655,7 @@ let acceptRide = async (req, res) => {
         !total
     )
 
-        return res.status(403).send('Something went wrong'); 
+        return res.status(403).send('Something went wrong');
 
     for (socket in sockets) {
         if (sockets[socket].user_id == rider_id && sockets[socket].status == 1) {
@@ -693,33 +693,36 @@ let acceptRide = async (req, res) => {
                 streetFrom: streetFrom.toString(),
                 streetTo: streetTo.toString(),
                 total: parseInt(total),
-                
+
             }))
 
             if (sockets[socket].user_id != rider_id) {
                 global.io.to(sockets[socket].socket_id).emit('hide-ride', JSON.stringify({
                     user_id: parseInt(user_id),
-                }))                
+                }))
             }
 
-            global.io.to(sockets[socket].socket_id).emit('current-trip', JSON.stringify({
-                user_id: parseInt(user_id),
-                rideId: ride.id,
-                rider_id: parseInt(rider_id),
-                distance: distance.toString(),
-                tripTime: tripTime.toString(),
-                customerLng: customerLng.toString(),
-                customerlat: customerLat.toString(),
-                destinationLng: destinationLng.toString(),
-                destinationLat: destinationLat.toString(),
-                streetFrom: streetFrom.toString(),
-                streetTo: streetTo.toString(),
-                total: parseInt(total),
-                driverInfo: await driverInformation(rider_id)
-            }))
+            if (sockets[socket].user_id == req.user.id) {
+                global.io.to(sockets[socket].socket_id).emit('current-trip', JSON.stringify({
+                    user_id: parseInt(user_id),
+                    rideId: ride.id,
+                    rider_id: parseInt(rider_id),
+                    distance: distance.toString(),
+                    tripTime: tripTime.toString(),
+                    customerLng: customerLng.toString(),
+                    customerlat: customerLat.toString(),
+                    destinationLng: destinationLng.toString(),
+                    destinationLat: destinationLat.toString(),
+                    streetFrom: streetFrom.toString(),
+                    streetTo: streetTo.toString(),
+                    total: parseInt(total),
+                    driverInfo: await driverInformation(rider_id)
+                }))
+
+            }
 
             return res.send('You already in a trip , finish this to take the other.')
-        } 
+        }
         break;
     }
 
@@ -779,7 +782,7 @@ let acceptRide = async (req, res) => {
                     streetTo: streetTo.toString(),
                     total: parseInt(total),
                     driverInfo: await driverInformation(rider_id)
-                }))               
+                }))
             }
         }
 
@@ -1149,80 +1152,80 @@ let modifyPriceRange = async (req, res) => {
 let driverInformation = async (riderId) => {
     let riderTotalTrips = await db.ridesRequested.aggregate({
         where: {
-          rider_id: riderId,
-          isDone: 1,
+            rider_id: riderId,
+            isDone: 1,
         },
         _count: {
-          id: true
+            id: true
         }
-      })
+    })
 
-      let riders5StarRating = await db.ridesRatesAndComments.count({
+    let riders5StarRating = await db.ridesRatesAndComments.count({
         where: {
-          rideId: riderId,
-          rideRate: 5
+            rideId: riderId,
+            rideRate: 5
         }
-      })
+    })
 
-      let riders4StarRating = await db.ridesRatesAndComments.count({
+    let riders4StarRating = await db.ridesRatesAndComments.count({
         where: {
-          rideId: riderId,
-          rideRate: 4
+            rideId: riderId,
+            rideRate: 4
         }
-      })
+    })
 
-      let riders3StarRating = await db.ridesRatesAndComments.count({
+    let riders3StarRating = await db.ridesRatesAndComments.count({
         where: {
-          rideId: riderId,
-          rideRate: 3
+            rideId: riderId,
+            rideRate: 3
         }
-      })
+    })
 
-      let riders2StarRating = await db.ridesRatesAndComments.count({
+    let riders2StarRating = await db.ridesRatesAndComments.count({
         where: {
-          rideId: riderId,
-          rideRate: 2
+            rideId: riderId,
+            rideRate: 2
         }
-      })
+    })
 
-      let riders1StarRating = await db.ridesRatesAndComments.count({
+    let riders1StarRating = await db.ridesRatesAndComments.count({
         where: {
-          rideId: riderId,
-          rideRate: 1
+            rideId: riderId,
+            rideRate: 1
         }
-      })
+    })
 
-      let driverRate = calculateRate(riders5StarRating ?? 0,
+    let driverRate = calculateRate(riders5StarRating ?? 0,
         riders4StarRating ?? 0,
         riders3StarRating ?? 0,
         riders2StarRating ?? 0,
         riders1StarRating ?? 0
-      )
+    )
 
-      var userInfo = await db.users.findFirst({
+    var userInfo = await db.users.findFirst({
         where: {
-          id: parseInt(riderId)
+            id: parseInt(riderId)
         },
         select: {
-          profilePicture: true,
-          firstName: true,
+            profilePicture: true,
+            firstName: true,
         }
-      })
+    })
 
-      let info = await db.ride.findFirst({
+    let info = await db.ride.findFirst({
         where: {
-          user_id: parseInt(riderId)
+            user_id: parseInt(riderId)
         }
-      })
+    })
 
-      return  {
+    return {
         totalTrips: riderTotalTrips,
         totalRate: driverRate,
         riderPhoto: userInfo.profilePicture,
         riderName: userInfo.firstName,
         carInfo: info
-      }
     }
+}
 
 
 module.exports = {
