@@ -316,6 +316,7 @@ io.on('connection', async (socket) => {
     console.log('event emitted')
 
     socket.on('request-location', (data) => {
+      console.log(data)
       let sender = JSON.parse(data).sender_id
       let receiver = JSON.parse(data).receiver_id
       let lng = JSON.parse(data).lng
