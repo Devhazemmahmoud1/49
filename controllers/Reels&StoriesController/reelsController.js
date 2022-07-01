@@ -718,6 +718,48 @@ let getViewedPeople = async (req, res) => {
 
 }
 
+/* share a post */
+let shareThisReel = async (req, res) => {
+    const { id } = req.body
+
+    if (!id) {
+        return res.status(403).send('ID must be provided')
+    }
+
+    let checkReel = await db.reels.findFirst({
+        where: {
+            id: parseInt(id)
+        }
+    })
+
+    if (! checkReel) {
+        return res.status(403).send('Reel is not available')
+    }
+
+    try {
+        let addShare = await db.reels.update({
+            where: {
+                id: parseInt(id)
+            }, 
+            data: {
+                shareThisReel: parseInt(checkReel.totalShares) + 1
+            }
+        })
+
+        if (addShare) {
+            return res.json({
+                success: {
+                    success_en: 'Reel has been shared.',
+                    success_ar: 'تم نشر هذا الريل.'
+                }
+            })
+        }
+
+    } catch (e) {
+        console.log(e)
+    }
+}
+
 module.exports = {
     deleteReel,
     getOneReel,
@@ -730,5 +772,6 @@ module.exports = {
     getMyStories,
     getUserStories,
     getLikedPeople,
-    getViewedPeople
+    getViewedPeople,
+    shareThisReel
 }

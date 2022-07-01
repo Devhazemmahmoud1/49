@@ -846,6 +846,7 @@ model reels {
   videoDuration Int
   totalViews    Int         @default(0)
   totalLikes    Int         @default(0)
+  totalShares   Int         @default(0)
   song_id       Int         @unique
   //songs         songs[]
   type          Int         @default(1)

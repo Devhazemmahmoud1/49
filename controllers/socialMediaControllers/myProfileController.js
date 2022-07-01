@@ -106,14 +106,6 @@ let getMyProfile = async (req, res) => {
                 is_read: true,
             }
         }),
-        // rideRegForm: await db.ride.findFirst({
-        //     where: {
-        //         user_id: req.user.id
-        //     },
-        //     include: {
-        //         riderPhoto: true
-        //     }
-        // }),
         subscriptions: getSubscriptions,
         businessProvider: MainCategory
     })
@@ -316,9 +308,9 @@ let createPost = async (req, res) => {
                 feeling_id: feeling != null ? parseInt(feeling) : 0,
                 activity_id: activity != null ? parseInt(activity) : 0,
                 location: location ?? '',
-                privacy: parseInt(privacy),
-                lat: lat ?? '',
-                lng: lng ?? '',
+                privacy: parseInt(privacy) != null ? parseInt(privacy) : 0,
+                lat: lat != null ? lat : '',
+                lng: lng != null ? lng : '',
                 type: parseInt(type) ?? 0
             }
         })
@@ -731,6 +723,7 @@ let getMainPage = async (req, res) => {
 
     if (!page) page = 1
     let posts = []
+    let ids = []
     let uniquePosts = []
 
 
@@ -769,25 +762,68 @@ let getMainPage = async (req, res) => {
         },
     })
 
+    for (item of getMyFollowing) {
+        if (item.user.userPrivacy[6] == 0) continue;
+        posts.push(item.user.posts)
+    }
+
     for (items of getMyFriends) {
-        //console.log(item.user.posts)
-        items.user.posts['userInfo'] = await db.users.findFirst({
+
+        if (items.user.userPrivacy[6] == 0) continue;
+        posts.push(items.user.posts)
+    }
+
+    let finalPosts = [].concat.apply([], posts)
+
+    let postsWithsPrivacyFilter = finalPosts.filter( (result) => {
+         return result.privacy > 0
+    })
+
+    for (item of postsWithsPrivacyFilter) {
+        console.log(item.id)
+        if (ids.includes(item.id)) continue;
+
+        item.feeling = await db.postFeelings.findFirst({
             where: {
-                id: items.user.posts.user_id
+                id: item.feeling_id
             }
         })
 
-        console.log(items.user.posts.userInfo)
-        console.log(items)
-        posts.push(items)
+        item.userInfo = await db.users.findFirst({
+            where: {
+                id: item.user_id
+            },
+            select: {
+                id: true,
+                firstName: true,
+                lastName: true,
+                profilePicture: true,
+            }
+        })
+
+        item.activity = (await db.postActivity.findFirst({
+            where: {
+                id: item.activity_id
+            }
+        }))
+
+        // get reacted or not.
+        item.isReacted = (await db.reactions.findFirst({
+            where: {
+                post_id: parseInt(item.id),
+                comment_id: 0,
+                user_id: req.user.id
+            },
+            select: {
+                type: true,
+            }
+        }))
+
+        ids.push(item.id)
+        uniquePosts.push(item)
     }
 
-    // let filteredFriendsPosts = posts.filter( (result) => {
-    //     console.log(result.user)
-    //     return result.user.userPrivacy[6].status > 0
-    // })
-
-    return res.status(200).json(posts)
+    return res.status(200).json(uniquePosts)
 }
 
 let getMyGalary = async (req, res) => {

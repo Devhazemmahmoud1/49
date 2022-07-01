@@ -176,4 +176,6 @@ router.get('/people/who/liked/myReel/:id', guard, autoCatch(reels.getLikedPeople
 /*  */
 router.get('/get/views/of/myReel/:id', guard, autoCatch(reels.getViewedPeople))
 
+router.post('/increase-total-shares/for-reel', guard, autoCatch( reels.shareThisReel ))
+
 module.exports = router

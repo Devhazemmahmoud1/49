@@ -63,6 +63,10 @@ router.get('/calculate-distance/per-kilo/:distance/:subCategory', autoCatch( rid
 /* This route is for accepting rides requests */
 router.post('/accept-ride', guard, autoCatch( ride.acceptRide))
 
+router.post('/end-ride', guard, autoCatch( ride.endRide ))
+
+router.post('/cancel-ride', guard, autoCatch( ride.cancelRide ))
+
 /* Customers APIs  */
 router.post('/post-comment-and-rating/for-customer', guard, autoCatch( ride.customerFeedBack ))
 
