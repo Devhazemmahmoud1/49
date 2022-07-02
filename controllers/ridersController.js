@@ -903,7 +903,58 @@ let cancelTrip = async (req , res) => {
 
     if (! id) return res.status(403).send('No ID provided')
 
-    // check if this 
+    // check if this trip exsits 
+    let trip = await db.ridesRequested.findFirst({
+        where: {
+            id: parseInt(id),
+            isDone: 0,
+        }
+    })
+
+    if (! trip) return res.status(403).send('Trip was not found')
+
+    try {
+
+        let cancelThisTrip = await db.ridesRequested.update({
+            where: {
+                id: parseInt(id)
+            },
+            data: {
+                isDone: 3,
+                isPendding: 0,
+            }
+        })
+
+        if (cancelThisTrip) {
+
+            if (trip.client_id == req.user.id) {
+                // this is the client who cancled the trip
+                for (socket in sockets) {
+                    if (sockets[socket].user_id == trip.rider_id) {
+                        global.io.to(sockets[socket].socket_id).emit('cancel-ride', JSON.stringify({
+                            ride_id: trip.id != null ? trip.id : parseInt(id)
+                        }))
+                        break;
+                    }
+                }
+            } else {
+                for (socket in sockets) {
+                    if (sockets[socket].user_id == trip.client_id) {
+                        global.io.to(sockets[socket].socket_id).emit('cancel-ride', JSON.stringify({
+                            ride_id: trip.id != null ? trip.id : parseInt(id)
+                        }))
+                        break;
+                    }
+                }
+            }
+        }
+
+    } catch (e) {
+        console.log(e)
+    }
+
+    return res.status(200).send('ok')
+
 }
 
 let addFinalDestination = async (req, res) => {
@@ -1257,5 +1308,6 @@ module.exports = {
     deleteRider,
     ridersDashBoard,
     modifyPriceRange,
-    driverInformation
+    driverInformation,
+    cancelTrip
 }
