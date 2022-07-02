@@ -165,6 +165,20 @@ let publicReels = async (req, res) => {
     if (!page) page = 1;
     let maxReels = 20;
 
+    let reels = []
+    let uniqueReels = []
+
+    // get my friendList 
+
+    let getMyFriends = await db.friends.findMany({
+        where: {
+            
+        }
+    })
+
+
+    // get my following
+
     let getMyreelList = await db.reels.findMany({
         where: {
             type: 1

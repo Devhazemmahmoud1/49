@@ -45,7 +45,7 @@ const job = new CronJob("00 00 00 * * *", async () => {
                             id: 1
                         },
                         data: {
-                            likeCashBack: parseInt(cashBackRe) - parseInt(currentReactionPerc)
+                            likeCashBack: (parseInt(cashBackRe) - parseInt(currentReactionPerc)).toString()
                         }
                     })
                     // Update Wallet
@@ -54,7 +54,7 @@ const job = new CronJob("00 00 00 * * *", async () => {
                             user_id: item.id
                         },
                         data: {
-                            balance: (parseInt(item.Wallet.balance) + parseInt(currentReactionPerc)).toString()
+                            balance: ((parseInt(item.Wallet.balance) + parseInt(currentReactionPerc))).toString()
                         }
                     })
 
@@ -64,7 +64,7 @@ const job = new CronJob("00 00 00 * * *", async () => {
                             id: item.id
                         },
                         data: {
-                            recentLikes: item.recentLikes + parseInt(currentReactions)
+                            recentLikes: parseInt(item.recentLikes + parseInt(currentReactions))
                         }
                     })
 
@@ -84,7 +84,7 @@ const job = new CronJob("00 00 00 * * *", async () => {
                             user_id: item.id
                         },
                         data: {
-                            balance: (parseInt(item.Wallet.balance) + parseInt(cashBackRe)).toString()
+                            balance: ((parseInt(item.Wallet.balance) + parseInt(cashBackRe))).toString()
                         }
                     })
 
@@ -133,7 +133,7 @@ const job = new CronJob("00 00 00 * * *", async () => {
                             id: 1
                         },
                         data: {
-                            shareCashBack: parseInt(cashBackSh) - parseInt(currentSharesPerc)
+                            shareCashBack: (parseInt(cashBackSh) - parseInt(currentSharesPerc)).toString()
                         }
                     })
                     // Update Wallet

@@ -134,6 +134,9 @@ let getUserPosts = async (req, res) => {
     });
 
     for (item of getMyPosts) {
+
+        if (item.privacy <= 0) continue;
+
         item.feeling = await db.postFeelings.findFirst({
             where: {
                 id: item.feeling_id
