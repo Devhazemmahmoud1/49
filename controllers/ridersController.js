@@ -664,7 +664,6 @@ let acceptRide = async (req, res) => {
                 data: {
                     client_id: parseInt(user_id),
                     rider_id: parseInt(rider_id),
-                    cleint_name: req.user.firstName,
                     distance: distance.toString(),
                     tripTime: tripTime.toString(),
                     customerLng: customerLng.toString(),
@@ -709,6 +708,7 @@ let acceptRide = async (req, res) => {
                     user_id: parseInt(user_id),
                     rideId: ride.id,
                     rider_id: parseInt(rider_id),
+                    cleint_name: req.user.firstName,
                     distance: distance.toString(),
                     tripTime: tripTime.toString(),
                     customerLng: customerLng.toString(),
@@ -753,6 +753,7 @@ let acceptRide = async (req, res) => {
                     user_id: parseInt(user_id),
                     rideId: ride.id,
                     rider_id: parseInt(rider_id),
+                    cleint_name: req.user.firstName,
                     distance: distance.toString(),
                     tripTime: tripTime.toString(),
                     customerLng: customerLng.toString(),
@@ -774,6 +775,7 @@ let acceptRide = async (req, res) => {
                     user_id: parseInt(user_id),
                     rideId: ride.id,
                     rider_id: parseInt(rider_id),
+                    cleint_name: req.user.firstName,
                     distance: distance.toString(),
                     tripTime: tripTime.toString(),
                     customerLng: customerLng.toString(),
@@ -894,6 +896,14 @@ let endRide = async (req, res) => {
     } catch (e) {
         throw new e
     }
+}
+
+let cancelTrip = async (req , res) => {
+    const { id } = req.body
+
+    if (! id) return res.status(403).send('No ID provided')
+
+    // check if this 
 }
 
 let addFinalDestination = async (req, res) => {
