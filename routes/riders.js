@@ -65,7 +65,7 @@ router.post('/accept-ride', guard, autoCatch( ride.acceptRide))
 
 router.post('/end-ride', guard, autoCatch( ride.endRide ))
 
-router.post('/cancel-ride', guard, autoCatch( ride.cancelRide ))
+router.post('/cancel-ride', guard, autoCatch( ride.cancelTrip ))
 
 /* Customers APIs  */
 router.post('/post-comment-and-rating/for-customer', guard, autoCatch( ride.customerFeedBack ))
@@ -83,6 +83,5 @@ router.get('/rider-dashboard', guard, autoCatch( ride.ridersDashBoard ))
 
 router.post('/change-price-rate', guard, autoCatch( ride.modifyPriceRange ))
 
-router.post('/cancel-ride' , guard, ride.cancelTrip )
 
 module.exports = router
