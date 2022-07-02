@@ -664,6 +664,7 @@ let acceptRide = async (req, res) => {
                 data: {
                     client_id: parseInt(user_id),
                     rider_id: parseInt(rider_id),
+                    cleint_name: req.user.firstName,
                     distance: distance.toString(),
                     tripTime: tripTime.toString(),
                     customerLng: customerLng.toString(),
@@ -684,6 +685,7 @@ let acceptRide = async (req, res) => {
                 user_id: parseInt(user_id),
                 rideId: ride.id,
                 rider_id: parseInt(rider_id),
+                cleint_name: req.user.firstName,
                 distance: distance.toString(),
                 tripTime: tripTime.toString(),
                 customerLng: customerLng.toString(),
