@@ -838,7 +838,7 @@ let startRide = async (req, res) => {
                 }))
             }
         }
-        
+
         return res.send('Ride has started')
     } catch (e) {
         console.log(e)
@@ -1358,5 +1358,6 @@ module.exports = {
     ridersDashBoard,
     modifyPriceRange,
     driverInformation,
-    cancelTrip
+    cancelTrip,
+    startRide
 }
