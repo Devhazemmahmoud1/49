@@ -59,7 +59,7 @@ const job = new CronJob("00 00 00 * * *", async () => {
                     })
 
                     // update new reactions
-                    await db.users.findFirst({
+                    await db.users.update({
                         where: {
                             id: item.id
                         },
@@ -88,7 +88,7 @@ const job = new CronJob("00 00 00 * * *", async () => {
                         }
                     })
 
-                    await db.users.findFirst({
+                    await db.users.update({
                         where: {
                             id: item.id
                         },
@@ -100,7 +100,7 @@ const job = new CronJob("00 00 00 * * *", async () => {
                     res.status(200).send('you got money only from cashback lil')
                 }
             } else {
-                await db.users.findFirst({
+                await db.users.update({
                     where: {
                         id: item.id
                     },
@@ -112,7 +112,7 @@ const job = new CronJob("00 00 00 * * *", async () => {
                  res.status(200).send('No OP has been taken.');    
             }
         } else {
-            await db.users.findFirst({
+            await db.users.update({
                 where: {
                     id: item.id
                 },
@@ -188,7 +188,7 @@ const job = new CronJob("00 00 00 * * *", async () => {
                      res.status(200).send('you got money only from cashback lil')
                 }
             } else {
-                await db.users.findFirst({
+                await db.users.update({
                     where: {
                         id: item.id
                     },
@@ -200,7 +200,7 @@ const job = new CronJob("00 00 00 * * *", async () => {
                 res.status(200).send('No OP has been taken.');    
             }
         } else {
-            await db.users.findFirst({
+            await db.users.update({
                 where: {
                     id: item.id
                 },
