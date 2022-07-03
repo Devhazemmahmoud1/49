@@ -798,6 +798,53 @@ let acceptRide = async (req, res) => {
     }
 }
 
+let startRide = async (req, res) => {
+    const { id } = req.body
+
+    if (!id ) return res.status(403).send('ID not provided')
+
+    // check if the ride excets 
+    let checkRide = await db.ridesRequested.findFirst({
+        where: {
+            id: parseInt(id),
+        }
+    })
+
+    if (! checkRide) {
+        return res.status(403).send('Trip is not available right now')
+    }
+
+    if (checkRide.ride_status != 0) {
+        return res.status(403).send('Ride has already started')
+    }
+
+    // set status to taken
+
+    try {
+        await db.ridesRequested.update({
+            where: {
+              id: parseInt(id)  
+            },
+            data: {
+                ride_status: 1,
+            }
+        })
+
+        for (socket in sockets) {
+            if (sockets[socket].user_id == checkRide.client_id) {
+                global.io.to(sockets[socket].socket_id).emit('start-ride', JSON.stringify({
+                    rider_name: req.user.firstName,
+                    rideId: id
+                }))
+            }
+        }
+        
+        return res.send('Ride has started')
+    } catch (e) {
+        console.log(e)
+    }
+}
+
 // finish  a ride 
 let endRide = async (req, res) => {
 
@@ -816,6 +863,7 @@ let endRide = async (req, res) => {
             data: {
                 isDone: 1,
                 isPendding: 0,
+                ride_status: 0,
             }
         })
 
@@ -922,6 +970,7 @@ let cancelTrip = async (req , res) => {
             data: {
                 isDone: 3,
                 isPendding: 0,
+                ride_status: 0,
             }
         })
 
