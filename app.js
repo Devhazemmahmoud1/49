@@ -55,11 +55,20 @@ var app = express();
 var paths = '/etc/letsencrypt/live/49backend.com';
 
 // Create the http server
-const server = require('https').createServer({
-  key: fs.readFileSync(paths + '/privkey.pem', 'utf8'),
-  cert: fs.readFileSync(paths + '/cert.pem', 'utf8'),
-  ca: fs.readFileSync(paths + '/chain.pem', 'utf8')
-},app);
+
+if (fs.existsSync(paths)) {
+  var server = require('https').createServer({
+    key: fs.readFileSync(paths + '/privkey.pem', 'utf8'),
+    cert: fs.readFileSync(paths + '/cert.pem', 'utf8'),
+    ca: fs.readFileSync(paths + '/chain.pem', 'utf8')
+  },app);
+} else {
+  var server = null
+}
+
+
+const httpServer = require('http').createServer(app)
+
 //const https = require('https').createServer(options, app)
 
 // Create the Socket IO server on 
@@ -447,5 +456,5 @@ io.use(async (socket, next) => {
   }
 });
 
-module.exports = { app, server }
+module.exports = { app, server, httpServer }
 
