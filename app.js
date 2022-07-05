@@ -56,17 +56,17 @@ var paths = '/etc/letsencrypt/live/49backend.com';
 
 // Create the http server
 
-// if (fs.existsSync(paths)) {
-//   var server = require('https').createServer({
-//     key: fs.readFileSync(paths + '/privkey.pem', 'utf8'),
-//     cert: fs.readFileSync(paths + '/cert.pem', 'utf8'),
-//     ca: fs.readFileSync(paths + '/chain.pem', 'utf8')
-//   },app);
-// } else {
-//   var server = null
-// }
+if (fs.existsSync(paths)) {
+  var server = require('https').createServer({
+    key: fs.readFileSync(paths + '/privkey.pem', 'utf8'),
+    cert: fs.readFileSync(paths + '/cert.pem', 'utf8'),
+    ca: fs.readFileSync(paths + '/chain.pem', 'utf8')
+  },app);
+} else {
+  var server = null
+}
 
-var server = null
+//var server = null
 
 const httpServer = require('http').createServer(app)
 
@@ -86,7 +86,7 @@ global.io = socketio(server, {
     callback(null, true);
   },
   cors: {
-    origin: "https://49backend.com:3000",
+    origin: "https://49backend.com",
     methods: ["GET", "POST"],
   }
 });
@@ -106,14 +106,14 @@ app.use((req, res, next) => {
   next();
 });
 
-// app.enable('trust proxy')
+app.enable('trust proxy')
 
-// app.use(function(request, response, next) {
-//   if (process.env.NODE_ENV != 'development' && !request.secure) {
-//      return response.redirect("https://" + request.headers.host + request.url);
-//   }
-//   next();
-// })
+app.use(function(request, response, next) {
+  if (process.env.NODE_ENV != 'development' && !request.secure) {
+     return response.redirect("https://" + request.headers.host + request.url);
+  }
+  next();
+})
 
 // view engine setup
 app.set('views', path.join(__dirname, 'views'));
