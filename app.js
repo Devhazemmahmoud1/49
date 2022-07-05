@@ -66,7 +66,6 @@ if (fs.existsSync(paths)) {
   var server = null
 }
 
-
 const httpServer = require('http').createServer(app)
 
 //const https = require('https').createServer(options, app)
@@ -104,6 +103,15 @@ app.use((req, res, next) => {
   );
   next();
 });
+
+app.enable('trust proxy')
+
+app.use(function(request, response, next) {
+  if (process.env.NODE_ENV != 'development' && !request.secure) {
+     return response.redirect("https://" + request.headers.host + request.url);
+  }
+  next();
+})
 
 // view engine setup
 app.set('views', path.join(__dirname, 'views'));
