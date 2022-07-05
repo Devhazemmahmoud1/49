@@ -3,7 +3,7 @@
 // Module dependencies
 var app = require('../app').app;
 var debug = require('debug')('socketiotest:server');
-var http = require('http');
+var http = require('https');
   
 // Get port from environment and store in Express
 var port = normalizePort(process.env.PORT || '3000');
@@ -12,8 +12,6 @@ app.set('port', port);
 // Create HTTP server
 var server = require("../app").server;
 
-
-  
 // Listen on provided port, on all
 // network interfaces.
   

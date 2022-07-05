@@ -13,6 +13,7 @@ const secretKey = "fourtyninehub495051fourtynine";
 const Jwt = require('jsonwebtoken');
 const serviceAccount = require('./foutrynine-firebase.json');
 const moment = require('moment');
+var fs = require('fs');
 
 admin.initializeApp({
   credential: admin.cert(serviceAccount),
@@ -51,9 +52,16 @@ var paymob = require('./routes/payments/PayMob');
 var packages = require('./routes/packages')
 var app = express();
 
+var path = '/etc/letsencrypt/live/49backend.com';
+
 // Create the http server
-const server = require('http').createServer(app);
+const server = require('https').createServer({
+  key: fs.readFileSync(path + '/privkey.pem', 'utf8'),
+  cert: fs.readFileSync(path + '/cert.pem', 'utf8'),
+  ca: fs.readFileSync(path + '/chain.pem', 'utf8')
+},app);
 //const https = require('https').createServer(options, app)
+
 
 // Create the Socket IO server on 
 // the top of http server
@@ -74,7 +82,7 @@ global.io = socketio(server, {
   }
 });
 
-var connect = global.io.connect('https://49backend.com', {secure: true})
+// var connect = global.io.connect('https://49backend.com', {secure: true})
 
 
 app.use((req, res, next) => {
