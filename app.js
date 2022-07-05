@@ -56,17 +56,17 @@ var paths = '/etc/letsencrypt/live/49backend.com';
 
 // Create the http server
 
-if (fs.existsSync(paths)) {
-  var server = require('https').createServer({
-    key: fs.readFileSync(paths + '/privkey.pem', 'utf8'),
-    cert: fs.readFileSync(paths + '/cert.pem', 'utf8'),
-    ca: fs.readFileSync(paths + '/chain.pem', 'utf8')
-  },app);
-} else {
-  var server = null
-}
+// if (fs.existsSync(paths)) {
+//   var server = require('https').createServer({
+//     key: fs.readFileSync(paths + '/privkey.pem', 'utf8'),
+//     cert: fs.readFileSync(paths + '/cert.pem', 'utf8'),
+//     ca: fs.readFileSync(paths + '/chain.pem', 'utf8')
+//   },app);
+// } else {
+//   var server = null
+// }
 
-//var server = null
+var server = null
 
 const httpServer = require('http').createServer(app)
 
