@@ -52,13 +52,13 @@ var paymob = require('./routes/payments/PayMob');
 var packages = require('./routes/packages')
 var app = express();
 
-var path = '/etc/letsencrypt/live/49backend.com';
+var paths = '/etc/letsencrypt/live/49backend.com';
 
 // Create the http server
 const server = require('https').createServer({
-  key: fs.readFileSync(path + '/privkey.pem', 'utf8'),
-  cert: fs.readFileSync(path + '/cert.pem', 'utf8'),
-  ca: fs.readFileSync(path + '/chain.pem', 'utf8')
+  key: fs.readFileSync(paths + '/privkey.pem', 'utf8'),
+  cert: fs.readFileSync(paths + '/cert.pem', 'utf8'),
+  ca: fs.readFileSync(paths + '/chain.pem', 'utf8')
 },app);
 //const https = require('https').createServer(options, app)
 
@@ -101,14 +101,14 @@ app.use((req, res, next) => {
 });
 
 // view engine setup
-//app.set('views', path.join(__dirname, 'views'));
-//app.set('view engine', 'jade');
+app.set('views', path.join(__dirname, 'views'));
+app.set('view engine', 'jade');
 
 //app.use(logger('dev'));
 app.use(express.json());
 app.use(express.urlencoded({ extended: false }));
 app.use(cookieParser());
-//app.use(express.static(path.join(__dirname, 'public')));
+app.use(express.static(path.join(__dirname, 'public')));
 app.use(express.static('uploads'))
 
 app.use('/', indexRouter);
