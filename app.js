@@ -62,7 +62,6 @@ const server = require('https').createServer({
 },app);
 //const https = require('https').createServer(options, app)
 
-
 // Create the Socket IO server on 
 // the top of http server
 
@@ -77,13 +76,10 @@ global.io = socketio(server, {
     callback(null, true);
   },
   cors: {
-    origin: "https://49backend.com",
+    origin: "https://49backend.com:3000",
     methods: ["GET", "POST"],
   }
 });
-
-// var connect = global.io.connect('https://49backend.com', {secure: true})
-
 
 app.use((req, res, next) => {
   req.io = io;
