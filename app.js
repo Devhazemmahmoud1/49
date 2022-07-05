@@ -74,7 +74,7 @@ global.io = socketio(server, {
   }
 });
 
-var connect = global.io.connect('https://localhost:3000', {secure: true})
+var connect = global.io.connect('https://49backend.com', {secure: true})
 
 
 app.use((req, res, next) => {
