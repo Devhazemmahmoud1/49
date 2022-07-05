@@ -85,8 +85,7 @@ let getAd = async (req, res) => {
         adDetails.isFavo = false
         adDetails.isRequested = false
     }
-
-
+    
     return res.status(200).json(adDetails)
 }
 

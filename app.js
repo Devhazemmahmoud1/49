@@ -2,7 +2,7 @@ var createError = require('http-errors');
 var express = require('express');
 var path = require('path');
 var cookieParser = require('cookie-parser');
-var logger = require('morgan');
+//var logger = require('morgan');
 const { PrismaClient } = require('@prisma/client');
 const db = new PrismaClient();
 var socketio = require("socket.io");
@@ -49,7 +49,6 @@ var Reels = require('./routes/Reels&stories')
 var notification = require('./routes/notifications')
 var paymob = require('./routes/payments/PayMob');
 var packages = require('./routes/packages')
-//const { sockets } = require('./controllers/socketController/socketController');
 var app = express();
 
 // Create the http server
@@ -70,10 +69,12 @@ global.io = socketio(server, {
     callback(null, true);
   },
   cors: {
-    origin: "http://localhost:8888",
+    origin: "https://49backend.com",
     methods: ["GET", "POST"],
   }
 });
+
+var connect = global.io.connect('https://localhost:3000', {secure: true})
 
 
 app.use((req, res, next) => {
@@ -95,7 +96,7 @@ app.use((req, res, next) => {
 app.set('views', path.join(__dirname, 'views'));
 app.set('view engine', 'jade');
 
-app.use(logger('dev'));
+//app.use(logger('dev'));
 app.use(express.json());
 app.use(express.urlencoded({ extended: false }));
 app.use(cookieParser());
@@ -142,7 +143,7 @@ app.use(function (err, req, res, next) {
 
 //var socket = require('./controllers/socketController/socketController')
 global.sockets = {}
-io.on('connection', async (socket) => {
+global.io.on('connection', async (socket) => {
   if (socket.handshake.headers.authorization.includes('Bearer ')) {
     if (socket.user.id != null) {
       let userInfo = {
@@ -312,23 +313,18 @@ io.on('connection', async (socket) => {
       freeRide: JSON.parse(data).freeRide,
       driverInfo: driver,
     }));
-
-    console.log('event emitted')
-
   })
 
-
-  socket.on('request-location', (data) => {
-    console.log(data)
+  socket.on('request-location', async (data) => {
     let sender = JSON.parse(data).sender_id
     let receiver = JSON.parse(data).receiver_id
     let lng = JSON.parse(data).lng
-    let lat = JSON.parse(data).lat 
+    let lat = JSON.parse(data).lat
 
     for (rider in sockets) {
       if (sockets[rider].user_id == receiver) {
         io.to(sockets[rider].socket_id).emit('get-location', JSON.stringify({
-          lng: lng, 
+          lng: lng,
           lat: lat,
           sender_id: sender,
           receiver_id: receiver
