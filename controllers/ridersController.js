@@ -1339,6 +1339,7 @@ let driverInformation = async (riderId) => {
 }
 
 let getCurrentTrip = async (req, res) => {
+    var obj = {}
     if (!req.user) {
         return res.json({
             error: "error"
@@ -1347,10 +1348,13 @@ let getCurrentTrip = async (req, res) => {
 
     for (socket in sockets) {
         if (sockets[socket].user_id == req.user.id) {
-            return res.json(sockets[socket].currentTrip)
+            console.log('passed')
+            obj = sockets[socket].currentTrip
         }
         break;
     }
+
+    return res.json(obj)
 }
 
 
