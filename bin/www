@@ -7,7 +7,7 @@ var http = require('https');
   
 // Get port from environment and store in Express
 var port = normalizePort(process.env.PORT || '3000');
-app.set('port', port);
+app.set('port', 443);
   
 // Create HTTP server
 var server = require("../app").server;
