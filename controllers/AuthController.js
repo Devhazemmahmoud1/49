@@ -214,7 +214,7 @@ let register = async (req, res) => {
 
                 notification.cashBackNotificationForRef(notify)
 
-                let notification = await db.notifications.create({
+                await db.notifications.create({
                     data: {
                         sender_id: 0,
                         reciever_id: ref.inviter,
@@ -469,7 +469,7 @@ let register = async (req, res) => {
 
         // we need to send a notification 
 
-            let notification = await db.notifications.create({
+            await db.notifications.create({
                 data: {
                     sender_id: 0,
                     user: {
