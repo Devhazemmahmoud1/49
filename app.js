@@ -83,7 +83,7 @@ global.io = socketio(server, {
     callback(null, true);
   },
   cors: {
-    origin: "https://49backend.com",
+    origin: "http://localhost:3000",
     methods: ["GET", "POST"],
   }
 });
