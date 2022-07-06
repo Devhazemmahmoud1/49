@@ -1075,7 +1075,8 @@ let customerFeedBack = async (req, res) => {
         })
 
     } catch (e) {
-        throw new e
+        console.log(e)
+        return false;
     }
 }
 
