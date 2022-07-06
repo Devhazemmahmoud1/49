@@ -86,7 +86,7 @@ global.io = socketio(server, {
     callback(null, true);
   },
   cors: {
-    origin: "https://49backend.com",
+    origin: "https://49backend.com:3000",
     methods: ["GET", "POST"],
   }
 });
