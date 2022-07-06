@@ -7,8 +7,8 @@ var http = require('http');
 var https = require('https')
   
 // Get port from environment and store in Express
-var port = normalizePort(process.env.PORT || '3000');
-app.set('port', server != null ? 443 : 3000);
+var port = normalizePort('443');
+app.set('port', port);
   
 // Create HTTP server
 var server = require("../app").server;
@@ -23,17 +23,9 @@ if (server != null) {
 // network interfaces.
 
 // https
-server != null ? server.listen(443): httpServer.listen(3000)
+server != null ? server.listen('443'): httpServer.listen(3000)
 server != null ? server.on('error', onError) : httpServer.on('error', onError)
 server != null ? server.on('listening', onListening):  httpServer.on('listening', onListening)
-
-//http
-
-// if (server == null) {
-//     httpServer.listen(3000);
-//     httpServer.on('error', onError);
-//     httpServer.on('listening', onListening);
-// }
   
 // Normalize a port into a number,
 // string, or false.
