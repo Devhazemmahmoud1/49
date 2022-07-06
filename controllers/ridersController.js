@@ -1340,7 +1340,9 @@ let driverInformation = async (riderId) => {
 
 let getCurrentTrip = async (req, res) => {
     if (!req.user) {
-        return {}
+        return res.json({
+            error: "error"
+        })
     }
 
     for (socket in sockets) {
