@@ -1383,6 +1383,9 @@ let getCurrentTrip = async (req, res) => {
               },
               orderBy: {
                 created_at: 'desc'
+              },
+              include: {
+                  agentInfo: true,
               }
             })
     
@@ -1410,6 +1413,9 @@ let getCurrentTrip = async (req, res) => {
             },
             orderBy: {
               created_at: 'desc'
+            },
+            include: {
+                agentInfo: true,
             }
           })
   
@@ -1435,6 +1441,9 @@ let getCurrentTrip = async (req, res) => {
           },
           orderBy: {
             created_at: 'desc'
+          },
+          include: {
+              agentInfo: true,
           }
         })
 
