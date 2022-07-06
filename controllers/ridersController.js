@@ -130,9 +130,9 @@ let findRiders = async (req, res) => {
                             if (checkIfHadFreeRideBefore) {
                                 if (moment(checkIfHadFreeRideBefore.created_at).add('1', 'days').format('YYYY/MM/DD HH:mm:ss') >= moment().format('YYYY/MM/DD HH:mm:ss')) {
 
-                                    drivers.push(sockets[rider].user_id)
-                                    continue
-
+                                    // drivers.push(sockets[rider].user_id)
+                                    // continue
+                                    sockets[rider].freeRide = true
                                 }
                             }
                         }
@@ -163,7 +163,7 @@ let findRiders = async (req, res) => {
                             destinationLat: destinationLat,
                             destinationLng: destinationLng,
                             tripTime: tripTime,
-                            freeRide: null
+                            freeRide: sockets[rider].freeRide
                         }));
 
                         drivers.push(sockets[rider].user_id)
@@ -237,7 +237,7 @@ let findRiders = async (req, res) => {
                                 destinationLat: destinationLat,
                                 destinationLng: destinationLng,
                                 tripTime: tripTime,
-                                freeRide: null
+                                freeRide: sockets[rider1].freeRide
                             }));
 
                             drivers.push(sockets[rider1].user_id)
@@ -276,8 +276,9 @@ let findRiders = async (req, res) => {
 
                             if (checkIfHadFreeRideBefore) {
                                 if (moment(checkIfHadFreeRideBefore.created_at).add('1', 'days').format('YYYY/MM/DD HH:mm:ss') >= moment().format('YYYY/MM/DD HH:mm:ss')) {
-                                    drivers.push(sockets[rider1].user_id)
-                                    continue
+                                    // drivers.push(sockets[rider1].user_id)
+                                    // continue
+                                    sockets[rider1].freeRide = true
                                 }
                             }
 
@@ -306,7 +307,7 @@ let findRiders = async (req, res) => {
                                 destinationLat: destinationLat,
                                 destinationLng: destinationLng,
                                 tripTime: tripTime,
-                                freeRide: 1
+                                freeRide: sockets[rider1].freeRide
                             }));
 
                             let notify = {
@@ -847,18 +848,17 @@ let startRide = async (req, res) => {
 
 // finish  a ride 
 let endRide = async (req, res) => {
-
+    const { id } = req.body
     try {
         let getLastTripForDriver = await db.ridesRequested.findFirst({
             where: {
-                rider_id: req.user.id,
-                isDone: 0
+                id: parseInt(id)
             }
         })
 
         let finish = await db.ridesRequested.update({
             where: {
-                id: getLastTripForDriver.id
+                id: getLastTripForDriver.id ?? parseInt(id)
             },
             data: {
                 isDone: 1,
@@ -893,7 +893,7 @@ let endRide = async (req, res) => {
                         global.io.to(sockets[socket].socket_id).emit('end-of-trip', JSON.stringify({
                             user_id: getClientInfo.id,
                             riderId: finish.rider_id,
-                            ride: getLastTripForDriver.id
+                            ride: parseInt(id)
                         }))
                         break;
                     }
@@ -905,6 +905,9 @@ let endRide = async (req, res) => {
                     where: {
                         rider_id: req.user.id,
                         isPendding: 1
+                    },
+                    orderBy: {
+                        created_at: 'desc'
                     }
                 })
 
@@ -933,8 +936,6 @@ let endRide = async (req, res) => {
                         }
                     }
                 }
-
-
             } else {
                 return res.send('something went wrong')
             }
@@ -1048,15 +1049,12 @@ function calculateRate(total5Stars, total4Stars, total3Stars, total2Stars, total
 }
 
 let customerFeedBack = async (req, res) => {
-    const { rate, comment } = req.body
+    const { rate, comment, id } = req.body
     try {
 
         let lastRide = await db.ridesRequested.findFirst({
             where: {
-                client_id: req.user.id
-            },
-            orderBy: {
-                created_at: 'desc'
+                id: parseInt(id)
             }
         })
 

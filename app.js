@@ -162,11 +162,12 @@ global.io.on('connection', async (socket) => {
         firstName: socket.user.firstName,
         lastName: socket.user.lastName,
         user_id: socket.user.id,
-        userType: socket.user.accountType ?? 0,
-        isApproved: socket.user.isApproved,
-        isReady: true,
-        status: socket.status ?? null,
+        userType: socket.user.accountType ?? 0, // if a driver or a normal user
+        isApproved: socket.user.isApproved, // is driver was approved
+        isReady: true, // driver trips status
+        status: socket.status ?? null, // driver status
         token: socket.token,
+        freeTrip: false,
         subscription: socket.subscription ?? null,
         isPersonalAccount: socket.subscription != null ? socket.subscription.isPersonalAccount : null,
         lastTrip: {
@@ -177,7 +178,8 @@ global.io.on('connection', async (socket) => {
         currentLocation: {
           lat: socket.handshake.headers.lat ?? null,
           lng: socket.handshake.headers.lng ?? null,
-        }
+        },
+        currentTrip: socket.currentTrip != null ? socket.currentTrip : null
       }
 
       if (Object.keys(sockets).length != 0) {
@@ -396,9 +398,6 @@ io.use(async (socket, next) => {
 
       if (userSubscription) {
         if (moment(userSubscription.updated_at).add(userSubscription.period, 'days').format('YYYY/MM/DD HH:mm:ss') >= moment().format('YYYY/MM/DD HH:mm:ss')) {
-
-          console.log('passed')
-          // subscription still on
           socket.subscription = {
             categoryId: userSubscription.subCat_id,
             permium: userSubscription.isPermium,
@@ -412,35 +411,117 @@ io.use(async (socket, next) => {
         socket.subscription = null
       }
 
-      // check if he has any trips going on 
-      let checkTrip = await db.ridesRequested.findFirst({
-        where: {
-          rider_id: data.id,
-        },
-        orderBy: {
-          created_at: 'desc'
-        }
-      })
+      // check weather it is a user or a driver right here 
+      if (user.accountType != 0) {
+        if (user.isApproved != 0 && user.accountType != 0) {
+          if (user.accountType == 898 || user.accountType == 897 || user.accountType == 891) {
+            // check if he has any trips going on 
+            let checkTrip = await db.ridesRequested.findFirst({
+              where: {
+                rider_id: data.id,
+              },
+              orderBy: {
+                created_at: 'desc'
+              }
+            })
 
-      if (checkTrip) {
-        var getUserInfo = await db.users.findFirst({
+            if (checkTrip) {
+              var getUserInfo = await db.users.findFirst({
+                where: {
+                  id: checkTrip.client_id
+                }
+              })
+            }
+
+
+            if (checkTrip && checkTrip.isDone == 0 && checkTrip.isPendding != 1) {
+              socket.status = 1
+              socket.currentTrip = checkTrip
+              socket.currentTrip.peerUserInfo = getUserInfo
+              socket.currentTrip.hasStarted = checkTrip.ride_status != 0 ? true : false
+            }
+
+            if (!checkTrip || checkTrip.isDone == 1 && checkTrip.isPendding == 0) {
+              socket.status = null
+              socket.currentTrip = null
+            }
+          } else {
+            // client ride 
+            let checkTrip = await db.ridesRequested.findFirst({
+              where: {
+                client_id: data.id,
+                isDone: 0,
+              },
+              orderBy: {
+                created_at: 'desc'
+              }
+            })
+    
+            if (checkTrip) {
+              var getUserInfo = await db.users.findFirst({
+                where: {
+                  id: checkTrip.rider_id
+                }
+              })
+    
+              socket.status = null
+              socket.currentTrip = checkTrip
+              socket.currentTrip.peerUserInfo = getUserInfo
+              socket.currentTrip.hasStarted = checkTrip.ride_status != 0 ? true : false
+              
+            }
+          }
+        } else {
+          // client ride
+
+          let checkTrip = await db.ridesRequested.findFirst({
+            where: {
+              client_id: data.id,
+              isDone: 0,
+            },
+            orderBy: {
+              created_at: 'desc'
+            }
+          })
+  
+          if (checkTrip) {
+            var getUserInfo = await db.users.findFirst({
+              where: {
+                id: checkTrip.rider_id
+              }
+            })
+  
+            socket.status = null
+            socket.currentTrip = checkTrip
+            socket.currentTrip.peerUserInfo = getUserInfo
+            socket.currentTrip.hasStarted = checkTrip.ride_status != 0 ? true : false
+            
+          }
+        }
+      } else {
+        let checkTrip = await db.ridesRequested.findFirst({
           where: {
-            id: checkTrip.client_id
+            client_id: data.id,
+            isDone: 0,
+          },
+          orderBy: {
+            created_at: 'desc'
           }
         })
-      }
 
+        if (checkTrip) {
+          var getUserInfo = await db.users.findFirst({
+            where: {
+              id: checkTrip.rider_id
+            }
+          })
 
-      if (checkTrip && checkTrip.isDone == 0 && checkTrip.isPendding != 1) {
-        socket.status = 1
-      }
+          socket.status = null
+          socket.currentTrip = checkTrip
+          socket.currentTrip.peerUserInfo = getUserInfo
+          socket.currentTrip.hasStarted = checkTrip.ride_status != 0 ? true : false
 
-      if (checkTrip && checkTrip.isDone == 0 && checkTrip.isPendding == 1) {
-        socket.status = 2
-      }
-
-      if (!checkTrip || checkTrip.isDone == 1 && checkTrip.isPendding == 0) {
-        socket.status = null
+        }
       }
 
       socket.user = user;
