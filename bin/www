@@ -13,6 +13,11 @@ app.set('port', 443);
 var server = require("../app").server;
 var httpServer = require('../app').httpServer
 
+
+if (server != null) {
+    console.log('yes')
+}
+
 // Listen on provided port, on all
 // network interfaces.
 
