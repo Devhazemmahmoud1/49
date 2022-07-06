@@ -85,5 +85,7 @@ router.post('/change-price-rate', guard, autoCatch( ride.modifyPriceRange ))
 
 router.post('/set-trip-as-started/from-driver', guard, autoCatch( ride.startRide ))
 
+router.get('/get-user-current-trip', guard, autoCatch( ride.getCurrentTrip ))
+
 
 module.exports = router

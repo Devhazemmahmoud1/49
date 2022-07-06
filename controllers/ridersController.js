@@ -1338,6 +1338,19 @@ let driverInformation = async (riderId) => {
     }
 }
 
+let getCurrentTrip = async (req, res) => {
+    if (!req.user) {
+        return {}
+    }
+
+    for (socket in sockets) {
+        if (sockets[socket].user_id == req.user.id) {
+            return res.json(sockets[socket].currentTrip)
+        }
+        break;
+    }
+}
+
 
 module.exports = {
     addRider,
@@ -1358,5 +1371,6 @@ module.exports = {
     modifyPriceRange,
     driverInformation,
     cancelTrip,
-    startRide
+    startRide,
+    getCurrentTrip
 }
