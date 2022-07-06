@@ -106,14 +106,14 @@ app.use((req, res, next) => {
   next();
 });
 
-app.enable('trust proxy')
+// app.enable('trust proxy')
 
-app.use(function(request, response, next) {
-  if (process.env.NODE_ENV != 'development' && !request.secure) {
-     return response.redirect("https://" + request.headers.host + request.url);
-  }
-  next();
-})
+// app.use(function(request, response, next) {
+//   if (process.env.NODE_ENV != 'development' && !request.secure) {
+//      return response.redirect("https://" + request.headers.host + request.url);
+//   }
+//   next();
+// })
 
 // view engine setup
 app.set('views', path.join(__dirname, 'views'));
