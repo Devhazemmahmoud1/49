@@ -55,20 +55,17 @@ var app = express();
 var paths = '/etc/letsencrypt/live/49backend.com';
 
 // Create the http server
-if (fs.existsSync(paths)) {
-  var server = require('https').createServer({
-    key: fs.readFileSync(paths + '/privkey.pem', 'utf8'),
-    cert: fs.readFileSync(paths + '/cert.pem', 'utf8'),
-    ca: fs.readFileSync(paths + '/chain.pem', 'utf8')
-  },app);
-} else {
-  var server = null
-  var httpServer = require('http').createServer(app)
-}
 
-//var server = null
+// if (fs.existsSync(paths)) {
+//   var server = require('https').createServer({
+//     key: fs.readFileSync(paths + '/privkey.pem', 'utf8'),
+//     cert: fs.readFileSync(paths + '/cert.pem', 'utf8'),
+//     ca: fs.readFileSync(paths + '/chain.pem', 'utf8')
+//   },app);
+// }
 
 
+var server = require('http').createServer(app)
 
 //const https = require('https').createServer(options, app)
 
@@ -105,15 +102,6 @@ app.use((req, res, next) => {
   );
   next();
 });
-
-// app.enable('trust proxy')
-
-// app.use(function(request, response, next) {
-//   if (process.env.NODE_ENV != 'development' && !request.secure) {
-//      return response.redirect("https://" + request.headers.host + request.url);
-//   }
-//   next();
-// })
 
 // view engine setup
 app.set('views', path.join(__dirname, 'views'));
@@ -466,5 +454,5 @@ io.use(async (socket, next) => {
   }
 });
 
-module.exports = { app, server, httpServer }
+module.exports = { app, server }
 
