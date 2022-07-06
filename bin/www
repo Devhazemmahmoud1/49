@@ -17,7 +17,7 @@ var httpServer = require('../app').httpServer
 // network interfaces.
 
 // https
-server != null ? server.listen(port): ''
+server != null ? server.listen(443): ''
 server != null ? server.on('error', onError) : ''
 server != null ? server.on('listening', onListening): ''
 
