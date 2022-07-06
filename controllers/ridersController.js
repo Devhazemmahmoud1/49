@@ -1339,22 +1339,121 @@ let driverInformation = async (riderId) => {
 }
 
 let getCurrentTrip = async (req, res) => {
-    var obj = {}
-    if (!req.user) {
-        return res.json({
-            error: "error"
-        })
-    }
 
-    for (socket in sockets) {
-        if (sockets[socket].user_id == req.user.id) {
-            console.log('passed')
-            obj = sockets[socket].currentTrip
+        var result = {}
+      // check weather it is a user or a driver right here 
+      if (req.user.accountType != 0) {
+        if (req.user.isApproved != 0 && req.user.accountType != 0) {
+          if (req.user.accountType == 898 || req.user.accountType == 897 || req.user.accountType == 891) {
+            // check if he has any trips going on 
+            let checkTrip = await db.ridesRequested.findFirst({
+              where: {
+                rider_id: req.user.id,
+              },
+              orderBy: {
+                created_at: 'desc'
+              }
+            })
+
+            if (checkTrip) {
+              var getUserInfo = await db.users.findFirst({
+                where: {
+                  id: checkTrip.client_id
+                }
+              })
+            }
+
+
+            if (checkTrip && checkTrip.isDone == 0 && checkTrip.isPendding != 1) {
+              result.currentTrip = checkTrip
+              result.currentTrip.peerUserInfo = getUserInfo
+              result.currentTrip.hasStarted = checkTrip.ride_status != 0 ? true : false
+            }
+
+            if (!checkTrip || checkTrip.isDone == 1 && checkTrip.isPendding == 0) {
+                result.status = null
+                result.currentTrip = null
+            }
+          } else {
+            // client ride 
+            let checkTrip = await db.ridesRequested.findFirst({
+              where: {
+                client_id: req.user.id,
+                isDone: 0,
+              },
+              orderBy: {
+                created_at: 'desc'
+              }
+            })
+    
+            if (checkTrip) {
+              var getUserInfo = await db.users.findFirst({
+                where: {
+                  id: checkTrip.rider_id
+                }
+              })
+    
+              result.status = null
+              result.currentTrip = checkTrip
+              result.currentTrip.peerUserInfo = getUserInfo
+              result.currentTrip.hasStarted = checkTrip.ride_status != 0 ? true : false
+              
+            }
+          }
+        } else {
+          // client ride
+
+          let checkTrip = await db.ridesRequested.findFirst({
+            where: {
+              client_id: req.user.id,
+              isDone: 0,
+            },
+            orderBy: {
+              created_at: 'desc'
+            }
+          })
+  
+          if (checkTrip) {
+            var getUserInfo = await db.users.findFirst({
+              where: {
+                id: checkTrip.rider_id
+              }
+            })
+  
+            result.status = null
+            result.currentTrip = checkTrip
+            result.currentTrip.peerUserInfo = getUserInfo
+            result.currentTrip.hasStarted = checkTrip.ride_status != 0 ? true : false
+            
+          }
         }
-        break;
-    }
+      } else {
+        let checkTrip = await db.ridesRequested.findFirst({
+          where: {
+            client_id: req.user.id,
+            isDone: 0,
+          },
+          orderBy: {
+            created_at: 'desc'
+          }
+        })
 
-    return res.json(obj)
+        if (checkTrip) {
+          var getUserInfo = await db.users.findFirst({
+            where: {
+              id: checkTrip.rider_id
+            }
+          })
+
+          result.status = null
+          result.currentTrip = checkTrip
+          result.currentTrip.peerUserInfo = getUserInfo
+          result.currentTrip.hasStarted = checkTrip.ride_status != 0 ? true : false
+
+        }
+      }
+
+      return res.json(result)
 }
 
 
