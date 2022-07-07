@@ -1031,7 +1031,7 @@ let getTenderFemales = async (req, res) => {
     })
 
     let fillteredUsers = getUsers.filter((result) => {
-        return result.userSettings[7].value == 2
+        return result.userSettings[7].value == '2'
     })
 
     console.log("Femalessss " + fillteredUsers)
