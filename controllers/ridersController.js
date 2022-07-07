@@ -1300,7 +1300,7 @@ let modifyPriceRange = async (req, res) => {
     })
 }
 
-let driverInformation = async (riderId) => {
+var driverInformation = async (riderId) => {
     let riderTotalTrips = await db.ridesRequested.aggregate({
         where: {
             rider_id: riderId,
