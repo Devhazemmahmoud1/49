@@ -331,7 +331,7 @@ let createPost = async (req, res) => {
                 feeling_id: feeling != null ? parseInt(feeling) : 0,
                 activity_id: activity != null ? parseInt(activity) : 0,
                 location: location ?? '',
-                privacy: parseInt(privacy) != null ? parseInt(privacy) : 0,
+                privacy: parseInt(privacy) != null ? parseInt(privacy) : 1,
                 lat: lat != null ? lat : '',
                 lng: lng != null ? lng : '',
                 type: parseInt(type) ?? 0
