@@ -4,8 +4,8 @@ const profile = require('../../controllers/socialMediaControllers/myProfileContr
 const users = require('../../controllers/socialMediaControllers/usersProfileController');
 const uploadMethod = require('../../controllers/s3Controller/uploadS3Controller');
 const multer = require('multer');
-const {PrismaClient} = require('@prisma/client');
-const {autoCatch} = require("../../utils/auto_catch");
+const { PrismaClient } = require('@prisma/client');
+const { autoCatch } = require("../../utils/auto_catch");
 const db = new PrismaClient();
 const { sendBulkNotification } = require('../../controllers/notificationsController/SocialNotification')
 
@@ -52,13 +52,13 @@ router.post('/upload-profile-picture', upload.array('attachments', 12), async (r
 
         let createNewAd = await db.posts.create({
             data: {
-                post_content:  '',
+                post_content: '',
                 total_comments: 0,
                 total_reactions: 0,
-                feeling_id:  0,
-                activity_id:  0,
+                feeling_id: 0,
+                activity_id: 0,
                 location: '',
-                lat:  '',
+                lat: '',
                 lng: '',
                 type: 1,
                 user_id: parseInt(req.body.id)
@@ -71,6 +71,14 @@ router.post('/upload-profile-picture', upload.array('attachments', 12), async (r
                     post_id: createNewAd.id,
                     url: item.filename,
                     type: 1
+                }
+            })
+
+            await db.gallary.create({
+                data: {
+                    user_id: parseInt(req.body.id),
+                    post_id: createNewAd.id,
+                    url: item.filename
                 }
             })
         }
@@ -115,13 +123,13 @@ router.post('/upload-cover-picture', upload.array('attachments', 12), async (req
         })
         let createNewAd = await db.posts.create({
             data: {
-                post_content:  '',
+                post_content: '',
                 total_comments: 0,
                 total_reactions: 0,
-                feeling_id:  0,
-                activity_id:  0,
+                feeling_id: 0,
+                activity_id: 0,
                 location: '',
-                lat:  '',
+                lat: '',
                 lng: '',
                 type: 1,
                 user_id: parseInt(req.body.id)
