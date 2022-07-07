@@ -62,6 +62,29 @@ let getMyProfile = async (req, res) => {
         var MainCategory = null
     }
 
+    let loadingRegister = await db.loading.findFirst({
+        where: {
+            user_id: req.user.id,
+            isApproved: 1
+        }
+    })
+
+    if (loadingRegister) {
+        let subCategory = await db.subCategories.findFirst({
+            where: {
+                id: parseInt(loadingRegister.category_id)
+            }
+        })
+    
+        var MainCategory = await db.mainCategories.findFirst({
+            where: {
+                id: parseInt(subCategory.parent)
+            }
+        })
+    } else {
+        var MainCategory = null
+    }
+
     return res.status(200).json({
         userInfo: req.user,
         myStories: reels,
@@ -1061,6 +1084,8 @@ let getTenderFemales = async (req, res) => {
         }
 
     }
+
+    console.log(users)
 
     return res.status(200).json(users)
 }
