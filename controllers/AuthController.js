@@ -207,8 +207,8 @@ let register = async (req, res) => {
                 let notify = {
                     user: ref.inviter,
                     type: 1000,
-                    message_en: 'Conratulations, Someone has registered using your code and you got 10 Units.',
-                    message_ar: 'مبروك ، قام احدهم التسجيل باستخدام الكود الخاص بك و حصلت علي ١٠ وحدات.'
+                    message_en: `Conratulations, ${create.firstName} has registered using your code and you got 10 Units.`,
+                    message_ar: `مبروك ، قام ${create.firstName} التسجيل باستخدام الكود الخاص بك و حصلت علي ١٠ وحدات.`
                 }
 
                 notification.cashBackNotificationForRef(notify)
@@ -216,11 +216,16 @@ let register = async (req, res) => {
                 await db.notifications.create({
                     data: {
                         sender_id: 0,
-                        reciever_id: ref.inviter,
+                        user: {
+                            connect: {
+                                id: ref.inviter
+                            }
+                        },  
                         message_en: notify.message_en,
-                        message_ar: notify.message_ar,
+                        messgae_ar: notify.message_ar,
                         is_read: 0,
                         type: 10,
+                        direction: 0,
                         taps: 1,
                     }
                 })
@@ -485,7 +490,6 @@ let register = async (req, res) => {
                     taps: 1,
                 }
             })
-
         admin.messaging().send({
             token: fcm.toString(),
             notification: {

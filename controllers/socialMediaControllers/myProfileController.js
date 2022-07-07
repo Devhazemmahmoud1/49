@@ -1010,7 +1010,7 @@ let getTenderMales = async (req, res) => {
         }
     }
 
-    console.log(users)
+    console.log('Males= ' + users)
     return res.status(200).json(users)
 }
 
