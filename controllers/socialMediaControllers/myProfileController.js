@@ -936,7 +936,12 @@ let getTenderMales = async (req, res) => {
 
     let getUsers = await db.users.findMany({
         include: {
-            userPrivacy: true,
+            userPrivacy: {
+                where: {
+                    identifier: 8,
+                    value: (1).toString()
+                }
+            },
             userSettings: true,
         },
         skip: page == 1 ? 0 : parseInt(page * maxTender) - maxTender,
@@ -944,7 +949,7 @@ let getTenderMales = async (req, res) => {
     })
 
     let fillteredUsers = getUsers.filter((result) => {
-        return result.userSettings[7].value == 1
+        return result.userSettings != null
     })
 
     let latestFilter = fillteredUsers.filter((result) => {
@@ -1042,8 +1047,6 @@ let getTenderFemales = async (req, res) => {
     })
 
     console.log("Femalessss " + fillteredUsers)
-
-    return res.json(fillteredUsers)
 
     let latestFilter = fillteredUsers.filter((result) => {
         return result.userPrivacy[11].status == 1
