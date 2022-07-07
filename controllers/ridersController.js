@@ -1340,7 +1340,7 @@ let driverInformation = async (riderId) => {
 
 let getCurrentTrip = async (req, res) => {
 
-        var result = {}
+    var result = {}
       // check weather it is a user or a driver right here 
       if (req.user.accountType != 0) {
         if (req.user.isApproved != 0 && req.user.accountType != 0) {
@@ -1400,12 +1400,12 @@ let getCurrentTrip = async (req, res) => {
               result.currentTrip = checkTrip
               result.currentTrip.peerUserInfo = getUserInfo
               result.currentTrip.hasStarted = checkTrip.ride_status != 0 ? true : false
-              
+              result.riderInfo = driverInformation(checkTrip.rider_id)
+
             }
           }
         } else {
           // client ride
-
           let checkTrip = await db.ridesRequested.findFirst({
             where: {
               client_id: req.user.id,
@@ -1430,7 +1430,8 @@ let getCurrentTrip = async (req, res) => {
             result.currentTrip = checkTrip
             result.currentTrip.peerUserInfo = getUserInfo
             result.currentTrip.hasStarted = checkTrip.ride_status != 0 ? true : false
-            
+            result.riderInfo = driverInformation(checkTrip.rider_id)
+
           }
         }
       } else {
@@ -1458,7 +1459,7 @@ let getCurrentTrip = async (req, res) => {
           result.currentTrip = checkTrip
           result.currentTrip.peerUserInfo = getUserInfo
           result.currentTrip.hasStarted = checkTrip.ride_status != 0 ? true : false
-
+          result.riderInfo = driverInformation(checkTrip.rider_id)
         }
       }
 
