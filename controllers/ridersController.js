@@ -1500,7 +1500,7 @@ let getCurrentTrip = async (req, res) => {
           result.currentTrip = checkTrip
           result.currentTrip.peerUserInfo = getUserInfo
           result.currentTrip.hasStarted = checkTrip.ride_status != 0 ? true : false
-          result.riderInfo = driverInformation(checkTrip.rider_id)
+          result.riderInfo = await driverInformation(checkTrip.rider_id)
         }
       }
 
