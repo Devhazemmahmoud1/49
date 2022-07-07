@@ -1030,6 +1030,8 @@ let getTenderFemales = async (req, res) => {
         take: maxTender,
     })
 
+    console.log('users before filter', getUsers)
+
     let fillteredUsers = getUsers.filter((result) => {
         return result.userSettings[7].value == '2'
     })

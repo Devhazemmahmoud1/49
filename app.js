@@ -156,51 +156,53 @@ app.use(function (err, req, res, next) {
 global.sockets = {}
 global.io.on('connection', async (socket) => {
   if (socket.handshake.headers.authorization.includes('Bearer ')) {
-    if (socket.user.id != null) {
-      let userInfo = {
-        socket_id: socket.id,
-        firstName: socket.user.firstName,
-        lastName: socket.user.lastName,
-        user_id: socket.user.id,
-        userType: socket.user.accountType ?? 0, // if a driver or a normal user
-        isApproved: socket.user.isApproved, // is driver was approved
-        isReady: true, // driver trips status
-        status: socket.status ?? null, // driver status
-        token: socket.token,
-        freeTrip: false,
-        subscription: socket.subscription ?? null,
-        isPersonalAccount: socket.subscription != null ? socket.subscription.isPersonalAccount : null,
-        lastTrip: {
-          destinationAddress: null,
-          lat: null,
-          lng: null
-        },
-        currentLocation: {
-          lat: socket.handshake.headers.lat ?? null,
-          lng: socket.handshake.headers.lng ?? null,
-        },
-        currentTrip: socket.currentTrip != null ? socket.currentTrip : null
-      }
-
-      if (Object.keys(sockets).length != 0) {
-        console.log('passed Here')
-        for (sockett in sockets) {
-          if (sockets[sockett].user_id == socket.user.id) {
-            console.log('was there and deleted');
-            delete sockets[sockett]
-            sockets[socket.id] = userInfo
-          } else {
-            console.log('passed')
-            sockets[socket.id] = userInfo
-          }
-          break;
+    if (socket)  {
+      if (socket.user.id != null) {
+        let userInfo = {
+          socket_id: socket.id,
+          firstName: socket.user.firstName,
+          lastName: socket.user.lastName,
+          user_id: socket.user.id,
+          userType: socket.user.accountType ?? 0, // if a driver or a normal user
+          isApproved: socket.user.isApproved, // is driver was approved
+          isReady: true, // driver trips status
+          status: socket.status ?? null, // driver status
+          token: socket.token,
+          freeTrip: false,
+          subscription: socket.subscription ?? null,
+          isPersonalAccount: socket.subscription != null ? socket.subscription.isPersonalAccount : null,
+          lastTrip: {
+            destinationAddress: null,
+            lat: null,
+            lng: null
+          },
+          currentLocation: {
+            lat: socket.handshake.headers.lat ?? null,
+            lng: socket.handshake.headers.lng ?? null,
+          },
+          currentTrip: socket.currentTrip != null ? socket.currentTrip : null
         }
-      } else {
-        sockets[socket.id] = userInfo
-        console.log('passed Here Please')
+  
+        if (Object.keys(sockets).length != 0) {
+          console.log('passed Here')
+          for (sockett in sockets) {
+            if (sockets[sockett].user_id == socket.user.id) {
+              console.log('was there and deleted');
+              delete sockets[sockett]
+              sockets[socket.id] = userInfo
+            } else {
+              console.log('passed')
+              sockets[socket.id] = userInfo
+            }
+            break;
+          }
+        } else {
+          sockets[socket.id] = userInfo
+          console.log('passed Here Please')
+          console.log(sockets[socket.id])
+        }
         console.log(sockets[socket.id])
       }
-      console.log(sockets[socket.id])
     }
   }
 
