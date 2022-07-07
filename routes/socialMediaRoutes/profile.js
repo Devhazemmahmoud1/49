@@ -100,8 +100,8 @@ router.post('/upload-profile-picture', upload.array('attachments', 12), async (r
         }
 
         await sendBulkNotification(notify, getUser);
-
         return res.status(200).json(result)
+        
     } catch (e) {
         next(e)
     }

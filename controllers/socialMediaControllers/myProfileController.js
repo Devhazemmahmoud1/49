@@ -776,7 +776,11 @@ let getMainPage = async (req, res) => {
             user: {
                 include: {
                     userPrivacy: true,
-                    posts: true,
+                    posts: {
+                        include: {
+                            attachments: true,
+                        }
+                    },
                 }
             }
         },
