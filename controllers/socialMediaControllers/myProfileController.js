@@ -939,7 +939,7 @@ let getTenderMales = async (req, res) => {
             userPrivacy: true,
             userSettings: true,
         },
-        skip: page == 1 ? 0 : (page * maxTender) - maxTender,
+        skip: page == 1 ? 0 : parseInt(page * maxTender) - maxTender,
         take: maxTender,
     })
 
@@ -992,9 +992,10 @@ let getTenderMales = async (req, res) => {
             console.log('passed')
             item.isFriend = false;
             item.isFriendRequest = false;
-            if (Object.keys(sockets).length !== 0) {
+            if (Object.keys(sockets).length != 0) {
                 for (socket in sockets) {
                     if (sockets[socket].user_id == item.id) {
+                        console.log('someone is online')
                         item.recentlyActive = 1
                     } else {
                         item.recentlyActive = 0
@@ -1024,7 +1025,7 @@ let getTenderFemales = async (req, res) => {
             userSettings: true,
             userPrivacy: true,
         },
-        skip: page == 1 ? 0 : (page * maxTender) - maxTender,
+        skip: page == 1 ? 0 : parseInt(page * maxTender) - maxTender,
         take: maxTender,
     })
 
@@ -1054,10 +1055,11 @@ let getTenderFemales = async (req, res) => {
                 }
             })) != null
 
-            if (Object.keys(sockets).length !== 0) {
+            if (Object.keys(sockets).length != 0) {
                 console.log('passed 5')
                 for (socket in sockets) {
                     if (sockets[socket].user_id == item.id) {
+                        console.log('someone is online')
                         console.log('passed 3')
                         item.recentlyActive = 1
                     } else {
