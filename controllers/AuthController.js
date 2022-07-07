@@ -87,7 +87,6 @@ let register = async (req, res) => {
     });
 
     // check if user has already resigtered before.
-
     if (checkUser) {
         return res.status(403).json({
             error: {
@@ -195,7 +194,7 @@ let register = async (req, res) => {
             })
 
             if (checkHashCode) {
-                var ref =await db.ref.create({
+                var ref = await db.ref.create({
                     data: {
                         inviter: checkHashCode.id,
                         invited: create.id,
@@ -486,8 +485,6 @@ let register = async (req, res) => {
                     taps: 1,
                 }
             })
-
-        
 
         admin.messaging().send({
             token: fcm.toString(),

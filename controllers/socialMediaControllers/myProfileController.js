@@ -41,7 +41,7 @@ let getMyProfile = async (req, res) => {
 
     let driverRegister = await db.ride.findFirst({
         where: {
-            user_id: req.user.id,
+            user_id: req.user.id ?? 0,
             isApproved: 1
         }
     })
@@ -64,7 +64,7 @@ let getMyProfile = async (req, res) => {
 
     let loadingRegister = await db.loading.findFirst({
         where: {
-            user_id: req.user.id,
+            user_id: req.user.id ?? 0,
             isApproved: 1
         }
     })
@@ -1010,6 +1010,7 @@ let getTenderMales = async (req, res) => {
         }
     }
 
+    console.log(users)
     return res.status(200).json(users)
 }
 
@@ -1030,7 +1031,7 @@ let getTenderFemales = async (req, res) => {
     })
 
     let fillteredUsers = getUsers.filter((result) => {
-        return result.userSettings[7].value == 2
+        return result.userSettings[7].value == '2'
     })
     let latestFilter = fillteredUsers.filter((result) => {
         return result.userPrivacy[11].status == 1
@@ -1097,7 +1098,6 @@ let getTenderFemales = async (req, res) => {
     }
 
     console.log(users)
-
     return res.status(200).json(users)
 }
 
