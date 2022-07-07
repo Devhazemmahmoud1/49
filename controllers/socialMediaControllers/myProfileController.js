@@ -1023,7 +1023,12 @@ let getTenderFemales = async (req, res) => {
 
     let getUsers = await db.users.findMany({
         include: {
-            userSettings: true,
+            userSettings: {
+                where: {
+                    identifier: 8,
+                    value: 2
+                }
+            },
             userPrivacy: true,
         },
         skip: page == 1 ? 0 : parseInt(page * maxTender) - maxTender,
