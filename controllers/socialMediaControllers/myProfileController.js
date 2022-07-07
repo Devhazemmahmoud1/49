@@ -932,7 +932,7 @@ let getTenderMales = async (req, res) => {
 
     if (!page) page = 1;
 
-    let maxTender = 10
+    let maxTender = 1
 
     let getUsers = await db.users.findMany({
         include: {
@@ -1019,7 +1019,7 @@ let getTenderFemales = async (req, res) => {
 
     if (!page) page = 1;
 
-    let maxTender = 10
+    let maxTender = 1
 
     let getUsers = await db.users.findMany({
         include: {
