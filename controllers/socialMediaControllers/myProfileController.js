@@ -1080,6 +1080,7 @@ let getTenderFemales = async (req, res) => {
             if (Object.keys(sockets).length !== 0) {
                 for (socket in sockets) {
                     if (sockets[socket].user_id == item.id) {
+                        console.log('someone is online')
                         item.recentlyActive = 1
                     } else {
                         item.recentlyActive = 0
