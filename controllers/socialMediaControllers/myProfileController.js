@@ -1026,7 +1026,7 @@ let getTenderFemales = async (req, res) => {
             userSettings: {
                 where: {
                     identifier: 8,
-                    value: 2
+                    value: (2).toString()
                 }
             },
             userPrivacy: true,
