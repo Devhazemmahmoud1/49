@@ -1037,6 +1037,8 @@ let getTenderFemales = async (req, res) => {
         return result.userPrivacy[11].status == 1
     })
 
+    console.log('Females before filter' + latestFilter)
+
     let users = []
 
     for (item of latestFilter) {
