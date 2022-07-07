@@ -55,4 +55,11 @@ router.post('/upload-shipment',upload.array('attachments', 12), (req, res, next)
 /* Notifiction is required to send the pending requests to the other agents */
 //router.get('');
 
+
+
+/* Loading dashboard */
+router.get('/my-loading-profile', guard, autoCatch(loading.myDashboard))
+
+router.delete('/delete-loading/agent', guard, autoCatch( loading.deleteLoadingAgent ))
+
 module.exports = router

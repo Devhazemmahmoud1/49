@@ -7,8 +7,8 @@ generator client {
 
 datasource db {
   provider = "mysql"
-  url      = "mysql://root:root@localhost:3306/fourtynine?schema=public"
-  //url      = "mysql://49hub1:Database49hub@64.225.101.68:3306/fourtynine?schema=public"
+  //url      = "mysql://root:root@localhost:3306/fourtynine?schema=public"
+  url      = "mysql://49hub1:Database49hub@64.225.101.68:3306/fourtynine?schema=public"
 }
 
 model Admins {
@@ -29,7 +29,7 @@ model Users {
   phone            String               @db.VarChar(255)
   password         String               @db.VarChar(255)
   is_locked        Int                  @default(0)
-  ref_number       String?               @db.VarChar(255)
+  ref_number       String?              @db.VarChar(255)
   device_id        String?              @db.VarChar(100)
   fcm              String?              @db.VarChar(300)
   countryCode      String?
@@ -397,9 +397,11 @@ model loading {
   id                Int                  @id @default(autoincrement())
   user_id           Int
   carModel          String
+  carType           String?
   lng               String
   lat               String
   hashCode          String
+  isApproved        Int                  @default(0)
   category_id       Int
   loadingAttachment loadingAttachments[]
   created_at        DateTime             @default(now())
@@ -419,12 +421,14 @@ model loadingAttachments {
 model loadingRequests {
   id         Int                         @id @default(autoincrement())
   client_id  Int
-  hash       String
-  fromLng    String
-  fromLat    String
-  toLng      String
-  toLat      String
-  date       String
+  agent_id   Int
+  fromLng    String?
+  fromLat    String?
+  toLng      String?
+  toLat      String?
+  date       String?
+  total      Int 
+  isDone     Int
   created_at DateTime                    @default(now())
   updated_at DateTime                    @updatedAt
   photos     loadingShippingAttachment[]

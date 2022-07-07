@@ -19,6 +19,45 @@ var addRider = async (request, response) => {
     }
 
 
+    // check if the user has registered before
+
+    let checkRider = await db.ride.findFirst({
+        where: {
+            user_id: req.user.id
+        }
+    })
+
+    if (checkRider) {
+        return res.status(403).json({
+            error: {
+                error_en: 'You cannot register in this section.',
+                error_ar: 'You cannot register in this section.'
+            }
+        })
+    }
+
+    let checkLoading = await db.loading.findFirst({
+        where: {
+            user_id: req.user.id
+        }
+    })
+
+    if (checkLoading) {
+        return res.status(403).json({
+            error: {
+                error_en: 'You cannot register in this section.',
+                error_ar: 'You cannot register in this section.'
+            }
+        })        
+    }
+
+
+    // same as health 'required'
+
+
+    // same as food 'required'
+
+
     // THIS IS FOR THE FLUTTER DEV
 
     if (!attachments) {
@@ -1112,6 +1151,7 @@ let deleteRider = async (req, res) => {
                 }
 
                 await db.$queryRaw`SET FOREIGN_KEY_CHECKS=0;`
+                await db.$queryRaw`DELETE FROM ridersAttachment WHERE rideId = ${user.id}`
                 await db.$queryRaw`DELETE FROM ride WHERE id = ${user.id}`
                 await db.$queryRaw`SET FOREIGN_KEY_CHECKS=1;`
 

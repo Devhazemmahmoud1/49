@@ -5,9 +5,9 @@ const db = new PrismaClient();
 
 /* Make a new loading according to the giving informarion */
 let makeNewLoading = async (req, res) => {
-    const { carModel, lng, lat , subCategory_id, attachments} = req.body
+    const { carModel, carType,  lng, lat , subCategory_id, attachments} = req.body
 
-    if (!carModel || !lng || !lat || !subCategory_id) {
+    if (!carModel || !carType || !lng || !lat || !subCategory_id) {
         return res.status(403).json({
             error: {
                 error_en: 'Please fill out all fields.',
@@ -17,14 +17,55 @@ let makeNewLoading = async (req, res) => {
     }
 
     try {
+
+        // check if they have registered before in another category
+        let checkRide = await db.ride.findFirst({
+            where: {
+                user_id: req.user.id
+            }
+        })
+
+        if (checkRide) {
+            return res.status(403).json({
+                error: {
+                    error_en: 'You cannot register in this section',
+                    error_ar: 'You cannot register in this section'
+                }
+            })
+        }
+
+
+        let checkLoading = await db.loading.findFirst({
+            where: {
+                user_id: req.user.id
+            }
+        })
+    
+        if (checkLoading) {
+            return res.status(403).json({
+                error: {
+                    error_en: 'You cannot register in this section.',
+                    error_ar: 'You cannot register in this section.'
+                }
+            })        
+        }
+
+        // same as food 
+
+
+        // same as health
+
+
+
         let addNewoad = await db.loading.create({
             data: {
                 user_id: req.user.id,
-                carModel: carModel,
+                carModel: carModel.toString(),
+                carType: carType.toString(),
                 lng: lng.toString(),
                 lat: lat.toString(),
                 category_id: parseInt(subCategory_id),
-                hashCode: '99'
+                hashCode: ''
             }
         })
 
@@ -116,6 +157,128 @@ let createNewLoadingRequest = async (request, response) => {
     })
 }
 
+/* Show my own DashBoard */
+let myDashboard = async (req, res) => {
 
+    // check if im register and approved 
 
-module.exports = { makeNewLoading, createNewLoadingRequest }
+    let check = await db.loading.findFirst({
+        where: {
+            user_id: req.user.id,
+            isApproved: 1,
+        }
+    })
+
+    if (!check ) {
+        return res.status(403).json({
+            error: {
+                error_en: 'You are not approved as an agent yet.',
+                error_ar: 'You are not approved as an agent yet.'
+            }
+        })
+    }
+
+    let myTrips = await db.loadingRequests.findMany({
+        where: {
+            isDone: 1,
+            agent_id: req.user.id
+        },
+        include: {
+            photos: true,
+        }
+    })
+
+    for (item of myTrips) {
+        item.clientInfo = await db.users.findFirst({
+            where: {
+                id: item.client_id
+            }
+        })
+    }
+
+    return res.json({
+        myTrips: myTrips,
+        totalTrips: await db.loadingRequests.aggregate({
+            where: {
+                agent_id: req.user.id
+            },
+            _count: {
+                id: true
+            }
+        }),
+        registerForm: await db.loading.findFirst({
+            where: {
+                user_id: req.user.id,
+                isDone: 1,
+            },
+            include: {
+                loadingAttachment: true,
+            }
+        }),
+        profit: await db.loadingRequests.aggregate({
+            where: {
+                agent_id: req.user.id,
+                isDone: 1
+            },
+            _sum: {
+                total: true
+            }
+        }),
+    })
+}
+
+let deleteLoadingAgent = async (req, res) => {
+    const { password } = req.body
+
+    if (!password) {
+        return res.send('No password provided')
+    }
+
+    if (req.user) {
+        let getUser = await db.users.findFirst({
+            where: {
+                id: req.user.id
+            }
+        })
+
+        const validPassword = hash.compareSync(password, getUser.password);
+
+        if (validPassword) {
+
+            try {
+                let user = await db.loading.findFirst({
+                    where: {
+                        user_id: req.user.id
+                    }
+                })
+
+                if (!user) {
+                    return res.status(403).send('User is not an agent')
+                }
+
+                await db.$queryRaw`SET FOREIGN_KEY_CHECKS=0;`
+                await db.$queryRaw`DELETE FROM loadingAttachments WHERE loading_id = ${user.id}`
+                await db.$queryRaw`DELETE FROM loading WHERE id = ${user.id}`
+                await db.$queryRaw`SET FOREIGN_KEY_CHECKS=1;`
+
+                return res.send('You account has been deleted')
+
+            } catch (e) {
+                console.log(e)
+                return;
+            }
+        } else {
+            res.status(403).json({
+                error: {
+                    error_en: 'Password is incorrect',
+                    error_ar: 'كلمه المرور غير صحيحه.'
+                }
+            })
+        }
+
+    } else {
+        return res.send('Something went wrong')
+    }
+}
+
+module.exports = { makeNewLoading, createNewLoadingRequest, myDashboard, deleteLoadingAgent }
