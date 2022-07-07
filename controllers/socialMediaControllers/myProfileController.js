@@ -1033,6 +1033,11 @@ let getTenderFemales = async (req, res) => {
     let fillteredUsers = getUsers.filter((result) => {
         return result.userSettings[7].value == 2
     })
+
+    console.log("Femalessss " + fillteredUsers)
+
+    return res.json(fillteredUsers)
+
     let latestFilter = fillteredUsers.filter((result) => {
         return result.userPrivacy[11].status == 1
     })
