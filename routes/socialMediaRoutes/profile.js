@@ -144,6 +144,14 @@ router.post('/upload-cover-picture', upload.array('attachments', 12), async (req
                     type: 1
                 }
             })
+
+            await db.gallary.create({
+                data: {
+                    user_id: parseInt(req.body.id),
+                    post_id: createNewAd.id,
+                    url: item.filename
+                }
+            })
         }
 
         let getUser = await db.users.findFirst({

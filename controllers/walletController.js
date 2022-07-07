@@ -18,11 +18,20 @@ let getWallet = async (req, res) => {
                 _sum: {
                     amount: true
                 }
-            }))
+            })),
+            totalPayment: 0,
+            //(await db.subscriptions.aggregate({
+            //     where: {
+            //         user_id: req.user.id
+            //     },
+            //     _sum: {
+            //         p
+            //     }
+            // }))
         })
     } else {
         return res.status(403).send('User is not provided in the database, or not found , or not logged in.')
     }
 }
 
-module.exports = {getWallet,}
+module.exports = { getWallet }
