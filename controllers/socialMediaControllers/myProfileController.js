@@ -936,13 +936,13 @@ let getTenderMales = async (req, res) => {
 
     let getUsers = await db.users.findMany({
         include: {
-            userPrivacy: {
+            userPrivacy: true,
+            userSettings: {
                 where: {
                     identifier: 8,
                     value: (1).toString()
                 }
             },
-            userSettings: true,
         },
         skip: page == 1 ? 0 : parseInt(page * maxTender) - maxTender,
         take: maxTender,
