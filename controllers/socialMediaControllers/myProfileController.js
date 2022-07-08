@@ -947,6 +947,8 @@ let getTenderMales = async (req, res) => {
         Malelist.push(item.user_id)
     }
 
+    console.log(Malelist)
+
     let getUsers = await db.users.findMany({
         where: {
             id: {
