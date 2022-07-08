@@ -1226,7 +1226,7 @@ let makeRequest = async (req, res) => {
         }
 
         if (checkIfAppOweMeMoney.refundStorage > 0) {
-            if (checkIfAppOweMeMoney.FreeClicksStorage >= 250) {
+            if (checkIfAppOweMeMoney.FreeClicksStorage >= 500) {
                 if (parseInt(req.user.providerCashBack) > 0) {
                     if (parseInt(req.user.providerCashBack) - parseInt(getStep.step) >= 0) {
                         await db.users.update({

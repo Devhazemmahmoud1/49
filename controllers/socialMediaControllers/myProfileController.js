@@ -941,6 +941,8 @@ let getTenderMales = async (req, res) => {
         take: maxTender,
     })
 
+    console.log(listOfMales)
+
     for (item of listOfMales) {
         Malelist.push(item.id)
     }
