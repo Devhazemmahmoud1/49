@@ -941,10 +941,8 @@ let getTenderMales = async (req, res) => {
         take: maxTender,
     })
 
-    console.log(listOfMales)
-
     for (item of listOfMales) {
-        Malelist.push(item.id)
+        Malelist.push(item.user_id)
     }
 
     let getUsers = await db.users.findMany({
@@ -1040,7 +1038,7 @@ let getTenderFemales = async (req, res) => {
     })
 
     for (item of listOfMales) {
-        feMalelist.push(item.id)
+        feMalelist.push(item.user_id)
     }
 
     let getUsers = await db.users.findMany({
