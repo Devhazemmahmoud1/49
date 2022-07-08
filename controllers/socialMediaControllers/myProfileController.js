@@ -957,6 +957,8 @@ let getTenderMales = async (req, res) => {
         take: maxTender,
     })
 
+    console.log(getUsers)
+
     let latestFilter = getUsers.filter((result) => {
         return result.userPrivacy[11].status = 1
     })
