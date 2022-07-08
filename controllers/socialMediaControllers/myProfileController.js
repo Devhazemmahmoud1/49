@@ -948,7 +948,7 @@ let getTenderMales = async (req, res) => {
     let getUsers = await db.users.findMany({
         where: {
             id: {
-                in: [Malelist]
+                in: Malelist
             }
         },
         skip: page == 1 ? 0 : parseInt(page * maxTender) - maxTender,
@@ -1044,7 +1044,7 @@ let getTenderFemales = async (req, res) => {
     let getUsers = await db.users.findMany({
         where: {
             id: {
-                in: [feMalelist]
+                in: feMalelist
             }
         },
         include: {
