@@ -929,30 +929,33 @@ let getMyAbout = async (req, res) => {
 
 let getTenderMales = async (req, res) => {
     let { page } = req.query
-
     if (!page) page = 1;
-
     let maxTender = 1
-
-    let getUsers = await db.users.findMany({
-        include: {
-            userPrivacy: true,
-            userSettings: {
-                where: {
-                    identifier: 8,
-                    value: (1).toString()
-                }
-            },
+    var Malelist = []
+    let listOfMales = await db.userSettings.findMany({
+        where: {
+            identifier: 8,
+            value: "1"
         },
         skip: page == 1 ? 0 : parseInt(page * maxTender) - maxTender,
         take: maxTender,
     })
 
-    let fillteredUsers = getUsers.filter((result) => {
-        return result.userSettings != null
+    for (item of listOfMales) {
+        Malelist.push(item.id)
+    }
+
+    let getUsers = await db.users.findMany({
+        where: {
+            id: {
+                in: [list]
+            }
+        },
+        skip: page == 1 ? 0 : parseInt(page * maxTender) - maxTender,
+        take: maxTender,
     })
 
-    let latestFilter = fillteredUsers.filter((result) => {
+    let latestFilter = getUsers.filter((result) => {
         return result.userPrivacy[11].status = 1
     })
 
@@ -1021,34 +1024,41 @@ let getTenderMales = async (req, res) => {
 
 let getTenderFemales = async (req, res) => {
     let { page } = req.query
-
     if (!page) page = 1;
-
     let maxTender = 1
+
+    var feMalelist = []
+    let listOfMales = await db.userSettings.findMany({
+        where: {
+            identifier: 8,
+            value: "2"
+        },
+        skip: page == 1 ? 0 : parseInt(page * maxTender) - maxTender,
+        take: maxTender,
+    })
+
+    for (item of listOfMales) {
+        feMalelist.push(item.id)
+    }
 
     let getUsers = await db.users.findMany({
         include: {
-            userSettings: {
-                where: {
-                    identifier: 8,
-                    value: (2).toString()
-                }
-            },
+            userSettings: true,
             userPrivacy: true,
         },
         skip: page == 1 ? 0 : parseInt(page * maxTender) - maxTender,
         take: maxTender,
     })
 
-    console.log('users before filter', getUsers)
+    // console.log('users before filter', getUsers)
 
-    let fillteredUsers = getUsers.filter((result) => {
-        return result.userSettings != null
-    })
+    // let fillteredUsers = getUsers.filter((result) => {
+    //     return result.userSettings != null
+    // })
 
     console.log("Femalessss " + fillteredUsers)
 
-    let latestFilter = fillteredUsers.filter((result) => {
+    let latestFilter = getUsers.filter((result) => {
         return result.userPrivacy[11].status == 1
     })
 
