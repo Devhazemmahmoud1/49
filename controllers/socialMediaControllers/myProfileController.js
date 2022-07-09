@@ -944,6 +944,13 @@ let getTenderMales = async (req, res) => {
     console.log(listOfMales)
 
     for (item of listOfMales) {
+        let checkUser = await db.users.findFirst({
+            where: {
+                id: item.user_id
+            }
+        })
+
+        if (! checkUser) continue;
         Malelist.push(item.user_id)
     }
 
@@ -962,7 +969,7 @@ let getTenderMales = async (req, res) => {
     console.log(getUsers)
 
     let latestFilter = getUsers.filter((result) => {
-        return result.userPrivacy[11].status = 1
+        return result.userPrivacy[11].status == 1
     })
 
     let users = []
