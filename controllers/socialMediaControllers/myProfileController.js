@@ -941,6 +941,7 @@ let getTenderMales = async (req, res) => {
         take: maxTender,
     })
 
+    console.log('op 0')
     console.log(listOfMales)
 
     for (item of listOfMales) {
@@ -954,6 +955,7 @@ let getTenderMales = async (req, res) => {
         Malelist.push(item.user_id)
     }
 
+    console.log('op 1')
     console.log(Malelist)
 
     let getUsers = await db.users.findMany({
@@ -969,6 +971,7 @@ let getTenderMales = async (req, res) => {
         take: maxTender,
     })
 
+    console.log("op 2")
     console.log(getUsers)
 
     let latestFilter = getUsers.filter((result) => {
@@ -976,9 +979,14 @@ let getTenderMales = async (req, res) => {
         return result.userPrivacy[11].status == 1
     })
 
+    console.log('op 4')
+    console.log(latestFilter)
+
     let users = []
 
     for (item of latestFilter) {
+        console.log('op 5')
+        console.log(item)
         if (req.user) {
             if (item.id == req.user.id) continue;
             item.isFriend = (await db.friends.findFirst({
@@ -1036,6 +1044,7 @@ let getTenderMales = async (req, res) => {
     }
 
     console.log('Males= ' + users)
+    console.log(`${users}`)
     return res.status(200).json(users)
 }
 
