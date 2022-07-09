@@ -962,6 +962,9 @@ let getTenderMales = async (req, res) => {
                 in: Malelist
             }
         },
+        include: {
+            userPrivacy: true,
+        },
         skip: page == 1 ? 0 : parseInt(page * maxTender) - maxTender,
         take: maxTender,
     })
