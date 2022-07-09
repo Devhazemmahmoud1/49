@@ -969,6 +969,7 @@ let getTenderMales = async (req, res) => {
     console.log(getUsers)
 
     let latestFilter = getUsers.filter((result) => {
+        console.log(result)
         return result.userPrivacy[11].status == 1
     })
 
