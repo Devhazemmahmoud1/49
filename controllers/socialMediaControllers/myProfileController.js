@@ -935,7 +935,7 @@ let getTenderMales = async (req, res) => {
     let listOfMales = await db.userSettings.findMany({
         where: {
             identifier: 8,
-            value: "1"
+            value: (1).toString()
         },
         skip: page == 1 ? 0 : parseInt(page * maxTender) - maxTender,
         take: maxTender,
