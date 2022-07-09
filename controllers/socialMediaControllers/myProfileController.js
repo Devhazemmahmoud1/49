@@ -930,7 +930,7 @@ let getMyAbout = async (req, res) => {
 let getTenderMales = async (req, res) => {
     var { page } = req.query
     if (!page) page = 1;
-    let maxTender = 1
+    let maxTender = 3
     var Malelist = []
     let listOfMales = await db.userSettings.findMany({
         where: {
