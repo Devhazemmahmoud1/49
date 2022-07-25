@@ -928,67 +928,46 @@ let getMyAbout = async (req, res) => {
 }
 
 let getTenderMales = async (req, res) => {
-    var { page } = req.query
-    //if (!page) page = 1;
-    let hello = 'world'
-    let maxTender = 3
-    var Malelist = []
+    let { page } = req.query
+    if (!page) page = 1;
+    let maxTender = 2
+    var malelist = []
     let listOfMales = await db.userSettings.findMany({
         where: {
             identifier: 8,
-            value: (1).toString()
+            value: "1"
         },
         skip: page == 1 ? 0 : parseInt(page * maxTender) - maxTender,
         take: maxTender,
+        orderBy: {
+            created_at: 'desc'
+        }
     })
 
-    console.log('op 0')
-    console.log(listOfMales)
 
     for (item of listOfMales) {
-        let checkUser = await db.users.findFirst({
-            where: {
-                id: item.user_id
-            }
-        })
-
-        if (! checkUser) continue;
-        Malelist.push(item.user_id)
+        malelist.push(item.user_id)
     }
 
-    console.log('op 1')
-    console.log(Malelist)
-
+    console.log(malelist)
     let getUsers = await db.users.findMany({
         where: {
             id: {
-                in: Malelist
+                in: malelist
             }
         },
         include: {
+            userSettings: true,
             userPrivacy: true,
-        },
-        skip: page == 1 ? 0 : parseInt(page * maxTender) - maxTender,
-        take: maxTender,
+        }
     })
-
-    console.log("op 2")
-    console.log(getUsers)
-
-    let latestFilter = getUsers.filter((result) => {
-        console.log(result)
-        return result.userPrivacy[11].status == 1
-    })
-
-    console.log('op 4')
-    console.log(latestFilter)
 
     let users = []
 
-    for (item of latestFilter) {
-        console.log('op 5')
+    for (item of getUsers) {
         console.log(item)
         if (req.user) {
+            console.log(req.user.id)
             if (item.id == req.user.id) continue;
             item.isFriend = (await db.friends.findFirst({
                 where: {
@@ -999,15 +978,16 @@ let getTenderMales = async (req, res) => {
 
             item.isFriendRequest = (await db.friendRequests.findFirst({
                 where: {
-                    friendRequestTo: item.id,
-                    user_id: req.user.id
+                    friendRequestTo: req.user.id,
+                    user_id: item.id
                 }
             })) != null
 
-            if (Object.keys(sockets).length !== 0) {
+            if (Object.keys(sockets).length != 0) {
                 console.log('passed 5')
                 for (socket in sockets) {
                     if (sockets[socket].user_id == item.id) {
+                        console.log('someone is online')
                         console.log('passed 3')
                         item.recentlyActive = 1
                     } else {
@@ -1021,12 +1001,11 @@ let getTenderMales = async (req, res) => {
             }
 
             users.push(item)
-
         } else {
             console.log('passed')
             item.isFriend = false;
             item.isFriendRequest = false;
-            if (Object.keys(sockets).length != 0) {
+            if (Object.keys(sockets).length !== 0) {
                 for (socket in sockets) {
                     if (sockets[socket].user_id == item.id) {
                         console.log('someone is online')
@@ -1042,19 +1021,18 @@ let getTenderMales = async (req, res) => {
 
             users.push(item)
         }
+
     }
 
-    console.log('Males= ' + users)
-    console.log(`${users}`)
+    console.log(users)
     return res.status(200).json(users)
 }
 
 let getTenderFemales = async (req, res) => {
     let { page } = req.query
     if (!page) page = 1;
-    let maxTender = 1
-
-    var feMalelist = []
+    let maxTender = 2
+    var malelist = []
     let listOfMales = await db.userSettings.findMany({
         where: {
             identifier: 8,
@@ -1062,44 +1040,35 @@ let getTenderFemales = async (req, res) => {
         },
         skip: page == 1 ? 0 : parseInt(page * maxTender) - maxTender,
         take: maxTender,
+        orderBy: {
+            created_at: 'desc'
+        }
     })
 
+
     for (item of listOfMales) {
-        feMalelist.push(item.user_id)
+        malelist.push(item.user_id)
     }
 
+    console.log(malelist)
     let getUsers = await db.users.findMany({
         where: {
             id: {
-                in: feMalelist
+                in: malelist
             }
         },
         include: {
             userSettings: true,
             userPrivacy: true,
-        },
-        skip: page == 1 ? 0 : parseInt(page * maxTender) - maxTender,
-        take: maxTender,
+        }
     })
-
-    // console.log('users before filter', getUsers)
-
-    // let fillteredUsers = getUsers.filter((result) => {
-    //     return result.userSettings != null
-    // })
-
-    console.log("Femalessss " + fillteredUsers)
-
-    let latestFilter = getUsers.filter((result) => {
-        return result.userPrivacy[11].status == 1
-    })
-
-    console.log('Females before filter' + latestFilter)
 
     let users = []
 
-    for (item of latestFilter) {
+    for (item of getUsers) {
+        console.log(item)
         if (req.user) {
+            console.log(req.user.id)
             if (item.id == req.user.id) continue;
             item.isFriend = (await db.friends.findFirst({
                 where: {

@@ -52,7 +52,7 @@ var paymob = require('./routes/payments/PayMob');
 var packages = require('./routes/packages')
 var app = express();
 
-var paths = '/etc/letsencrypt/live/49backend.com';
+//var paths = '/etc/letsencrypt/live/49backend.com';
 
 // Create the http server
 
@@ -83,15 +83,14 @@ global.io = socketio(server, {
     callback(null, true);
   },
   cors: {
-    origin: "http://localhost:3000",
+    origin: "https://49hub.com",
     methods: ["GET", "POST"],
   }
 });
 
-app.use((req, res, next) => {
-  req.io = io;
-  return next();
-});
+var cors = require('cors');
+app.use(cors({ origin: "*", optionsSuccessStatus: 200 }));
+
 
 // Add Access Control Allow Origin headers
 app.use((req, res, next) => {
@@ -422,6 +421,11 @@ io.use(async (socket, next) => {
     console.log("socket cant connect because => " + e.toString())
     next(Error(e.toString()))
   }
+});
+
+app.use((req, res, next) => {
+  req.io = io;
+  return next();
 });
 
 module.exports = { app, server }

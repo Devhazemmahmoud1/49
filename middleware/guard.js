@@ -6,7 +6,9 @@ module.exports = ((req, res, next) => {
 
         var authorization = req.headers.authorization
         try {
-            if (authorization == "Bearer NO TOKEN" || !authorization) {
+            console.log(authorization)
+            if (authorization == "Bearer NO TOKEN" || !authorization || authorization == "Bearer") {
+                //eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6MiwiaWF0IjoxNjU2MDg3NTI2LCJleHAiOjEzNzAyNTUyMTkyfQ.5zVZhbOKPUcZeApPeuZm8zngd_t9CgVO3g4fGm-Nji8
                 req.user = null;
                 console.log("this access done with No Token ! provided !")
                 next()
@@ -53,6 +55,7 @@ module.exports = ((req, res, next) => {
                 }
             }
         } catch (e) {
+            console.log(e)
             return res.status(401).send('unauthorized');
         }
 
